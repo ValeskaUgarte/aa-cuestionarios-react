@@ -253,20 +253,30 @@ export const eliminarAsignatura = (id) => {
 };
 
 // ⭐ UNICA DECLARACIÓN DE getAsignaturas - eliminé la duplicada
-// Consulta la API real (json-server). Si no responde (ej: se está
-// "despertando" en Render, o no tienes conexión), usa un respaldo
-// local para que la app no se rompa.
+// IMPORTANTE: a diferencia de los reportes, crearAsignatura/editarAsignatura/
+// eliminarAsignatura NUNCA escriben en la API real (solo en Local Storage).
+// Por eso esta función NO debe intentar leer de la API: si lo hiciera y
+// esa API respondiera cualquier cosa (aunque fuera vieja o vacía), las
+// asignaturas recién creadas por el admin desaparecerían de la vista,
+// porque nunca llegaron a esa API. Se usa siempre Local Storage + banco
+// estático, que es donde realmente vive esta información.
 export function getAsignaturas() {
-  return fetch(`${API_URL}/asignaturas`)
-    .then(r => r.json())
-    .catch(() => {
-      const delAdmin = getAsignaturasLS();
-      const delArchivo = ASIGNATURAS.map(({ preguntas, ...rest }) => ({
-        ...rest,
-        totalPreguntas: preguntas.length,
-      }));
-      return [...delArchivo, ...delAdmin];
-    });
+  const delAdmin = getAsignaturasLS();
+  const delArchivo = ASIGNATURAS.map(({ preguntas, ...rest }) => ({
+    ...rest,
+    totalPreguntas: preguntas.length,
+  }));
+  // Las asignaturas creadas desde el Admin no traen totalPreguntas de
+  // fábrica: lo calculamos contando cuántas preguntas guardadas en
+  // Local Storage apuntan a esa asignatura (por asignaturaId).
+  const preguntasAdmin = getPreguntasLS();
+  const delAdminConTotal = delAdmin.map(a => ({
+    ...a,
+    totalPreguntas: preguntasAdmin.filter(
+      p => p.asignaturaId === a.key || p.asignatura === a.key
+    ).length,
+  }));
+  return Promise.resolve([...delArchivo, ...delAdminConTotal]);
 }
 
 // ⭐ UNICA DECLARACIÓN DE getPreguntasPorAsignatura

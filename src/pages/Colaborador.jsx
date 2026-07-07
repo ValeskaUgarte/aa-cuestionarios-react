@@ -12,6 +12,20 @@ const MAX_PREGUNTA = 300;
 const MAX_OPCION = 120;
 const MAX_EXPLICACION = 500;
 const MAX_UNIDAD = 40;
+const MAX_EXTRA = 4000;
+
+// Mismas plantillas que en Admin.jsx (ver comentario allá), para que
+// un colaborador también pueda agregar tablas o consolas simuladas.
+const PLANTILLA_TABLA = `<table class="subnet-table">
+  <tr><th>Columna 1</th><th>Columna 2</th></tr>
+  <tr><td>Dato A</td><td>Dato B</td></tr>
+  <tr><td>Dato C</td><td>Dato D</td></tr>
+</table>`;
+
+const PLANTILLA_CONSOLA = `<div class="terminal-box">
+$ comando de ejemplo
+salida simulada de la consola...
+</div>`;
 
 //HOOKS Autenticación y navegación
 export default function Colaborador() {
@@ -39,7 +53,8 @@ export default function Colaborador() {
     dificultad: 'easy', 
     unidad: '', 
     asignaturaId: '', 
-    explicacion: '' 
+    explicacion: '',
+    extra: ''
   });
   const [msgManual, setMsgManual] = useState('');
 
@@ -251,6 +266,10 @@ REGLAS:
       setMsgManual(`La explicación no puede superar los ${MAX_EXPLICACION} caracteres.`);
       return;
     }
+    if (formP.extra.length > MAX_EXTRA) {
+      setMsgManual(`El contenido extra no puede superar los ${MAX_EXTRA} caracteres.`);
+      return;
+    }
 
     try {
       // Buscar la asignatura seleccionada
@@ -285,7 +304,8 @@ REGLAS:
         dificultad: 'easy', 
         unidad: '', 
         asignaturaId: '', 
-        explicacion: '' 
+        explicacion: '',
+        extra: ''
       });
       
       setTimeout(() => setMsgManual(''), 3000);
@@ -557,6 +577,43 @@ REGLAS:
                 maxLength={MAX_EXPLICACION}
               />
               <span style={{ fontSize: '0.75rem', color: '#8a7e9a' }}>{formP.explicacion.length}/{MAX_EXPLICACION}</span>
+            </div>
+
+            {/* Contenido extra: tabla o consola simulada (opcional) */}
+            <div className="form-group">
+              <label className="input-label">🖥️ Contenido extra (tabla o consola, opcional)</label>
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setFormP(f => ({ ...f, extra: (f.extra ? f.extra + '\n' : '') + PLANTILLA_TABLA }))}
+                >
+                  + Insertar tabla
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setFormP(f => ({ ...f, extra: (f.extra ? f.extra + '\n' : '') + PLANTILLA_CONSOLA }))}
+                >
+                  + Insertar consola
+                </button>
+              </div>
+              <textarea
+                className="input"
+                rows={4}
+                value={formP.extra}
+                onChange={e => setFormP(f => ({ ...f, extra: e.target.value }))}
+                placeholder="Usa los botones de arriba para insertar una plantilla, o pega tu propio HTML…"
+                maxLength={MAX_EXTRA}
+                style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
+              />
+              <span style={{ fontSize: '0.75rem', color: '#8a7e9a' }}>{formP.extra.length}/{MAX_EXTRA}</span>
+              {formP.extra && (
+                <div style={{ marginTop: '0.6rem' }}>
+                  <span className="input-label" style={{ marginBottom: '0.3rem' }}>Vista previa</span>
+                  <div className="quiz-extra" dangerouslySetInnerHTML={{ __html: formP.extra }} />
+                </div>
+              )}
             </div>
             
             <button className="btn btn-primary" onClick={guardarPreguntaManual}>

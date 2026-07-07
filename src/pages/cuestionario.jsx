@@ -7,6 +7,21 @@ import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 import './cuestionario.css';
 
+// Keys de las asignaturas que ya tienen su tarjeta escrita a mano más
+// abajo en este archivo. Cualquier asignatura que llegue desde
+// getAsignaturas() y NO esté en esta lista fue creada dinámicamente
+// desde el panel de administración, así que se renderiza aparte
+// (ver bloque "ASIGNATURAS CREADAS POR EL ADMINISTRADOR").
+const KEYS_ESTATICAS = [
+  'administracion', 'algebra', 'backend', 'bd_estructurados', 'bd_no_estructurados',
+  'chino', 'coreano', 'frontend', 'funciones_matrices', 'fundamentos_bd',
+  'hardware_software', 'ingenieria_software', 'ingles_avanzado', 'ingles_basico',
+  'ingles_intermedio', 'japones', 'lenguaje_css', 'lenguaje_javascript',
+  'lenguaje_python', 'linux', 'metodologia_agil', 'mobile_iot',
+  'modelamiento_informaticas', 'prog_html', 'seguridad-examen',
+  'seguridad_informacion', 'sistemas_operativos',
+];
+
 // ESTADOS
 export default function Cuestionario() {
   const [asignaturas, setAsignaturas] = useState([]);  // Lista de asignaturas
@@ -517,6 +532,37 @@ export default function Cuestionario() {
                 </button>
               )}
               </div>
+
+            {/* ASIGNATURAS CREADAS POR EL ADMINISTRADOR
+                Cualquier asignatura nueva creada desde el panel de Admin
+                (que no esté en KEYS_ESTATICAS) se pinta acá, de forma
+                dinámica, con los mismos datos que ingresó el admin
+                (nombre, descripción, color) */}
+            {asignaturas
+              .filter(a => !KEYS_ESTATICAS.includes(a.key))
+              .map(a => (
+                <div
+                  key={a.key}
+                  className={`subject-card${desactivadas.includes(a.key) ? ' subject-disabled' : ''}`}
+                  id={`card-${a.key}`}
+                  style={{ '--card-accent': a.color || undefined }}
+                  onClick={() => irAlQuiz(a.key)}
+                >
+                  <div className="subject-name">{a.nombre}</div>
+                  <div className="subject-meta">{a.descripcion}</div>
+                  <div><span className="coming-badge">
+                    {a.totalPreguntas > 0 ? `${a.totalPreguntas} preguntas` : 'Aún sin preguntas'}
+                  </span></div>
+                  {usuario && (
+                    <button
+                      className={`fav-btn ${usuario.favoritas?.includes(a.key) ? 'fav-activa' : ''}`}
+                      onClick={(e) => { e.stopPropagation(); toggleFavorita(a.key); }}
+                    >
+                      {usuario.favoritas?.includes(a.key) ? 'Guardada' : 'Guardar'}
+                    </button>
+                  )}
+                </div>
+              ))}
 
           </div>
 

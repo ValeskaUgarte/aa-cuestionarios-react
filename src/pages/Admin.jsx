@@ -20,7 +20,23 @@ const MAX_EXPLICACION = 500;
 const MAX_UNIDAD = 40;
 const MAX_NOMBRE_ASIG = 60;
 const MAX_DESC_ASIG = 150;
-const EMPTY_P = { pregunta: '', opciones: ['', '', '', ''], respuestaCorrecta: 0, dificultad: 'easy', unidad: '', asignaturaId: '', explicacion: '' };
+const MAX_EXTRA = 4000;
+
+// Plantillas listas para pegar y editar en el campo "Contenido extra".
+// Reutilizan las mismas clases CSS que ya usan las preguntas del banco
+// estático (ver Quiz.css: .terminal-box y .subnet-table), así que se
+// ven igual de bien sin tener que escribir el HTML/CSS desde cero.
+const PLANTILLA_TABLA = `<table class="subnet-table">
+  <tr><th>Columna 1</th><th>Columna 2</th></tr>
+  <tr><td>Dato A</td><td>Dato B</td></tr>
+  <tr><td>Dato C</td><td>Dato D</td></tr>
+</table>`;
+
+const PLANTILLA_CONSOLA = `<div class="terminal-box">
+$ comando de ejemplo
+salida simulada de la consola...
+</div>`;
+const EMPTY_P = { pregunta: '', opciones: ['', '', '', ''], respuestaCorrecta: 0, dificultad: 'easy', unidad: '', asignaturaId: '', explicacion: '', extra: '' };
 const EMPTY_A = { nombre: '', color: '#7c6dfa', descripcion: '' };
 
 // ESTADOS DEL COMPONENTE
@@ -39,7 +55,7 @@ export default function Admin() {
 
   // FUNCIONES AUXILIARES
   // Muestra un mensaje temporal (2.5 segundos)
-  function flash(txt) { setMsg(txt); setTimeout(() => setMsg(''), 2500); }
+  function flash(txt) { setMsg(txt); setTimeout(() => setMsg(''), 3200); }
 
   // CARGA DE DATOS Obtiene preguntas, asignaturas y reportes
   function cargar() {
@@ -72,6 +88,7 @@ export default function Admin() {
     if (preguntaLimpia.length > MAX_PREGUNTA) return flash(`La pregunta no puede superar los ${MAX_PREGUNTA} caracteres.`);
     if (form.opciones.some(o => o.length > MAX_OPCION)) return flash(`Cada opción no puede superar los ${MAX_OPCION} caracteres.`);
     if (form.explicacion.length > MAX_EXPLICACION) return flash(`La explicación no puede superar los ${MAX_EXPLICACION} caracteres.`);
+    if (form.extra.length > MAX_EXTRA) return flash(`El contenido extra no puede superar los ${MAX_EXTRA} caracteres.`);
     try {
       const asig = asignaturas.find(a => a.key === form.asignaturaId || a._id === form.asignaturaId);
       if (!asig) return flash('Asignatura no encontrada.');
@@ -106,7 +123,8 @@ export default function Admin() {
       dificultad: p.dificultad,
       unidad: p.unidad || '',
       asignaturaId: p.asignaturaId,
-      explicacion: p.explicacion || ''
+      explicacion: p.explicacion || '',
+      extra: p.extra || ''
     });
     setEditId(p._id || p.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -229,6 +247,47 @@ export default function Admin() {
                 <label className="input-label">Explicación</label>
                 <textarea className="input" rows={2} value={form.explicacion} onChange={e => setForm(f => ({ ...f, explicacion: e.target.value }))} placeholder="Explicación de la respuesta correcta…" maxLength={MAX_EXPLICACION} />
                 <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.explicacion.length}/{MAX_EXPLICACION}</span>
+              </div>
+
+              {/* Contenido extra: para preguntas que necesitan mostrar una
+                  tabla (ej: subnetting) o una simulación de consola.
+                  Se guarda como HTML y se muestra tal cual en el cuestionario. */}
+              <div className="form-group">
+                <label className="input-label">Contenido extra (tabla o consola, opcional)</label>
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setForm(f => ({ ...f, extra: (f.extra ? f.extra + '\n' : '') + PLANTILLA_TABLA }))}
+                  >
+                    + Insertar tabla
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setForm(f => ({ ...f, extra: (f.extra ? f.extra + '\n' : '') + PLANTILLA_CONSOLA }))}
+                  >
+                    + Insertar consola
+                  </button>
+                </div>
+                <textarea
+                  className="input"
+                  rows={4}
+                  value={form.extra}
+                  onChange={e => setForm(f => ({ ...f, extra: e.target.value }))}
+                  placeholder="Usa los botones de arriba para insertar una plantilla, o pega tu propio HTML…"
+                  maxLength={MAX_EXTRA}
+                  style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
+                />
+                <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.extra.length}/{MAX_EXTRA}</span>
+
+                {/* Vista previa: así se va a ver dentro del cuestionario */}
+                {form.extra && (
+                  <div style={{ marginTop: '0.6rem' }}>
+                    <span className="input-label" style={{ marginBottom: '0.3rem' }}>Vista previa</span>
+                    <div className="quiz-extra" dangerouslySetInnerHTML={{ __html: form.extra }} />
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: '0.6rem' }}>
