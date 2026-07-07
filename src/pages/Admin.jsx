@@ -7,7 +7,8 @@ import {
   getAsignaturas, getPreguntas,
   crearPregunta, editarPregunta, eliminarPregunta,
   crearAsignatura, eliminarAsignatura,
-  LISTA_ASIGNATURAS_ADMIN, getAsignaturasDesactivadas, toggleAsignaturaActiva
+  LISTA_ASIGNATURAS_ADMIN, getAsignaturasDesactivadas, toggleAsignaturaActiva,
+  getReportes, eliminarReporte
 } from '../services/api';
 
 // CONFIGURACIÓN INICIAL Valores por defecto para formularios
@@ -43,9 +44,9 @@ export default function Admin() {
   // CARGA DE DATOS Obtiene preguntas, asignaturas y reportes
   function cargar() {
   return Promise.all([
-    getPreguntas(), 
-    getAsignaturas(), 
-    fetch('http://localhost:3001/reportes').then(r => r.json())
+    getPreguntas(),
+    getAsignaturas(),
+    getReportes() // ahora viene de Local Storage, ya no depende de json-server
   ])
     .then(([p, a, r]) => { setPreguntas(p); setAsignaturas(a); setReportes(r); })
     .finally(() => setLoading(false));
@@ -335,13 +336,13 @@ export default function Admin() {
                           await eliminarPregunta(preg._id || preg.id);
                           flash('Pregunta eliminada ✓');
                         }
-                        await fetch(`http://localhost:3001/reportes/${r.id}`, { method: 'DELETE' });
+                        await eliminarReporte(r.id);
                         cargar();
                       }}>
                         🗑️ Eliminar pregunta
                       </button>
                       <button className="btn btn-ghost btn-sm" onClick={async () => {
-                        await fetch(`http://localhost:3001/reportes/${r.id}`, { method: 'DELETE' });
+                        await eliminarReporte(r.id);
                         cargar();
                       }}>
                         Descartar reporte

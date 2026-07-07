@@ -45,10 +45,6 @@
   object-fit: contain;
 }
 
-@media (max-width: 600px) {
-  .hero-img { display: none; }
-}
-
 .img-centrada {
   display: block;
   margin: 2rem auto;
@@ -236,94 +232,6 @@
   padding-top: 0.8rem;
 }
 
-/* RESPONSIVE Ajustes para móviles */
-@media (max-width: 600px) {
-  .hero-img {display: none;}
-
-  .hero-layout {
-    gap: 0.5rem;
-  }
-
-  .home-title {
-    font-size: 1rem;
-  }
-
-  .home-sub {
-    font-size: 0.75rem;
-  }
-
-  .footer-content {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-
-  .hero-img {
-    width: 120px;
-  }
-
-  .hero-content {
-    width: 100%;
-    text-align: center;
-  }
-
-  .home-title {
-    font-size: 1.5rem;
-    letter-spacing: -0.5px;
-  }
-
-  .home-sub {
-    font-size: 0.85rem;
-  }
-
-  .footer-content {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .hero-img {
-    width: 70px;
-    flex-shrink: 0;
-    display: block !important;
-  }
-
-  .hero-layout {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.3rem;
-  }
-
-  .footer-col h4,
-.footer-texto,
-.footer-links li,
-.footer-links a,
-.footer-bottom {
-  font-size: 0.7rem;
-}
-.home-footer {
-  padding: 0.8rem 1rem;
-}
-
-.footer-content {
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.footer-col h4 {
-  font-size: 0.7rem;
-  margin-bottom: 0.3rem;
-}
-
-.footer-texto,
-.footer-links li,
-.footer-links a {
-  font-size: 0.65rem;
-  line-height: 1.4;
-}
-
-.footer-bottom {
-  font-size: 0.65rem;
-  padding-top: 0.5rem;
-}
-
 /* CARRUSEL */
 .carrusel-wrap { margin: 2rem 0; text-align: center; }
 .carrusel-titulo { font-family: 'Lora', serif; font-size: 1.2rem; color: var(--text); margin-bottom: 1rem; }
@@ -338,8 +246,65 @@
 .carrusel-dots { display: flex; justify-content: center; gap: 0.4rem; margin-top: 1rem; }
 .carrusel-dot { width: 8px; height: 8px; border-radius: 50%; border: none; background: var(--border); cursor: pointer; transition: all 0.2s; }
 .carrusel-dot.activo { background: var(--accent); transform: scale(1.3); }
-@media (max-width: 600px) { .carrusel-track { gap: 0.5rem; } .carrusel-item { width: 120px; } }
 
+/* RESPONSIVE Ajustes para móviles (celular) */
+@media (max-width: 600px) {
+  /* Hero: imagen chica al lado del texto, en vez de desaparecer */
+  .hero-layout {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+  }
 
+  .hero-content {
+    width: 100%;
+    text-align: center;
+  }
 
+  .hero-img {
+    width: 70px;
+    flex-shrink: 0;
+    display: block;
+  }
+
+  .home-title {
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+  }
+
+  .home-sub {
+    font-size: 0.85rem;
+  }
+
+  /* Footer: 2 columnas en vez de 4, texto más chico */
+  .home-footer {
+    padding: 0.8rem 1rem;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .footer-col h4 {
+    font-size: 0.7rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .footer-texto,
+  .footer-links li,
+  .footer-links a {
+    font-size: 0.65rem;
+    line-height: 1.4;
+  }
+
+  .footer-bottom {
+    font-size: 0.65rem;
+    padding-top: 0.5rem;
+  }
+
+  /* Carrusel: tarjetas más angostas */
+  .carrusel-track { gap: 0.5rem; }
+  .carrusel-item { width: 120px; }
 }

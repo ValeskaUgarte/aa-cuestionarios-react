@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { getAsignaturas } from '../services/api';
+import { getAsignaturas, getReportes, API_URL } from '../services/api';
 import './Home.css';
 
 
@@ -87,11 +87,12 @@ export default function Home() {
   // Estado del carrusel — índice de la asignatura que se muestra
   const [carruselIdx, setCarruselIdx] = useState(0);
 
-  // EFECTO 2 Obtiene estadísticas desde la API externa en localhost:3001
+  // EFECTO 2 Obtiene estadísticas desde Local Storage
+  // (antes venían de json-server en localhost:3001, que no existe en producción)
   useEffect(() => {
     Promise.all([
-      fetch('http://localhost:3001/asignaturas').then(r => r.json()),
-      fetch('http://localhost:3001/reportes').then(r => r.json()),
+      getAsignaturas(),
+      getReportes(),
     ]).then(([asigs, reps]) => {
       const totalPreguntas = asigs.reduce((acc, a) => acc + (a.totalPreguntas || 0), 0);
       setStats({ asignaturas: asigs.length, preguntas: totalPreguntas, reportes: reps.length });
@@ -145,13 +146,13 @@ export default function Home() {
         <div className="api-section">
           <p className="api-titulo">API disponible</p>
           <div className="api-links">
-            <a href="http://localhost:3001/asignaturas" target="_blank" className="api-link">
+            <a href={`${API_URL}/asignaturas`} target="_blank" className="api-link">
               GET /asignaturas
             </a>
-            <a href="http://localhost:3001/reportes" target="_blank" className="api-link">
+            <a href={`${API_URL}/reportes`} target="_blank" className="api-link">
               GET /reportes
             </a>
-            <a href="http://localhost:3001" target="_blank" className="api-link">
+            <a href={API_URL} target="_blank" className="api-link">
               Ver API completa
             </a>
           </div>
@@ -209,9 +210,9 @@ export default function Home() {
           <div className="footer-col">
             <h4 className="footer-titulo">API</h4>
             <ul className="footer-links">
-              <li><a href="http://localhost:3001" target="_blank">API Principal</a></li>
-              <li><a href="http://localhost:3001/asignaturas" target="_blank">GET /asignaturas</a></li>
-              <li><a href="http://localhost:3001/reportes" target="_blank">GET /reportes</a></li>
+              <li><a href={API_URL} target="_blank">API Principal</a></li>
+              <li><a href={`${API_URL}/asignaturas`} target="_blank">GET /asignaturas</a></li>
+              <li><a href={`${API_URL}/reportes`} target="_blank">GET /reportes</a></li>
             </ul>
           </div>
 

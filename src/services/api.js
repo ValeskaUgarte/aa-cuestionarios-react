@@ -1,4 +1,14 @@
 // src/services/api.js
+
+// ══════════════════════════════════════════════════════════
+// URL de la API (json-server / server.cjs)
+// En desarrollo local usa http://localhost:3001.
+// En producción (Render) se toma de la variable de entorno
+// VITE_API_URL, que debe apuntar al servicio de Render donde
+// desplegaste server.cjs (ej: https://aa-cuestionarios-api.onrender.com)
+// ══════════════════════════════════════════════════════════
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 import preguntas_seguridad_examen from '../data/preguntas/seguridad_examen.js';
 import preguntas_seguridad_informacion from '../data/preguntas/seguridad_informacion.js';
 import preguntas_sistemas_operativos from '../data/preguntas/sistemas_operativos.js';
@@ -243,8 +253,11 @@ export const eliminarAsignatura = (id) => {
 };
 
 // ⭐ UNICA DECLARACIÓN DE getAsignaturas - eliminé la duplicada
+// Consulta la API real (json-server). Si no responde (ej: se está
+// "despertando" en Render, o no tienes conexión), usa un respaldo
+// local para que la app no se rompa.
 export function getAsignaturas() {
-  return fetch('http://localhost:3001/asignaturas')
+  return fetch(`${API_URL}/asignaturas`)
     .then(r => r.json())
     .catch(() => {
       const delAdmin = getAsignaturasLS();
@@ -347,4 +360,53 @@ export function toggleAsignaturaActiva(key) {
     : [...desactivadas, key];               // estaba activa → la desactivamos
   localStorage.setItem(LS_KEY_DESACTIVADAS, JSON.stringify(actualizadas));
   return estabaDesactivada;
+}
+
+// ══════════════════════════════════════════════════════════
+// REPORTES (json-server / server.cjs)
+// Igual que getAsignaturas: primero intenta la API real; si no
+// responde, usa un respaldo en Local Storage para no perder el
+// reporte (ese respaldo NO se ve en el Admin de la API real,
+// solo evita que la app falle).
+// ══════════════════════════════════════════════════════════
+
+const LS_KEY_REPORTES = 'reportes_admin_fallback';
+
+function getReportesLS() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY_REPORTES) || '[]'); }
+  catch { return []; }
+}
+
+function setReportesLS(reportes) {
+  localStorage.setItem(LS_KEY_REPORTES, JSON.stringify(reportes));
+}
+
+// Devuelve todos los reportes guardados (usado en el panel de Admin)
+export function getReportes() {
+  return fetch(`${API_URL}/reportes`)
+    .then(r => r.json())
+    .catch(() => getReportesLS());
+}
+
+// Crea un nuevo reporte (usado cuando un estudiante reporta una pregunta)
+export function crearReporte(data) {
+  return fetch(`${API_URL}/reportes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+    .then(r => r.json())
+    .catch(() => {
+      const nuevo = { ...data, id: Date.now().toString() };
+      setReportesLS([...getReportesLS(), nuevo]);
+      return nuevo;
+    });
+}
+
+// Elimina un reporte por id (usado al descartar o resolver un reporte)
+export function eliminarReporte(id) {
+  return fetch(`${API_URL}/reportes/${id}`, { method: 'DELETE' })
+    .catch(() => {
+      setReportesLS(getReportesLS().filter(r => r.id !== id));
+    });
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { getPreguntasPorAsignatura, getAsignaturas } from '../services/api';
+import { getPreguntasPorAsignatura, getAsignaturas, crearReporte } from '../services/api';
 import { KEYS_IDIOMAS } from '../services/api';
 import './Quiz.css';
 
@@ -188,16 +188,13 @@ if (esIdioma && !nivelElegido) {
     return 'opcion';
   }
   async function enviarReporte(motivo) {
-  await fetch('http://localhost:3001/reportes', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      pregunta: pregunta.pregunta,
-      asignatura: asignaturaId,
-      motivo,
-      fecha: new Date().toISOString(),
-      usuario: 'anonimo'
-    })
+  // Guarda el reporte en Local Storage (antes iba a json-server, que no existe en producción)
+  await crearReporte({
+    pregunta: pregunta.pregunta,
+    asignatura: asignaturaId,
+    motivo,
+    fecha: new Date().toISOString(),
+    usuario: 'anonimo'
   });
   setReportando(false);
   setReporteEnviado(true);

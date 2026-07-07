@@ -9,4 +9,9 @@ server.get('/', (req, res) => {
 
 server.use(middlewares);
 server.use(router);
-server.listen(3001, () => console.log('API en http://localhost:3001'));
+
+// Render (y otros hosts) asignan el puerto dinámicamente mediante la
+// variable de entorno PORT. En local no existe esa variable, así que
+// usamos 3001 como antes para no romper el flujo de desarrollo.
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => console.log(`API en el puerto ${PORT}`));
