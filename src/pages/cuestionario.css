@@ -299,3 +299,24 @@ header p {
     margin-top: 0.3rem;
   }
 }
+/* ── ASIGNATURA DESACTIVADA (activar/desactivar cuestionarios) ── */
+.subject-disabled {
+  position: relative;
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(60%);
+}
+
+.subject-disabled::after {
+  content: 'Desactivado';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--danger, #ff4f6a);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}

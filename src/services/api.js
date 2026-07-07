@@ -280,3 +280,71 @@ export function getPreguntasPorAsignatura(key) {
 }
 
 export const getPreguntasByKey = (key) => getPreguntasPorAsignatura(key);
+
+// ══════════════════════════════════════════════════════════
+// ACTIVAR / DESACTIVAR CUESTIONARIOS
+// Permite que un administrador oculte temporalmente una
+// asignatura sin eliminarla. Se guarda solo la lista de
+// keys desactivadas en Local Storage.
+// ══════════════════════════════════════════════════════════
+
+const LS_KEY_DESACTIVADAS = 'asignaturas_desactivadas';
+
+// Lista maestra de asignaturas que aparecen como tarjetas en
+// Cuestionario.jsx. Se usa en el panel de administración para
+// mostrar el switch de activar/desactivar de cada una.
+export const LISTA_ASIGNATURAS_ADMIN = [
+  { key: 'seguridad_informacion', nombre: 'Seguridad de la Información' },
+  { key: 'sistemas_operativos', nombre: 'Sistemas Operativos' },
+  { key: 'seguridad-examen', nombre: 'Fundamentos de Seguridad de la Información' },
+  { key: 'algebra', nombre: 'Resolución de Problemas de Álgebra' },
+  { key: 'funciones_matrices', nombre: 'Funciones y Matrices' },
+  { key: 'metodologia_agil', nombre: 'Metodología de Desarrollo Ágil' },
+  { key: 'frontend', nombre: 'Programación Front End' },
+  { key: 'backend', nombre: 'Programación Back End' },
+  { key: 'bd_estructurados', nombre: 'Base de Datos Estructurados' },
+  { key: 'bd_no_estructurados', nombre: 'Base de Datos No Estructurados' },
+  { key: 'fundamentos_bd', nombre: 'Fundamentos de Base de Datos' },
+  { key: 'administracion', nombre: 'Administración' },
+  { key: 'ingenieria_software', nombre: 'Ingeniería de Software' },
+  { key: 'hardware_software', nombre: 'Fundamentos de Hardware y Software' },
+  { key: 'modelamiento_informaticas', nombre: 'Modelamiento de Soluciones Informáticas' },
+  { key: 'mobile_iot', nombre: 'Aplicaciones Móviles IoT' },
+  { key: 'ingles_basico', nombre: 'Inglés Inicial' },
+  { key: 'ingles_intermedio', nombre: 'Inglés Intermedio' },
+  { key: 'ingles_avanzado', nombre: 'Inglés Avanzado' },
+  { key: 'lenguaje_python', nombre: 'Lenguaje de Programación Python' },
+  { key: 'lenguaje_javascript', nombre: 'Lenguaje de Programación JavaScript' },
+  { key: 'prog_html', nombre: 'Programación HTML' },
+  { key: 'lenguaje_css', nombre: 'Lenguaje de Programación CSS' },
+  { key: 'linux', nombre: 'Linux' },
+  { key: 'japones', nombre: 'Japonés' },
+  { key: 'chino', nombre: 'Chino' },
+  { key: 'coreano', nombre: 'Coreano' },
+];
+
+function getAsignaturasDesactivadasLS() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY_DESACTIVADAS) || '[]'); }
+  catch { return []; }
+}
+
+// Devuelve el arreglo de keys actualmente desactivadas
+export function getAsignaturasDesactivadas() {
+  return getAsignaturasDesactivadasLS();
+}
+
+// Devuelve true si la asignatura está activa (visible para estudiar)
+export function isAsignaturaActiva(key) {
+  return !getAsignaturasDesactivadasLS().includes(key);
+}
+
+// Activa o desactiva una asignatura. Devuelve el nuevo estado (true = quedó activa)
+export function toggleAsignaturaActiva(key) {
+  const desactivadas = getAsignaturasDesactivadasLS();
+  const estabaDesactivada = desactivadas.includes(key);
+  const actualizadas = estabaDesactivada
+    ? desactivadas.filter(k => k !== key)   // estaba desactivada → la reactivamos
+    : [...desactivadas, key];               // estaba activa → la desactivamos
+  localStorage.setItem(LS_KEY_DESACTIVADAS, JSON.stringify(actualizadas));
+  return estabaDesactivada;
+}

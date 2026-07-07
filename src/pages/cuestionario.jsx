@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAsignaturas } from '../services/api';
+import { getAsignaturas, getAsignaturasDesactivadas } from '../services/api';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 import './cuestionario.css';
@@ -16,10 +16,19 @@ export default function Cuestionario() {
   const navigate = useNavigate();                      // Para redirigir al quiz
   const { usuario, toggleFavorita } = useAuth();       // Usuario y función de favoritos
   const [modalSinPreguntas, setModalSinPreguntas] = useState(false);
+  const [modalDesactivado, setModalDesactivado] = useState(false); // Modal: asignatura desactivada por el admin
+  const [desactivadas, setDesactivadas] = useState([]);            // Keys de asignaturas desactivadas (estado)
 
   // FUNCIÓN Navega al cuestionario de la asignatura seleccionada
   const irAlQuiz = (key) => {
   if (!key || key.trim() === '') return;
+
+  // Si el administrador desactivó esta asignatura, bloqueamos el acceso
+  if (desactivadas.includes(key)) {
+    setModalDesactivado(true);
+    return;
+  }
+
   const asig = asignaturas.find(a => a.key === key);
   if (!asig || asig.totalPreguntas === 0) {
     setModalSinPreguntas(true);
@@ -28,9 +37,10 @@ export default function Cuestionario() {
   navigate(`/quiz/${key}`, { state: { count, modo } });
 };
 
-  // EFECTO INICIAL Carga las asignaturas al montar el componente
+  // EFECTO INICIAL Carga las asignaturas y el estado activo/inactivo al montar el componente
   useEffect(() => {
     getAsignaturas().then(setAsignaturas).finally(() => setLoading(false));
+    setDesactivadas(getAsignaturasDesactivadas());
   }, []);
 
   // RENDER
@@ -74,7 +84,7 @@ export default function Cuestionario() {
 
           <div className="subject-grid" id="subject-grid">
 
-            <div className="subject-card" id="card-seguridad_informacion" onClick={() => irAlQuiz('seguridad_informacion')}>
+            <div className={`subject-card${desactivadas.includes('seguridad_informacion') ? ' subject-disabled' : ''}`} id="card-seguridad_informacion" onClick={() => irAlQuiz('seguridad_informacion')}>
               <img src="img/Seguridad de la Información01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Seguridad de la Información</div>
               <div className="subject-meta">Prueba 1 · Solo las 32 primeras preguntas son de la prueba</div>
@@ -90,7 +100,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-sistemas_operativos" onClick={() => irAlQuiz('sistemas_operativos')}>
+            <div className={`subject-card${desactivadas.includes('sistemas_operativos') ? ' subject-disabled' : ''}`} id="card-sistemas_operativos" onClick={() => irAlQuiz('sistemas_operativos')}>
               <img src="img/Sistemas Operativos02.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Sistemas Operativos</div>
               <div className="subject-meta">Prueba 1 · Subnetting, Las primeras 38 preguntas son los cuestionarios del profesor y una prueba</div>
@@ -106,7 +116,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-seguridad-examen" onClick={() => irAlQuiz('seguridad-examen')}>
+            <div className={`subject-card${desactivadas.includes('seguridad-examen') ? ' subject-disabled' : ''}`} id="card-seguridad-examen" onClick={() => irAlQuiz('seguridad-examen')}>
               <img src="img/Seguridad de la Información02.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Fundamentos de Seguridad de la Información</div>
               <div className="subject-meta">Cuestionario Examen Final otorgado por el profesor</div>
@@ -122,7 +132,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-algebra" onClick={() => irAlQuiz('algebra')}>
+            <div className={`subject-card${desactivadas.includes('algebra') ? ' subject-disabled' : ''}`} id="card-algebra" onClick={() => irAlQuiz('algebra')}>
               <img src="img/Algebra01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Resolución de Problemas de Álgebra</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -138,7 +148,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-funciones_matrices" onClick={() => irAlQuiz('funciones_matrices')}>
+            <div className={`subject-card${desactivadas.includes('funciones_matrices') ? ' subject-disabled' : ''}`} id="card-funciones_matrices" onClick={() => irAlQuiz('funciones_matrices')}>
               <img src="img/FuncionesMatrices01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Funciones y Matrices</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -154,7 +164,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-metodologia_agil" onClick={() => irAlQuiz('metodologia_agil')}>
+            <div className={`subject-card${desactivadas.includes('metodologia_agil') ? ' subject-disabled' : ''}`} id="card-metodologia_agil" onClick={() => irAlQuiz('metodologia_agil')}>
               <img src="img/Desarrollo Agil01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Metodología de Desarrollo Ágil</div>
               <div className="subject-meta">Rol del Scrum Master y características del equipo (T-shaped, cross-functional), Gobernanza mínima y gestión de exclusiones en el Acta, Cálculo de capacidad y reserva para deuda técnica, Técnicas de elicitación (shadowing, 5 Whys), Métricas ágiles (Velocidad, Burndown)</div>
@@ -170,7 +180,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-frontend" onClick={() => irAlQuiz('frontend')}>
+            <div className={`subject-card${desactivadas.includes('frontend') ? ' subject-disabled' : ''}`} id="card-frontend" onClick={() => irAlQuiz('frontend')}>
               <img src="img/Programación FrontEnd01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Programación Front End</div>
               <div className="subject-meta">Pendiente: FrontEnd HTML, CSS, JavaScript, React, Vue, TypeScript, Angular, etc. </div>
@@ -186,7 +196,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-backend" onClick={() => irAlQuiz('backend')}>
+            <div className={`subject-card${desactivadas.includes('backend') ? ' subject-disabled' : ''}`} id="card-backend" onClick={() => irAlQuiz('backend')}>
               <img src="img/Programación BackEnd01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Programación Back End</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -202,7 +212,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-bd_estructurados" onClick={() => irAlQuiz('bd_estructurados')}>
+            <div className={`subject-card${desactivadas.includes('bd_estructurados') ? ' subject-disabled' : ''}`} id="card-bd_estructurados" onClick={() => irAlQuiz('bd_estructurados')}>
               <img src="img/bdestructuradas01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Base de Datos Estructurados</div>
               <div className="subject-meta">preguntas prácticas de diferentes lenguajes/tecnologías, incluyendo campos interactivos para que el usuario complete</div>
@@ -218,7 +228,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-bd_no_estructurados" onClick={() => irAlQuiz('bd_no_estructurados')}>
+            <div className={`subject-card${desactivadas.includes('bd_no_estructurados') ? ' subject-disabled' : ''}`} id="card-bd_no_estructurados" onClick={() => irAlQuiz('bd_no_estructurados')}>
               <img src="img/bdnoestructuradas01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Base de Datos No Estructurados</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>           
@@ -234,7 +244,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-fundamentos_bd" onClick={() => irAlQuiz('fundamentos_bd')}>
+            <div className={`subject-card${desactivadas.includes('fundamentos_bd') ? ' subject-disabled' : ''}`} id="card-fundamentos_bd" onClick={() => irAlQuiz('fundamentos_bd')}>
               <img src="img/Base de datos01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Fundamentos de Base de Datos</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -250,7 +260,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-administracion" onClick={() => irAlQuiz('administracion')}>
+            <div className={`subject-card${desactivadas.includes('administracion') ? ' subject-disabled' : ''}`} id="card-administracion" onClick={() => irAlQuiz('administracion')}>
               <img src="img/Administración01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Administración</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -266,7 +276,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-ingenieria_software" onClick={() => irAlQuiz('ingenieria_software')}>
+            <div className={`subject-card${desactivadas.includes('ingenieria_software') ? ' subject-disabled' : ''}`} id="card-ingenieria_software" onClick={() => irAlQuiz('ingenieria_software')}>
               <img src="img/Inhgenieriasoftware01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Ingeniería de Software</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -282,7 +292,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-hardware_software" onClick={() => irAlQuiz('hardware_software')}>
+            <div className={`subject-card${desactivadas.includes('hardware_software') ? ' subject-disabled' : ''}`} id="card-hardware_software" onClick={() => irAlQuiz('hardware_software')}>
               <img src="img/Hardware y Software01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Fundamentos de Hardware y Software</div>
               <div className="subject-meta">Hardware, redes, sistemas operativos, impresoras, seguridad y ética para técnicos de TI.</div>
@@ -298,7 +308,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-modelamiento_informaticas" onClick={() => irAlQuiz('modelamiento_informaticas')}>
+            <div className={`subject-card${desactivadas.includes('modelamiento_informaticas') ? ' subject-disabled' : ''}`} id="card-modelamiento_informaticas" onClick={() => irAlQuiz('modelamiento_informaticas')}>
               <img src="img/Modelamiento01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Modelamiento de Soluciones Informáticas</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -314,7 +324,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-mobile_iot" onClick={() => irAlQuiz('mobile_iot')}>
+            <div className={`subject-card${desactivadas.includes('mobile_iot') ? ' subject-disabled' : ''}`} id="card-mobile_iot" onClick={() => irAlQuiz('mobile_iot')}>
               <img src="img/Apps Móviles para IoT02.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Aplicaciones Móviles IoT</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -330,7 +340,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-ingles_basico" onClick={() => irAlQuiz('ingles_basico')}>
+            <div className={`subject-card${desactivadas.includes('ingles_basico') ? ' subject-disabled' : ''}`} id="card-ingles_basico" onClick={() => irAlQuiz('ingles_basico')}>
               <img src="img/Ingles Imicial01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Inglés Inicial</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -346,7 +356,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-ingles_intermedio" onClick={() => irAlQuiz('ingles_intermedio')}>
+            <div className={`subject-card${desactivadas.includes('ingles_intermedio') ? ' subject-disabled' : ''}`} id="card-ingles_intermedio" onClick={() => irAlQuiz('ingles_intermedio')}>
               <img src="img/InglesIntermedio01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Inglés Intermedio</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -362,7 +372,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-ingles_avanzado" onClick={() => irAlQuiz('ingles_avanzado')}>
+            <div className={`subject-card${desactivadas.includes('ingles_avanzado') ? ' subject-disabled' : ''}`} id="card-ingles_avanzado" onClick={() => irAlQuiz('ingles_avanzado')}>
               <img src="img/Inglesavanzado01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Inglés Avanzado</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -378,7 +388,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-lenguaje_python" onClick={() => irAlQuiz('lenguaje_python')}>
+            <div className={`subject-card${desactivadas.includes('lenguaje_python') ? ' subject-disabled' : ''}`} id="card-lenguaje_python" onClick={() => irAlQuiz('lenguaje_python')}>
               <img src="img/lenguaje_python.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Lenguaje de Programación Python</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -394,7 +404,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-lenguaje_javascript" onClick={() => irAlQuiz('lenguaje_javascript')}>
+            <div className={`subject-card${desactivadas.includes('lenguaje_javascript') ? ' subject-disabled' : ''}`} id="card-lenguaje_javascript" onClick={() => irAlQuiz('lenguaje_javascript')}>
               <img src="img/lenguaje_java01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Lenguaje de Programación JavaScript</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -410,7 +420,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-prog__html" onClick={() => irAlQuiz('prog_html')}>
+            <div className={`subject-card${desactivadas.includes('prog_html') ? ' subject-disabled' : ''}`} id="card-prog__html" onClick={() => irAlQuiz('prog_html')}>
               <img src="img/lenguaje_html01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Programación HTML</div>
               <div className="subject-meta">Ejercicios prácticos de HTML (estructura, formularios, tablas), CSS (Flexbox, modelo de caja, media queries) y JavaScript (DOM, eventos, validación, localStorage).</div>
@@ -426,7 +436,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-lenguaje_css" onClick={() => irAlQuiz('lenguaje_css')}>
+            <div className={`subject-card${desactivadas.includes('lenguaje_css') ? ' subject-disabled' : ''}`} id="card-lenguaje_css" onClick={() => irAlQuiz('lenguaje_css')}>
               <img src="img/lenguaje_css01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Lenguaje de Programación CSS</div>
               <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -443,7 +453,7 @@ export default function Cuestionario() {
               </div>
 
             
-            <div className="subject-card" id="card-linux" onClick={() => irAlQuiz('linux')}>
+            <div className={`subject-card${desactivadas.includes('linux') ? ' subject-disabled' : ''}`} id="card-linux" onClick={() => irAlQuiz('linux')}>
               <img src="img/linux002.jpg" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Linux</div>
               <div className="subject-meta">Contiene cuestionario desarrollado a partir de las PPt para la instalación y desarrollo de RedHat en maquina virtual VirtualBox</div>
@@ -460,7 +470,7 @@ export default function Cuestionario() {
               </div>
 
 
-            <div className="subject-card" id="card-japones" onClick={() => irAlQuiz('japones')}>
+            <div className={`subject-card${desactivadas.includes('japones') ? ' subject-disabled' : ''}`} id="card-japones" onClick={() => irAlQuiz('japones')}>
               <img src="img/japones01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Japonés</div>
               <div className="subject-meta">hiragana, katakana, saludos, números, kanji básico, keigo honorífico/humilde, pasiva de sufrimiento, causativa-pasiva, yojijukugo, expresiones, onomatopeyas, lecturas especiales,  japonés clásico, dialectos regionales, keigo ultraformal</div>
@@ -476,7 +486,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-chino" onClick={() => irAlQuiz('chino')}>
+            <div className={`subject-card${desactivadas.includes('chino') ? ' subject-disabled' : ''}`} id="card-chino" onClick={() => irAlQuiz('chino')}>
               <img src="img/Chino01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Chino</div>
               <div className="subject-meta">tonos, pinyin, saludos, pronombres, verbos, preguntas,contadores, tiempo, familia, direcciones, adjetivos, gramática con 了 y 把, expresiones, chengyu, expresiones avanzadas, proverbios clásicos, textos clásicos, keigo chino formal, dialectos cantonés </div>
@@ -492,7 +502,7 @@ export default function Cuestionario() {
               )}
               </div>
 
-            <div className="subject-card" id="card-coreano" onClick={() => irAlQuiz('coreano')}>
+            <div className={`subject-card${desactivadas.includes('coreano') ? ' subject-disabled' : ''}`} id="card-coreano" onClick={() => irAlQuiz('coreano')}>
               <img src="img/Coreano03.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
               <div className="subject-name">Coreano</div>
               <div className="subject-meta">Hangul vocales/consonantes, saludos, números sino/nativos, hanja básico, verbos básicos, partículas, tiempos verbales, adjetivos, adverbios, contadores, familia, comparaciones, comida, dialectos regionales, proverbios coreanos, keigo ultraformal</div>
@@ -571,6 +581,34 @@ export default function Cuestionario() {
                 <button
                   className="btn btn-primary"
                   onClick={() => setModalSinPreguntas(false)}
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* MODAL, asignatura desactivada por el administrador */}
+
+          {modalDesactivado && (
+            <div style={{
+              position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              zIndex: 9999
+            }}>
+              <div style={{
+                background: 'white', borderRadius: '20px', padding: '2rem',
+                textAlign: 'center', maxWidth: '380px', margin: '1rem',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+              }}>
+                <h3 style={{ marginBottom: '0.8rem', fontFamily: 'Space Grotesk' }}>Cuestionario desactivado 🔒</h3>
+                <p style={{ color: '#8a7e9a', marginBottom: '1.5rem' }}>
+                  Esta asignatura fue desactivada temporalmente por el administrador. Vuelve a intentarlo más tarde.
+                </p>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setModalDesactivado(false)}
                 >
                   Entendido
                 </button>

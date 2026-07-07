@@ -21,9 +21,10 @@ export default function Login() {
 
   // FUNCIÓN Maneja el envío del formulario de login
   async function handleSubmit() {
-    if (!form.email || !form.password) return setError('Completa todos los campos.');
+    const emailLimpio = form.email.trim();
+    if (!emailLimpio || !form.password) return setError('Completa todos los campos.');
     setLoading(true);
-    const result = login(form.email, form.password);
+    const result = login(emailLimpio, form.password);
     setLoading(false);
     if (!result.ok) return setError(result.error);
     navigate('/');
@@ -52,6 +53,7 @@ export default function Login() {
               value={form.email}
               onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
               onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+              maxLength={100}
             />
           </div>
 
@@ -66,6 +68,7 @@ export default function Login() {
               value={form.password}
               onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
               onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+              maxLength={30}
             />
           </div>
 

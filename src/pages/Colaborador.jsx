@@ -7,6 +7,12 @@ import { useAuth } from '../context/AuthContext';
 import './Colaborador.css';
 import { getAsignaturas, crearPregunta } from '../services/api';
 
+// LÍMITES DE CARACTERES Evita entradas desproporcionadas en el formulario manual
+const MAX_PREGUNTA = 300;
+const MAX_OPCION = 120;
+const MAX_EXPLICACION = 500;
+const MAX_UNIDAD = 40;
+
 //HOOKS Autenticación y navegación
 export default function Colaborador() {
   const { usuario } = useAuth();
@@ -216,18 +222,33 @@ REGLAS:
     setMsgManual('');
     
     // Validaciones
-    if (!formP.pregunta.trim()) {
-      setMsgManual('❌ Completa la pregunta.');
+    const preguntaLimpia = formP.pregunta.trim();
+    if (!preguntaLimpia) {
+      setMsgManual('Completa la pregunta.');
       return;
     }
     
     if (!formP.asignaturaId) {
-      setMsgManual('❌ Selecciona una asignatura.');
+      setMsgManual('Selecciona una asignatura.');
       return;
     }
     
     if (formP.opciones.some(o => !o.trim())) {
-      setMsgManual('❌ Completa todas las opciones.');
+      setMsgManual('Completa todas las opciones.');
+      return;
+    }
+
+    // Validación de longitud máxima (evita textos desproporcionados)
+    if (preguntaLimpia.length > MAX_PREGUNTA) {
+      setMsgManual(`La pregunta no puede superar los ${MAX_PREGUNTA} caracteres.`);
+      return;
+    }
+    if (formP.opciones.some(o => o.length > MAX_OPCION)) {
+      setMsgManual(`Cada opción no puede superar los ${MAX_OPCION} caracteres.`);
+      return;
+    }
+    if (formP.explicacion.length > MAX_EXPLICACION) {
+      setMsgManual(`La explicación no puede superar los ${MAX_EXPLICACION} caracteres.`);
       return;
     }
 
@@ -236,13 +257,14 @@ REGLAS:
       const asig = asignaturas.find(a => a.key === formP.asignaturaId || String(a.id) === formP.asignaturaId);
       
       if (!asig) {
-        setMsgManual('❌ Asignatura no encontrada.');
+        setMsgManual('Asignatura no encontrada.');
         return;
       }
 
       // Preparar datos para guardar
       const preguntaData = {
         ...formP,
+        pregunta: preguntaLimpia,
         asignatura: asig.key || asig.nombre,
         asignaturaId: asig.key || asig._id,
         // Asegurar que la respuesta correcta sea un número
@@ -269,7 +291,7 @@ REGLAS:
       setTimeout(() => setMsgManual(''), 3000);
     } catch (error) {
       console.error('Error guardando pregunta:', error);
-      setMsgManual('❌ Error al guardar la pregunta: ' + error.message);
+      setMsgManual('Error al guardar la pregunta: ' + error.message);
     }
   }
 
@@ -476,6 +498,7 @@ REGLAS:
                   value={formP.unidad} 
                   onChange={e => setFormP(f => ({ ...f, unidad: e.target.value }))} 
                   placeholder="Ej: Unidad 1" 
+                  maxLength={MAX_UNIDAD}
                 />
               </div>
             </div>
@@ -488,7 +511,9 @@ REGLAS:
                 value={formP.pregunta} 
                 onChange={e => setFormP(f => ({ ...f, pregunta: e.target.value }))} 
                 placeholder="Escribe la pregunta…" 
+                maxLength={MAX_PREGUNTA}
               />
+              <span style={{ fontSize: '0.75rem', color: '#8a7e9a' }}>{formP.pregunta.length}/{MAX_PREGUNTA}</span>
             </div>
             
             <div className="form-group">
@@ -514,6 +539,7 @@ REGLAS:
                     }} 
                     placeholder={`Opción ${String.fromCharCode(65 + i)}`} 
                     style={{ flex: 1 }}
+                    maxLength={MAX_OPCION}
                   />
                   {formP.respuestaCorrecta === i && <span style={{ color: 'green', fontWeight: 'bold' }}>✓ Correcta</span>}
                 </div>
@@ -528,7 +554,9 @@ REGLAS:
                 value={formP.explicacion} 
                 onChange={e => setFormP(f => ({ ...f, explicacion: e.target.value }))} 
                 placeholder="Explicación de por qué la respuesta es correcta…" 
+                maxLength={MAX_EXPLICACION}
               />
+              <span style={{ fontSize: '0.75rem', color: '#8a7e9a' }}>{formP.explicacion.length}/{MAX_EXPLICACION}</span>
             </div>
             
             <button className="btn btn-primary" onClick={guardarPreguntaManual}>

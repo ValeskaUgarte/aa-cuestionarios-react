@@ -6,11 +6,19 @@ import Navbar from '../components/Navbar';
 import {
   getAsignaturas, getPreguntas,
   crearPregunta, editarPregunta, eliminarPregunta,
-  crearAsignatura, eliminarAsignatura
+  crearAsignatura, eliminarAsignatura,
+  LISTA_ASIGNATURAS_ADMIN, getAsignaturasDesactivadas, toggleAsignaturaActiva
 } from '../services/api';
 
 // CONFIGURACIÓN INICIAL Valores por defecto para formularios
 const DIFFS = ['easy', 'medium', 'hard'];
+// LÍMITES DE CARACTERES Evita entradas desproporcionadas en los formularios
+const MAX_PREGUNTA = 300;
+const MAX_OPCION = 120;
+const MAX_EXPLICACION = 500;
+const MAX_UNIDAD = 40;
+const MAX_NOMBRE_ASIG = 60;
+const MAX_DESC_ASIG = 150;
 const EMPTY_P = { pregunta: '', opciones: ['', '', '', ''], respuestaCorrecta: 0, dificultad: 'easy', unidad: '', asignaturaId: '', explicacion: '' };
 const EMPTY_A = { nombre: '', color: '#7c6dfa', descripcion: '' };
 
@@ -26,6 +34,7 @@ export default function Admin() {
   const [formA, setFormA] = useState(EMPTY_A);        // Formulario de asignatura
   const [msg, setMsg] = useState('');                 // Mensajes de feedback
   const [reportes, setReportes] = useState([]);       // Lista de reportes de errores
+  const [desactivadas, setDesactivadas] = useState([]); // Keys de cuestionarios desactivados
 
   // FUNCIONES AUXILIARES
   // Muestra un mensaje temporal (2.5 segundos)
@@ -42,20 +51,32 @@ export default function Admin() {
     .finally(() => setLoading(false));
 }
 
+  // ACTIVAR/DESACTIVAR Cambia el estado de una asignatura y refresca la lista
+  function manejarToggleAsignatura(key) {
+    toggleAsignaturaActiva(key);
+    setDesactivadas(getAsignaturasDesactivadas());
+  }
+
 
   // EFECTO INICIAL Carga los datos al montar el componente
-  useEffect(() => { cargar(); }, []);
+  useEffect(() => { cargar(); setDesactivadas(getAsignaturasDesactivadas()); }, []);
 
   // CRUD DE PREGUNTAS Guardar, editar y eliminar
   async function guardarPregunta() {
     // Validaciones de pregunta y asignatura obligatorias, opciones completas
-    if (!form.pregunta || !form.asignaturaId) return flash('Completa pregunta y asignatura.');
-    if (form.opciones.some(o => !o)) return flash('Completa todas las opciones.');
+    const preguntaLimpia = form.pregunta.trim();
+    if (!preguntaLimpia || !form.asignaturaId) return flash('Completa pregunta y asignatura.');
+    if (form.opciones.some(o => !o.trim())) return flash('Completa todas las opciones.');
+    // Validación de longitud máxima (evita textos desproporcionados)
+    if (preguntaLimpia.length > MAX_PREGUNTA) return flash(`La pregunta no puede superar los ${MAX_PREGUNTA} caracteres.`);
+    if (form.opciones.some(o => o.length > MAX_OPCION)) return flash(`Cada opción no puede superar los ${MAX_OPCION} caracteres.`);
+    if (form.explicacion.length > MAX_EXPLICACION) return flash(`La explicación no puede superar los ${MAX_EXPLICACION} caracteres.`);
     try {
       const asig = asignaturas.find(a => a.key === form.asignaturaId || a._id === form.asignaturaId);
       if (!asig) return flash('Asignatura no encontrada.');
       const payload = {
         ...form,
+        pregunta: preguntaLimpia,
         asignatura: asig.key || asig.nombre,
         asignaturaId: asig.key || asig._id,
         respuestaCorrecta: parseInt(form.respuestaCorrecta) || 0
@@ -100,8 +121,11 @@ export default function Admin() {
 
   // CRUD DE ASIGNATURAS Guardar y eliminar
   async function guardarAsignatura() {
-    if (!formA.nombre) return flash('Escribe el nombre.');
-    const payload = { ...formA, key: formA.nombre.toLowerCase().replace(/\s+/g, '_') };
+    const nombreLimpio = formA.nombre.trim();
+    if (!nombreLimpio) return flash('Escribe el nombre.');
+    if (nombreLimpio.length > MAX_NOMBRE_ASIG) return flash(`El nombre no puede superar los ${MAX_NOMBRE_ASIG} caracteres.`);
+    if (formA.descripcion.length > MAX_DESC_ASIG) return flash(`La descripción no puede superar los ${MAX_DESC_ASIG} caracteres.`);
+    const payload = { ...formA, nombre: nombreLimpio, key: nombreLimpio.toLowerCase().replace(/\s+/g, '_') };
     await crearAsignatura(payload);
     flash('Asignatura creada ✓');
     setFormA(EMPTY_A);
@@ -154,6 +178,9 @@ export default function Admin() {
           <button className={`tab ${tab === 'reportes' ? 'tab-active' : ''}`} onClick={() => setTab('reportes')}>
             Reportes <span className="tab-count">{reportes.length}</span>
           </button>
+          <button className={`tab ${tab === 'estado' ? 'tab-active' : ''}`} onClick={() => setTab('estado')}>
+            Estado <span className="tab-count">{desactivadas.length}</span>
+          </button>
         </div>
 
         {/* TAB PREGUNTAS */}
@@ -180,25 +207,27 @@ export default function Admin() {
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
                   <label className="input-label">Unidad</label>
-                  <input className="input" value={form.unidad} onChange={e => setForm(f => ({ ...f, unidad: e.target.value }))} placeholder="Ej: Unidad 1" />
+                  <input className="input" value={form.unidad} onChange={e => setForm(f => ({ ...f, unidad: e.target.value }))} placeholder="Ej: Unidad 1" maxLength={MAX_UNIDAD} />
                 </div>
               </div>
 
               <div className="form-group">
                 <label className="input-label">Pregunta</label>
-                <textarea className="input" rows={2} value={form.pregunta} onChange={e => setForm(f => ({ ...f, pregunta: e.target.value }))} placeholder="Escribe la pregunta…" />
+                <textarea className="input" rows={2} value={form.pregunta} onChange={e => setForm(f => ({ ...f, pregunta: e.target.value }))} placeholder="Escribe la pregunta…" maxLength={MAX_PREGUNTA} />
+                <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.pregunta.length}/{MAX_PREGUNTA}</span>
               </div>
 
               {form.opciones.map((op, i) => (
                 <div className="form-group" key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <input type="radio" name="correcta" checked={form.respuestaCorrecta === i} onChange={() => setForm(f => ({ ...f, respuestaCorrecta: i }))} />
-                  <input className="input" value={op} onChange={e => { const opts = [...form.opciones]; opts[i] = e.target.value; setForm(f => ({ ...f, opciones: opts })); }} placeholder={`Opción ${String.fromCharCode(65 + i)}`} />
+                  <input className="input" value={op} onChange={e => { const opts = [...form.opciones]; opts[i] = e.target.value; setForm(f => ({ ...f, opciones: opts })); }} placeholder={`Opción ${String.fromCharCode(65 + i)}`} maxLength={MAX_OPCION} />
                 </div>
               ))}
 
               <div className="form-group">
                 <label className="input-label">Explicación</label>
-                <textarea className="input" rows={2} value={form.explicacion} onChange={e => setForm(f => ({ ...f, explicacion: e.target.value }))} placeholder="Explicación de la respuesta correcta…" />
+                <textarea className="input" rows={2} value={form.explicacion} onChange={e => setForm(f => ({ ...f, explicacion: e.target.value }))} placeholder="Explicación de la respuesta correcta…" maxLength={MAX_EXPLICACION} />
+                <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.explicacion.length}/{MAX_EXPLICACION}</span>
               </div>
 
               <div style={{ display: 'flex', gap: '0.6rem' }}>
@@ -246,7 +275,7 @@ export default function Admin() {
               <div className="form-row">
                 <div className="form-group" style={{ flex: 3 }}>
                   <label className="input-label">Nombre</label>
-                  <input className="input" value={formA.nombre} onChange={e => setFormA(f => ({ ...f, nombre: e.target.value }))} placeholder="Ej: Base de Datos" />
+                  <input className="input" value={formA.nombre} onChange={e => setFormA(f => ({ ...f, nombre: e.target.value }))} placeholder="Ej: Base de Datos" maxLength={MAX_NOMBRE_ASIG} />
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
                   <label className="input-label">Color</label>
@@ -255,7 +284,7 @@ export default function Admin() {
               </div>
               <div className="form-group">
                 <label className="input-label">Descripción</label>
-                <input className="input" value={formA.descripcion} onChange={e => setFormA(f => ({ ...f, descripcion: e.target.value }))} placeholder="Descripción breve…" />
+                <input className="input" value={formA.descripcion} onChange={e => setFormA(f => ({ ...f, descripcion: e.target.value }))} placeholder="Descripción breve…" maxLength={MAX_DESC_ASIG} />
               </div>
               <button className="btn btn-primary" onClick={guardarAsignatura}>Crear asignatura</button>
             </div>
@@ -324,6 +353,37 @@ export default function Admin() {
             )}
           </div>
         )}
+
+      {/* TAB ESTADO - Activar/desactivar cuestionarios */}
+      {tab === 'estado' && (
+        <div>
+          <p style={{ color: 'var(--muted)', marginBottom: '1rem' }}>
+            Desactiva temporalmente un cuestionario para ocultarlo de la página de Cuestionarios,
+            sin perder sus preguntas. Puedes reactivarlo cuando quieras.
+          </p>
+          <div className="asig-lista">
+            {LISTA_ASIGNATURAS_ADMIN.map(a => {
+              const activa = !desactivadas.includes(a.key);
+              return (
+                <div key={a.key} className="asig-item card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ flex: 1 }}>
+                    <p className="asig-nombre">{a.nombre}</p>
+                    <p className="asig-desc" style={{ color: activa ? 'var(--accent2, #00d4a0)' : 'var(--danger, #ff4f6a)' }}>
+                      {activa ? '🟢 Activo (visible para estudiantes)' : '🔴 Desactivado (oculto)'}
+                    </p>
+                  </div>
+                  <button
+                    className={`btn btn-sm ${activa ? 'btn-danger' : 'btn-primary'}`}
+                    onClick={() => manejarToggleAsignatura(a.key)}
+                  >
+                    {activa ? 'Desactivar' : 'Activar'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       </main>
     </>

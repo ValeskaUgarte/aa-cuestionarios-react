@@ -20,8 +20,9 @@ export function AuthProvider({ children }) {
 
    // LOGIN - Inicia sesión (admin fijo o usuario registrado)
   function login(email, password) {
+  const emailLimpio = (email || '').trim().toLowerCase();
   // Admin fijo — no está en localStorage
-  if (email === 'admin@appestudios.cl' && password === 'admin2026') {
+  if (emailLimpio === 'admin@appestudios.cl' && password === 'admin2026') {
     const adminUser = {
       id: 'admin',
       nombre: 'Administrador',
@@ -37,7 +38,7 @@ export function AuthProvider({ children }) {
 
   // Login normal: busca en la lista de usuarios registrados
   const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-  const encontrado = usuarios.find(u => u.email === email && u.password === password);
+  const encontrado = usuarios.find(u => u.email.toLowerCase() === emailLimpio && u.password === password);
   if (!encontrado) return { ok: false, error: 'Email o contraseña incorrectos' };
   localStorage.setItem('usuario_actual', JSON.stringify(encontrado));
   setUsuario(encontrado);
@@ -46,14 +47,22 @@ export function AuthProvider({ children }) {
 
   // REGISTRO - Crea un nuevo usuario y lo loguea automáticamente
   function registro(nombre, email, password, rol = 'estudiante') {
+    // VALIDACIÓN DE SEGURIDAD (defensa en profundidad, además de la del formulario)
+    const nombreLimpio = (nombre || '').trim();
+    const emailLimpio = (email || '').trim().toLowerCase();
+    if (nombreLimpio.length < 2 || nombreLimpio.length > 50)
+      return { ok: false, error: 'El nombre debe tener entre 2 y 50 caracteres.' };
+    if (!password || password.length < 6 || password.length > 30)
+      return { ok: false, error: 'La contraseña debe tener entre 6 y 30 caracteres.' };
+
     const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    // Verifica si el email ya está registrado
-    if (usuarios.find(u => u.email === email)) 
+    // Verifica si el email ya está registrado (sin distinguir mayúsculas/minúsculas)
+    if (usuarios.find(u => u.email.toLowerCase() === emailLimpio)) 
       return { ok: false, error: 'Este email ya está registrado' };
     const nuevo = {
       id: Date.now().toString(),
-      nombre,
-      email,
+      nombre: nombreLimpio,
+      email: emailLimpio,
       password,
       rol,
       favoritas: [],

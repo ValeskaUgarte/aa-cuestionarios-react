@@ -29,9 +29,15 @@ export default function Registro() {
     // Limpiamos cualquier error anterior
     setError('');
     
-    // 1. Verificamos que todos los campos estén llenos
-    if (!form.nombre || !form.email || !form.password || !form.confirmar)
+    // 1. Verificamos que todos los campos estén llenos (quitando espacios en blanco)
+    const nombreLimpio = form.nombre.trim();
+    if (!nombreLimpio || !form.email || !form.password || !form.confirmar)
       return setError('Completa todos los campos.');
+
+    // 1.1 Validamos longitud y formato del nombre (solo letras y espacios, 2 a 50 caracteres)
+    const nombreRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
+    if (!nombreRegex.test(nombreLimpio))
+      return setError('El nombre debe tener entre 2 y 50 letras (sin números ni símbolos).');
 
     // 2. Verificamos que el email tenga formato válido (algo@algo.algo)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -59,13 +65,15 @@ export default function Registro() {
     if (form.password !== form.confirmar)
       return setError('Las contraseñas no coinciden.');
 
-    // 5. Verificamos que la contraseña tenga al menos 6 caracteres
+    // 5. Verificamos que la contraseña tenga entre 6 y 30 caracteres
     if (form.password.length < 6)
       return setError('La contraseña debe tener al menos 6 caracteres.');
+    if (form.password.length > 30)
+      return setError('La contraseña no puede tener más de 30 caracteres.');
 
     // 6. Todo está bien — llamamos a la función registro del contexto
-    // Esta función guarda el usuario en localStorage
-    const result = registro(form.nombre, form.email, form.password, form.rol);
+    // Esta función guarda el usuario en localStorage (usamos el nombre ya sin espacios extra)
+    const result = registro(nombreLimpio, form.email, form.password, form.rol);
     
     // Si hubo un error (ej: email ya registrado), lo mostramos
     if (!result.ok) return setError(result.error);
@@ -96,6 +104,7 @@ export default function Registro() {
               placeholder="Tu nombre" 
               value={form.nombre}
               onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} 
+              maxLength={50}
             />
           </div>
 
@@ -108,6 +117,7 @@ export default function Registro() {
               placeholder="tucorreo@gmail.com" 
               value={form.email}
               onChange={e => setForm(f => ({ ...f, email: e.target.value }))} 
+              maxLength={100}
             />
           </div>
 
@@ -120,6 +130,7 @@ export default function Registro() {
               placeholder="Mínimo 6 caracteres" 
               value={form.password}
               onChange={e => setForm(f => ({ ...f, password: e.target.value }))} 
+              maxLength={30}
             />
           </div>
 
@@ -132,6 +143,7 @@ export default function Registro() {
               placeholder="Repite tu contraseña" 
               value={form.confirmar}
               onChange={e => setForm(f => ({ ...f, confirmar: e.target.value }))} 
+              maxLength={30}
             />
           </div>
 
