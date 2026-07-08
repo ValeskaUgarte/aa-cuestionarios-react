@@ -151,7 +151,7 @@ export default function Colaborador() {
 
     try {
       // Buscar la asignatura seleccionada
-      const asig = asignaturas.find(a => a.key === formP.asignaturaId || String(a.id) === formP.asignaturaId);
+      const asig = asignaturas.find(a => a.key === formP.asignaturaId || String(a._id) === formP.asignaturaId);
       
       if (!asig) {
         setMsgManual('Asignatura no encontrada.');
@@ -162,7 +162,7 @@ export default function Colaborador() {
       const preguntaData = {
         ...formP,
         pregunta: preguntaLimpia,
-        asignatura: asig.key || asig.nombre,
+        asignatura: asig.nombre || asig.key,
         asignaturaId: asig.key || asig._id,
         // Asegurar que la respuesta correcta sea un número
         respuestaCorrecta: parseInt(formP.respuestaCorrecta) || 0

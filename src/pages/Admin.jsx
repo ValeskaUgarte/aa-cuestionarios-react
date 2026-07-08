@@ -164,7 +164,7 @@ export default function Admin() {
       const payload = {
         ...form,
         pregunta: preguntaLimpia,
-        asignatura: asig.key || asig.nombre,
+        asignatura: asig.nombre || asig.key,
         asignaturaId: asig.key || asig._id,
         respuestaCorrecta: parseInt(form.respuestaCorrecta) || 0,
         // El admin publica directo: no pasa por revisión (a diferencia
