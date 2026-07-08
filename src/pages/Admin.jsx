@@ -333,7 +333,7 @@ export default function Admin() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                     <input type="radio" name="correcta" checked={form.respuestaCorrecta === i} onChange={() => setForm(f => ({ ...f, respuestaCorrecta: i }))} />
                     <input
-                    id={`opcion-${i}`}
+                    id={`opcion`}
                       className="input"
                       value={op}
                       onChange={e => {
@@ -390,6 +390,7 @@ export default function Admin() {
                   </button>
                 </div>
                 <textarea
+                id="extra"
                   className="input"
                   rows={4}
                   value={form.extra}
