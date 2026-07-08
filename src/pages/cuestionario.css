@@ -274,13 +274,13 @@ header p {
   padding: 0.35rem 0.6rem;
 }
 
-/* ── HEADER MÓVIL (oculto por defecto; visible solo en celulares reales,
-   no al angostar la ventana del navegador en escritorio) ── */
+/* ── HEADER MÓVIL (oculto por defecto; visible solo en pantalla angosta) ── */
 .header-mobile {
   display: none;
 }
 
-@media (max-width: 600px) and (pointer: coarse) {
+/* RESPONSIVE (mismo breakpoint que ya usaba el resto de la página) */
+@media (max-width: 600px) {
   .header-desktop {
     display: none;
   }
@@ -311,10 +311,7 @@ header p {
     color: var(--text);
     margin: 0;
   }
-}
 
-/* RESPONSIVE */
-@media (max-width: 600px) {
   .orden-row {
     justify-content: center;
   }
