@@ -1,268 +1,13 @@
 const preguntas_linux = [
 
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "easy",
-    "case": "Richard Stallman inició el Proyecto GNU en los años 80 para crear un sistema operativo similar a UNIX. En 1991, Linus Torvalds creó el kernel Linux.",
-    "q": "¿Cuál fue la principal motivación de Linus Torvalds para crear Linux?",
-    "extra": "",
-    "opts": [
-      "Crear un sistema operativo de pago con soporte técnico profesional",
-      "Desarrollar un sistema que compita directamente con Windows",
-      "Crear un sistema operativo que se comporte como UNIX y ejecute programas GNU",
-      "Reemplazar completamente el sistema Minix de Andrew Tanenbaum"
-    ],
-    "ans": 2,
-    "exp": "Linus Torvalds, estudiante de la Universidad de Helsinki, se inspiró en Minix y planteó crear un sistema operativo que se comportara como UNIX y ejecutara programas GNU."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "easy",
-    "case": "Linux se distribuye bajo la licencia GNU General Public License (GPL) que permite libre distribución y modificación.",
-    "q": "¿Cuáles son las dos características principales que diferencian a Linux de otros sistemas operativos?",
-    "extra": "",
-    "opts": [
-      "Es gratuito y tiene soporte técnico 24/7",
-      "Es libre (sin pago de licencias) y viene acompañado del código fuente",
-      "Es más rápido y tiene mejor interfaz gráfica",
-      "Es compatible con Windows y Mac"
-    ],
-    "ans": 1,
-    "exp": "Linux es libre (no requiere pago de licencia) y viene acompañado del código fuente, permitiendo su estudio y modificación."
-  },
+  // ========== PREGUNTAS DE INSTALACIÓN Y CONFIGURACIÓN ==========
+
+  
   {
     "profe": true,
     "unit": "Linux",
     "diff": "medium",
-    "case": "Durante la instalación de Red Hat Enterprise Linux en VirtualBox, se deben configurar los recursos de hardware de la máquina virtual.",
-    "q": "¿Cuáles son las especificaciones de hardware recomendadas para la máquina virtual en VirtualBox?",
-    "extra": "",
-    "opts": [
-      "2 GB de RAM, 1 CPU, 20 GB de disco duro",
-      "4 GB de RAM, 2 CPU, 30 GB de disco duro",
-      "8 GB de RAM, 4 CPU, 50 GB de disco duro",
-      "16 GB de RAM, 8 CPU, 100 GB de disco duro"
-    ],
-    "ans": 1,
-    "exp": "Según los pasos de instalación, se deben configurar 4 GB de RAM, 2 CPU y un disco duro de 30 GB."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "medium",
-    "case": "Después de crear la máquina virtual, se inicia y aparece el menú de arranque del ISO de Red Hat Enterprise Linux 10.0.",
-    "q": "¿Qué opción se debe seleccionar al iniciar la instalación desde el ISO?",
-    "extra": `
-      <div class="terminal-box" style="background:#1a1a1a;color:#00ff00;padding:15px;font-family:monospace;border-radius:5px;">
-      <b>Red Hat Enterprise Linux 10.0</b><br><br>
-      <span style="color:#ffff00;">▶ Install Red Hat Enterprise Linux 10.0</span><br>
-      <span style="color:#ffff00;">▶ Test this media & install Red Hat Enterprise Linux 10.0</span><br>
-      <span style="color:#ffff00;">▶ Rescue a Red Hat Enterprise Linux system</span><br>
-      <span style="color:#ffff00;">▶ Run a memory test</span><br><br>
-      Tab - switch between elements | Enter - select
-      </div>
-      `,
-    "opts": [
-      "Test this media & install Red Hat Enterprise Linux 10.0",
-      "Install Red Hat Enterprise Linux 10.0",
-      "Rescue a Red Hat Enterprise Linux system",
-      "Run a memory test"
-    ],
-    "ans": 0,
-    "exp": "Se debe seleccionar 'Test this media & install Red Hat Enterprise Linux 10.0' para iniciar el proceso de instalación con verificación del medio."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "easy",
-    "case": "Durante la instalación, aparece la pantalla de configuración de idioma y distribución de teclado.",
-    "q": "¿Qué configuraciones de idioma se deben seleccionar durante la instalación de Red Hat según los pasos?",
-    "extra": `
-      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
-      <b>📋 LOCALIZATION</b><br><br>
-      <span style="color:#00ffff;">▼ Language</span>  <span style="color:#ffa500;">[ Español Chile ]</span><br>
-      <span style="color:#00ffff;">▼ Keyboard</span>  <span style="color:#ffa500;">[ Castellano ]</span><br>
-      <span style="color:#00ffff;">▼ Time & Date</span>  <span style="color:#ffa500;">[ America/Santiago ]</span><br><br>
-      <span style="color:#888;">[Hecho]</span>
-      </div>
-      `,
-    "opts": [
-      "Inglés Estados Unidos y teclado en inglés",
-      "Español Chile y teclado en castellano",
-      "Español España y teclado en español",
-      "Portugués Brasil y teclado en portugués"
-    ],
-    "ans": 1,
-    "exp": "Se debe seleccionar el idioma Español Chile y el teclado en castellano como se muestra en la interfaz."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "medium",
-    "case": "En la instalación se debe configurar el usuario y la contraseña de root, y también crear un usuario administrador.",
-    "q": "¿Qué pasos se deben seguir para la creación del usuario durante la instalación de Red Hat?",
-    "extra": `
-      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
-      <b>👤 USER SETTINGS</b><br><br>
-      <span style="color:#00ffff;">▼ Root Password</span>  <span style="color:#ffa500;">[ ●●●●●●● ]</span><br>
-      <span style="color:#00ffff;">▼ User Creation</span><br>
-      &nbsp;&nbsp;Full name: <input placeholder="Nombre Apellido" style="background:#333;color:#fff;border:1px solid #555;"><br>
-      &nbsp;&nbsp;Username: <input placeholder="usuario" style="background:#333;color:#fff;border:1px solid #555;"><br>
-      &nbsp;&nbsp;Password: <input placeholder="●●●●●●●●" style="background:#333;color:#fff;border:1px solid #555;"><br>
-      &nbsp;&nbsp;☑ <span style="color:#ffa500;">Make this user administrator</span><br><br>
-      <span style="color:#888;">[Hecho]</span>
-      </div>
-      `,
-    "opts": [
-      "Crear solo la contraseña de root y omitir la creación del usuario",
-      "Crear el usuario con su nombre y apellido y marcarlo como administrador",
-      "Crear el usuario sin contraseña",
-      "Crear el usuario solo después de finalizar la instalación"
-    ],
-    "ans": 1,
-    "exp": "Se debe crear el usuario con nombre y apellido, y marcarlo como administrador con la opción 'Make this user administrator'."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "En la sección 'Selección de Software' del instalador de Red Hat, se deben elegir los paquetes y roles para el servidor.",
-    "q": "¿Qué opciones de software se deben marcar durante la instalación de Red Hat según los pasos?",
-    "extra": `
-      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
-      <b>📦 SOFTWARE SELECTION</b><br><br>
-      <span style="color:#ffa500;">Base Environment:</span><br>
-      ☑ <span style="color:#00ff00;">Server with GUI</span> - Servidor integrado y fácil de administrar con interfaz gráfica<br><br>
-      <span style="color:#ffa500;">Additional software for selected environment:</span><br>
-      ☑ <span style="color:#00ff00;">DNS Name Server</span><br>
-      ☑ <span style="color:#00ff00;">FTP Server</span><br>
-      ☑ <span style="color:#00ff00;">Mail Server</span><br>
-      ☐ Web Server<br>
-      ☐ Database Server<br><br>
-      <span style="color:#888;">[Hecho]</span>
-      </div>
-      `,
-    "opts": [
-      "Servidor con GUI, Servidor de nombres DNS, Servidor FTP y Servidores de correo",
-      "Solo Servidor con GUI y Servidor FTP",
-      "Servidor con GUI, Servidor web y Servidor de base de datos",
-      "Todas las opciones disponibles"
-    ],
-    "ans": 0,
-    "exp": "Se deben seleccionar 'Server with GUI' como base environment, y como adicionales: DNS Name Server, FTP Server y Mail Server."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "medium",
-    "case": "KDUMP es una característica que aparece en la instalación de Red Hat para diagnóstico de fallos.",
-    "q": "¿Qué es KDUMP y para qué sirve en la instalación de Red Hat?",
-    "extra": "",
-    "opts": [
-      "Un sistema de copia de seguridad de archivos",
-      "Un mecanismo de volcado de memoria de daños de kernel para troubleshooting",
-      "Un sistema de monitoreo de red",
-      "Un sistema de gestión de paquetes"
-    ],
-    "ans": 1,
-    "exp": "KDUMP es un mecanismo que captura información del sistema en caso de fallo del kernel, sirviendo para troubleshooting posterior."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Durante la instalación, en la sección 'Network & Hostname' se configura la conectividad de red del sistema.",
-    "q": "¿Cómo se configura la red durante la instalación de Red Hat?",
-    "extra": `
-      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
-      <b>🌐 NETWORK & HOSTNAME</b><br><br>
-      Interface: <span style="color:#00ffff;">enp0s3</span><br>
-      <span style="color:#ffa500;">Status:</span> <span style="color:#ff4444;">● Disconnected</span><br>
-      <span style="color:#ffa500;">Hostname:</span> <input placeholder="localhost.localdomain" style="background:#333;color:#fff;border:1px solid #555;"><br><br>
-      <span style="color:#ffa500;">IPv4 Settings:</span><br>
-      Method: <select style="background:#333;color:#fff;border:1px solid #555;"><option>DHCP</option><option>Manual</option></select><br><br>
-      <span style="color:#888;">[Configure] [Hecho]</span>
-      </div>
-      `,
-    "opts": [
-      "Las interfaces vienen habilitadas por defecto con IP estática",
-      "Las interfaces aparecen deshabilitadas con DHCP por defecto, y se pueden configurar IPs estáticas pulsando Configurar",
-      "Se debe configurar la red después de la instalación",
-      "No se requiere configuración de red durante la instalación"
-    ],
-    "ans": 1,
-    "exp": "Las interfaces aparecen deshabilitadas con DHCP. Para establecer IPs estáticas o modificar el Hostname, se debe pulsar 'Configure'."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Después de instalar Red Hat, se debe registrar el sistema para recibir actualizaciones desde la terminal.",
-    "q": "¿Qué comando se utiliza para registrar el sistema con Red Hat Subscription Manager?",
-    "extra": `
-      <div class="terminal-box" style="background:#1a1a1a;color:#00ff00;padding:15px;font-family:monospace;border-radius:5px;">
-      [root@localhost ~]# <input placeholder="Comando de registro" style="background:#333;color:#00ff00;border:1px solid #555;width:400px;"><br>
-      <span style="color:#ffa500;">Enter username:</span> <input placeholder="correo@redhat.com" style="background:#333;color:#fff;border:1px solid #555;"><br>
-      <span style="color:#ffa500;">Enter password:</span> <input placeholder="●●●●●●●●" style="background:#333;color:#fff;border:1px solid #555;"><br><br>
-      <span style="color:#00ffff;">The system has been registered with ID: 12345678-90ab-cdef-1234-567890abcdef</span>
-      </div>
-      `,
-    "opts": [
-      "subscription-manager register --username usuario --password contraseña",
-      "register --username usuario --password contraseña",
-      "rhsm-register --username usuario --password contraseña",
-      "redhat-register --username usuario --password contraseña"
-    ],
-    "ans": 0,
-    "exp": "El comando correcto es 'subscription-manager register --username usuario --password contraseña' usando las credenciales de Red Hat."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "easy",
-    "case": "Al iniciar sesión por primera vez en el sistema instalado, aparece la pantalla de bienvenida de Red Hat.",
-    "q": "¿Cómo se procede al iniciar sesión en Red Hat Enterprise Linux por primera vez?",
-    "extra": "",
-    "opts": [
-      "Se selecciona 'Empezar tour' y luego se registra el sistema",
-      "Se pulsa 'No gracias' en la bienvenida y luego se registra el sistema para actualizaciones",
-      "Se omite completamente el registro del sistema",
-      "Se configura inmediatamente el escritorio"
-    ],
-    "ans": 1,
-    "exp": "Se debe pulsar 'No gracias' en la pantalla de bienvenida y luego registrar el sistema para recibir actualizaciones."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "easy",
-    "case": "El nombre de la máquina virtual en VirtualBox debe seguir un formato específico para identificarla correctamente.",
-    "q": "¿Qué formato debe seguir el nombre de la máquina virtual en VirtualBox?",
-    "extra": `
-      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
-      <b>💻 VirtualBox - Create Virtual Machine</b><br><br>
-      <span style="color:#ffa500;">Name:</span> <input placeholder="RARSREDHAT" style="background:#333;color:#fff;border:1px solid #555;"><br>
-      <span style="color:#ffa500;">Folder:</span> /home/user/VirtualBox VMs<br>
-      <span style="color:#ffa500;">ISO Image:</span> rhel-10.0-x86_64-dvd.iso<br><br>
-      <span style="color:#ffa500;">ⓘ El nombre debe ser la inicial del nombre y apellido seguidas de REDHAT</span>
-      </div>
-      `,
-    "opts": [
-      "REDHAT + números",
-      "Iniciales de nombre y apellido + REDHAT",
-      "SOLO REDHAT",
-      "Nombre completo + REDHAT"
-    ],
-    "ans": 1,
-    "exp": "El nombre debe ser la inicial del nombre y apellido seguidas de REDHAT. Ejemplo: RARSREDHAT (R=nombre, ARS=apellidos)."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "medium",
-    "case": "Desde la terminal se puede verificar la versión del sistema operativo instalado.",
+    "case": "Desde la terminal, se puede consultar información detallada sobre la versión del sistema operativo instalado.",
     "q": "¿Qué comando se utiliza para verificar la versión de Red Hat instalada?",
     "extra": `
       <div class="terminal-box" style="background:#1a1a1a;color:#00ff00;padding:15px;font-family:monospace;border-radius:5px;">
@@ -279,59 +24,17 @@ const preguntas_linux = [
     "ans": 2,
     "exp": "El comando 'cat /etc/redhat-release' muestra la versión de Red Hat instalada, como se ve en la terminal."
   },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "medium",
-    "case": "La política de seguridad (Security Policy) se puede configurar durante la instalación para entornos específicos.",
-    "q": "¿Para qué sirve la configuración de Security Policy en la instalación de Red Hat?",
-    "extra": `
-      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
-      <b>🔒 SECURITY POLICY</b><br><br>
-      <span style="color:#ffa500;">Security Profile:</span><br>
-      ☐ PCI-DSS (Payment Card Industry)<br>
-      ☐ OSPP (Operating System Protection Profile)<br><br>
-      <span style="color:#888;">⚠️ Si el sistema va a formar parte de un entorno PCI u OSPP,<br>aquí se puede habilitar una política de seguridad específica.</span><br><br>
-      <span style="color:#888;">[Hecho]</span>
-      </div>
-      `,
-    "opts": [
-      "Para configurar el firewall del sistema",
-      "Para habilitar una política de seguridad específica si el sistema forma parte de un entorno PCI u OSPP",
-      "Para instalar antivirus",
-      "Para configurar contraseñas complejas"
-    ],
-    "ans": 1,
-    "exp": "La política de seguridad permite habilitar una política específica en caso de que el sistema forme parte de un entorno PCI u OSPP."
-  },
+  
+
+  // ========== PREGUNTAS DE COMANDOS BÁSICOS ==========
+
   {
     "profe": true,
     "unit": "Linux",
     "diff": "easy",
-    "case": "Después de completar todos los pasos de instalación y registro, se debe realizar un paso final para preservar el estado.",
-    "q": "¿Cuál es el último paso recomendado después de completar la instalación y registro del sistema?",
-    "extra": "",
-    "opts": [
-      "Apagar la máquina inmediatamente",
-      "Guardar la máquina virtual",
-      "Eliminar los archivos de instalación",
-      "Crear un punto de restauración"
-    ],
-    "ans": 1,
-    "exp": "Después de completar la instalación y el registro, se debe guardar la máquina virtual para preservar el estado."
-  },
-
-
-  //COMANDOS BASICOS CON IMAGENES SOBRE PPT DEL PROFESOR
-
-  //Organigrama de la empresa
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "easy",
-    "case": "En Linux, el símbolo del prompt indica el nivel de privilegios del usuario actual.",
+    "case": "En la terminal de Linux, el prompt muestra información sobre el usuario y sus privilegios a través de símbolos específicos.",
     "q": "¿Qué diferencia al símbolo $ del símbolo # en la terminal de Linux?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Organigrama de la empresa:<br><img src='/img/diagrama_empresa.jpg' alt='Organigrama' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra la estructura jerárquica de la empresa con los usuarios Jimena, Clara y Valeria. Observa cómo se relacionan los cargos para entender qué acceso debe tener cada usuario a las carpetas.</span></div>",
+    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Organigrama de la empresa:<br><img src='/img/diagrama_empresa.jpg' alt='Organigrama' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra la estructura jerárquica de la empresa con los usuarios Jimena, Clara y Valeria.</span></div>",
     "opts": [
       "$ indica usuario root y # indica usuario normal",
       "$ indica usuario normal y # indica usuario root o superusuario",
@@ -341,15 +44,13 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "El símbolo $ se utiliza para indicar que estamos logueados con un usuario normal, mientras que # indica que estamos con privilegios de administrador o root."
   },
-
-  //Estructura de Carpetas Compartidas
   {
     "profe": true,
     "unit": "Linux",
     "diff": "medium",
-    "case": "El comando 'ls' lista el contenido de un directorio con diferentes opciones.",
+    "case": "El comando 'ls' permite listar archivos con diferentes niveles de detalle según las opciones que se le pasen.",
     "q": "¿Qué muestra el comando 'ls -l' al listar el contenido de un directorio?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra cómo deben quedar organizadas las carpetas: CarpetasCompartidas → AltaGerencia, Estrategias, Tacticas. Además, dentro de AltaGerencia están InformeRendimiento y ReporteSeguridad, y dentro de Estrategias están Mercadeo y Nvosprod.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# ls -l\ntotal 0\ndrwxr-xr-x. 2 root root 64 nov 16 15:39 AltaGerencia\ndrwxr-xr-x. 2 root root 46 nov 16 15:55 Estrategias\ndrwxr-xr-x. 2 root root 6 nov 16 15:21 Tacticas\n[root@localhost Carpetascompartidas]#</div></div>",
+    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra cómo deben quedar organizadas las carpetas: CarpetasCompartidas → AltaGerencia, Estrategias, Tacticas.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# ls -l\ntotal 0\ndrwxr-xr-x. 2 root root 64 nov 16 15:39 AltaGerencia\ndrwxr-xr-x. 2 root root 46 nov 16 15:55 Estrategias\ndrwxr-xr-x. 2 root root 6 nov 16 15:21 Tacticas\n[root@localhost Carpetascompartidas]#</div></div>",
     "opts": [
       "Solo los nombres de los archivos",
       "Permisos, propietario, grupo, tamaño y fecha de modificación",
@@ -359,14 +60,11 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "El comando 'ls -l' muestra los permisos, número de enlaces, propietario, grupo, tamaño en bytes, fecha/hora de modificación y nombre del archivo o directorio."
   },
-
-  //Comando ls y ls
-
   {
     "profe": true,
     "unit": "Linux",
     "diff": "medium",
-    "case": "El comando 'ls' puede listar el contenido de cualquier directorio especificando la ruta.",
+    "case": "El comando 'ls' puede listar el contenido de cualquier directorio del sistema especificando su ruta.",
     "q": "¿Qué muestra el comando 'ls /' en Linux?",
     "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# ls\nanaconda-ks.cfg\n[root@localhost ~]# ls /\nafs boot etc lib media opt root sbin sys usr\nbin dev home lib64 mnt proc run srv tmp var\n[root@localhost ~]#</div>",
     "opts": [
@@ -378,13 +76,11 @@ const preguntas_linux = [
     "ans": 0,
     "exp": "El comando 'ls /' lista el contenido del directorio raíz del sistema, mostrando todas las carpetas principales como bin, dev, etc, home, usr, var, entre otras."
   },
-
-  //El comando 'cd'
   {
     "profe": true,
     "unit": "Linux",
     "diff": "easy",
-    "case": "El comando 'pwd' muestra la ruta actual del directorio de trabajo.",
+    "case": "Cuando se trabaja en la terminal, es importante saber en qué directorio nos encontramos para ejecutar comandos correctamente.",
     "q": "¿Qué función cumple el comando 'pwd' en Linux?",
     "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# pwd\n/root\n[root@localhost ~]# cd /home\n[root@localhost home]# pwd\n/home\n[root@localhost home]#</div>",
     "opts": [
@@ -396,13 +92,11 @@ const preguntas_linux = [
     "ans": 2,
     "exp": "El comando 'pwd' (print working directory) muestra la ruta completa del directorio de trabajo actual donde te encuentras."
   },
-
-  //El comando 'useradd'
   {
     "profe": true,
     "unit": "Linux",
     "diff": "hard",
-    "case": "El comando 'useradd' se utiliza para crear nuevos usuarios en el sistema.",
+    "case": "Para administrar un sistema Linux, es necesario crear cuentas de usuario para cada persona que vaya a utilizarlo.",
     "q": "¿Qué comando se utiliza para crear un nuevo usuario llamado 'Jimena' en Linux?",
     "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Organigrama de la empresa:<br><img src='/img/diagrama_empresa.jpg' alt='Organigrama' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Jimena es la CEO y tiene acceso a todas las carpetas.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# useradd Jimena\n[root@localhost ~]# passwd Jimena\nCambiando la contraseña del usuario Jimena.\nNueva contraseña: \nVuelva a escribir la nueva contraseña: \npasswd: todos los tokens de autenticación se actualizaron exit\n[root@localhost ~]#</div></div>",
     "opts": [
@@ -414,13 +108,11 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "El comando 'useradd' seguido del nombre de usuario (useradd Jimena) crea un nuevo usuario. Luego se debe usar 'passwd' para asignar una contraseña."
   },
-
-  //Comando passwd
   {
     "profe": true,
     "unit": "Linux",
     "diff": "medium",
-    "case": "El comando 'passwd' se utiliza para cambiar o asignar contraseñas a usuarios.",
+    "case": "Después de crear un usuario, es necesario asignarle una contraseña para que pueda iniciar sesión.",
     "q": "¿Qué comando se utiliza para asignar una contraseña al usuario 'Clara'?",
     "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Organigrama de la empresa:<br><img src='/img/diagrama_empresa.jpg' alt='Organigrama' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Clara es Directora de Cuentas y tiene acceso a la carpeta AltaGerencia.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# useradd Clara\n[root@localhost ~]# passwd Clara\nCambiando la contraseña del usuario Clara.\nNueva contraseña: \nVuelva a escribir la nueva contraseña: \npasswd: todos los tokens de autenticación se actualizaron exit\n[root@localhost ~]#</div></div>",
     "opts": [
@@ -432,15 +124,13 @@ const preguntas_linux = [
     "ans": 0,
     "exp": "El comando 'passwd' seguido del nombre de usuario (passwd Clara) permite asignar o cambiar la contraseña del usuario especificado."
   },
-
-  //Comando mkdir
   {
     "profe": true,
     "unit": "Linux",
     "diff": "easy",
-    "case": "El comando 'mkdir' permite crear directorios en el sistema.",
+    "case": "Para organizar archivos en Linux, se utilizan directorios que se crean con un comando específico.",
     "q": "¿Qué comando se utiliza para crear un directorio llamado 'AltaGerencia'?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra la estructura completa de carpetas que debes crear. Observa que la carpeta principal es 'CarpetasCompartidas' y dentro están 'AltaGerencia', 'Estrategias' y 'Tacticas'.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# cd /home/Jimena\n[root@localhost Jimena]# mkdir Carpetascompartidas\n[root@localhost Jimena]# ls\nCarpetascompartidas\n[root@localhost Jimena]# cd Carpetascompartidas\n[root@localhost Carpetascompartidas]# mkdir AltaGerencia\n[root@localhost Carpetascompartidas]# ls\nAltaGerencia\n[root@localhost Carpetascompartidas]#</div></div>",
+    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra la estructura completa de carpetas que debes crear.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# cd /home/Jimena\n[root@localhost Jimena]# mkdir Carpetascompartidas\n[root@localhost Jimena]# ls\nCarpetascompartidas\n[root@localhost Jimena]# cd Carpetascompartidas\n[root@localhost Carpetascompartidas]# mkdir AltaGerencia\n[root@localhost Carpetascompartidas]# ls\nAltaGerencia\n[root@localhost Carpetascompartidas]#</div></div>",
     "opts": [
       "create AltaGerencia",
       "mkdir AltaGerencia",
@@ -450,13 +140,11 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "El comando 'mkdir' seguido del nombre del directorio (mkdir AltaGerencia) crea un nuevo directorio en la ubicación actual."
   },
-
-  //Comando mkdir
   {
     "profe": true,
     "unit": "Linux",
     "diff": "medium",
-    "case": "El comando 'mkdir' permite crear múltiples directorios a la vez.",
+    "case": "Para ahorrar tiempo, es posible crear varios directorios con un solo comando.",
     "q": "¿Cómo se crean múltiples directorios de una sola vez con 'mkdir'?",
     "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas2.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Los tres directorios internos que debes crear: AltaGerencia, Estrategias y Tacticas.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# cd /home/Jimena/Carpetascompartidas\n[root@localhost Carpetascompartidas]# mkdir AltaGerencia Estrategias Tacticas\n[root@localhost Carpetascompartidas]# ls\nAltaGerencia  Estrategias  Tacticas\n[root@localhost Carpetascompartidas]#</div></div>",
     "opts": [
@@ -468,16 +156,13 @@ const preguntas_linux = [
     "ans": 3,
     "exp": "Se pueden crear múltiples directorios de varias formas: 'mkdir dir1 dir2 dir3', 'mkdir {dir1,dir2,dir3}', o usando ';' para ejecutar múltiples comandos."
   },
-
-  //COMANDO TOUCH
-
   {
     "profe": true,
     "unit": "Linux",
     "diff": "hard",
-    "case": "El comando 'touch' permite crear archivos vacíos en Linux.",
+    "case": "El comando 'touch' es muy versátil y permite crear archivos vacíos de manera rápida.",
     "q": "¿Cómo se crean varios archivos de manera simultánea en un directorio?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Creación de archivos con touch y ls:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='touch y ls' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra el comando 'touch {2025,2026,Trazabilidad}.txt' para crear múltiples archivos a la vez. También muestra cómo listarlos con 'ls'. Observa que si no pones espacio después de las comas, el sistema lo toma como un solo archivo.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# touch {2025,2026,Trazabilidad}.txt\n[root@localhost Carpetascompartidas]# ls\n2025.txt 2026.txt Trazabilidad.txt AltaGerencia Estrategias Tacticas\n[root@localhost Carpetascompartidas]#</div></div>",
+    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Creación de archivos con touch y ls:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='touch y ls' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra el comando 'touch {2025,2026,Trazabilidad}.txt' para crear múltiples archivos a la vez.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# touch {2025,2026,Trazabilidad}.txt\n[root@localhost Carpetascompartidas]# ls\n2025.txt 2026.txt Trazabilidad.txt AltaGerencia Estrategias Tacticas\n[root@localhost Carpetascompartidas]#</div></div>",
     "opts": [
       "touch archivo1 archivo2 archivo3",
       "touch {archivo1,archivo2,archivo3}.txt",
@@ -487,16 +172,13 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "El comando 'touch {arch1,arch2,arch3}.txt' permite crear múltiples archivos de manera simultánea utilizando llaves y el sufijo común."
   },
-
-  // Comando rm
-
   {
     "profe": true,
     "unit": "Linux",
     "diff": "hard",
-    "case": "El comando 'rm' elimina archivos y directorios, y requiere flags específicos para directorios con contenido.",
+    "case": "En ocasiones es necesario eliminar directorios que contienen archivos, lo cual requiere opciones especiales.",
     "q": "¿Qué comando se utiliza para eliminar un directorio con todo su contenido?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra la estructura de carpetas que debes tener. Si usas 'rm -rf Tacticas', eliminas esa carpeta y todo su contenido. Luego debes volver a crearla con 'mkdir Tacticas' para mantener la estructura completa.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# rm -rf Tacticas\n[root@localhost Carpetascompartidas]# ls\nAltaGerencia Estrategias\n[root@localhost Carpetascompartidas]# mkdir Tacticas\n[root@localhost Carpetascompartidas]# ls\nAltaGerencia Estrategias Tacticas\n[root@localhost Carpetascompartidas]#</div></div>",
+    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra la estructura de carpetas que debes tener.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# rm -rf Tacticas\n[root@localhost Carpetascompartidas]# ls\nAltaGerencia Estrategias\n[root@localhost Carpetascompartidas]# mkdir Tacticas\n[root@localhost Carpetascompartidas]# ls\nAltaGerencia Estrategias Tacticas\n[root@localhost Carpetascompartidas]#</div></div>",
     "opts": [
       "rm -r directorio",
       "rm -rf directorio",
@@ -506,16 +188,13 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "El comando 'rm -rf directorio' elimina el directorio y todo su contenido de forma recursiva y forzada. '-r' es recursivo y '-f' es forzado."
   },
-
-
-  //Patrones de busqueda
   {
     "profe": true,
     "unit": "Linux",
     "diff": "hard",
-    "case": "Los patrones de búsqueda con ls permiten listar archivos que coinciden con ciertos caracteres.",
+    "case": "Linux permite utilizar patrones de búsqueda para listar archivos que cumplan ciertas condiciones.",
     "q": "¿Qué comando lista los archivos que comienzan con un carácter alfabético en Linux?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Creación de archivos con touch y ls:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='touch y ls' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra cómo listar archivos que comienzan con letras usando 'ls [[:alpha:]]*' y archivos que comienzan con números usando 'ls [[:digit:]]*'. Observa que 'Trazabilidad' comienza con letra y '2025', '2026' comienzan con números.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# ls [[:alpha:]]*\nAltaGerencia Estrategias Tacticas Trazabilidad.txt\n[root@localhost Carpetascompartidas]# ls [[:digit:]]*\n2025.txt 2026.txt\n[root@localhost Carpetascompartidas]#</div></div>",
+    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Creación de archivos con touch y ls:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='touch y ls' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra cómo listar archivos que comienzan con letras usando 'ls [[:alpha:]]*'.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# ls [[:alpha:]]*\nAltaGerencia Estrategias Tacticas Trazabilidad.txt\n[root@localhost Carpetascompartidas]# ls [[:digit:]]*\n2025.txt 2026.txt\n[root@localhost Carpetascompartidas]#</div></div>",
     "opts": [
       "ls [[:digit:]]*",
       "ls [[:alpha:]]*",
@@ -525,13 +204,11 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "El comando 'ls [[:alpha:]]*' lista los archivos que comienzan con un carácter alfabético (letras). '[[:digit:]]*' lista los que comienzan con números."
   },
-
-  //Comando cat
   {
     "profe": true,
     "unit": "Linux",
     "diff": "hard",
-    "case": "El comando 'cat' permite concatenar archivos y mostrar su contenido en pantalla.",
+    "case": "El comando 'cat' es uno de los comandos más utilizados para trabajar con archivos de texto.",
     "q": "¿Qué función cumple el comando 'cat' en Linux?",
     "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>CAT(1)    User Commands    CAT(1)\n\nNAME\n    cat - concatenate files and print on the standard output\n\nSYNOPSIS\n    cat [OPTION]... [FILE]...\n\nDESCRIPTION\n    Concatenate FILE(s) to standard output.\n\n    With no FILE, or when FILE is -, read standard input.\n\n    -A, --show-all\n    equivalent to -OET\n\n    -b, --number-nonblank\n    number nonempty output lines, overrides -n\n\n    -E, --show-ends\n    display $ at end of each line\n\n    -n, --number\n    number all output lines\n\n    -s, --squeeze-blank\n    suppress repeated empty output lines\n\n    -T, --show-tabs\n    display TAB characters as ^I\n\n[root@localhost ~]#</div>",
     "opts": [
@@ -543,13 +220,11 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "El comando 'cat' (concatenate) lee uno o más archivos y muestra su contenido en la salida estándar (pantalla). También puede concatenar varios archivos."
   },
-
-  //Comando cp
   {
     "profe": true,
     "unit": "Linux",
     "diff": "hard",
-    "case": "El comando 'cp' con la opción '-a' (archive) preserva atributos y copia recursivamente.",
+    "case": "El comando 'cp' tiene múltiples opciones que permiten copiar archivos preservando sus atributos.",
     "q": "¿Qué hace la opción '-a' del comando 'cp'?",
     "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>CP(1)    User Commands    CP(1)\n\nNAME\n    cp - copy files and directories\n\nSYNOPSIS\n    cp [OPTION]... [-T] SOURCE DEST\n    cp [OPTION]... SOURCE... DIRECTORY\n    cp [OPTION]... -t DIRECTORY SOURCE...\n\nDESCRIPTION\n    Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.\n\n    Mandatory arguments to long options are mandatory for short options too.\n\n    -a, --archive\n    same as -dR --preserve=all\n\n    -r, --recursive\n    copy directories recursively\n\n    -i, --interactive\n    prompt before overwrite\n\n[root@localhost ~]#</div>",
     "opts": [
@@ -561,13 +236,11 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "La opción '-a' (archive) es equivalente a '-dR --preserve=all', lo que significa que copia recursivamente preservando todos los atributos del archivo."
   },
-
-  //Comando cp
   {
     "profe": true,
     "unit": "Linux",
     "diff": "hard",
-    "case": "El comando 'cp' permite copiar archivos y directorios en Linux.",
+    "case": "El comando 'cp' tiene diferentes sintaxis dependiendo de si se copia a un archivo o a un directorio.",
     "q": "¿Cuál es la sintaxis correcta para copiar un archivo a un directorio en Linux?",
     "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# cp archivo.txt /home/usuario/\n[root@localhost ~]#</div>",
     "opts": [
@@ -579,15 +252,13 @@ const preguntas_linux = [
     "ans": 3,
     "exp": "El comando 'cp' tiene varias sintaxis: 'cp SOURCE DEST' para copiar a un archivo, 'cp SOURCE DIRECTORY' para copiar a un directorio, y 'cp -r SOURCE DIRECTORY' para copiar directorios recursivamente."
   },
-
-  //ls -l
   {
     "profe": true,
     "unit": "Linux",
     "diff": "medium",
-    "case": "En Linux, los archivos y directorios tienen permisos específicos para propietario, grupo y otros.",
+    "case": "En la salida de 'ls -l', el primer carácter de cada línea proporciona información sobre el tipo de elemento.",
     "q": "En la salida de 'ls -l', ¿qué representa la primera letra de cada línea como 'd' o '-'?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>En la imagen de 'ls -l', observa que la primera letra de cada línea es 'd' para directorios (AltaGerencia, Estrategias, Tacticas). Los archivos regulares tienen '-' como primera letra.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>drwxr-xr-x. 2 root root 64 nov 16 15:39 AltaGerencia\n-rw-r--r--. 1 root root 0 nov 16 16:00 archivo.txt\n[root@localhost Carpetascompartidas]#</div></div>",
+    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>En la imagen de 'ls -l', observa que la primera letra de cada línea es 'd' para directorios.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>drwxr-xr-x. 2 root root 64 nov 16 15:39 AltaGerencia\n-rw-r--r--. 1 root root 0 nov 16 16:00 archivo.txt\n[root@localhost Carpetascompartidas]#</div></div>",
     "opts": [
       "El tamaño del archivo",
       "El propietario del archivo",
@@ -598,7 +269,8 @@ const preguntas_linux = [
     "exp": "En 'ls -l', la primera letra indica el tipo: 'd' para directorio, '-' para archivo regular, 'l' para enlace simbólico, entre otros."
   },
 
-  //POSIBLES PREGUNTAS DE LA PRUEBA
+  // ========== PREGUNTAS DE PERMISOS Y USUARIOS ==========
+
   {
     "profe": true,
     "unit": "Linux",
@@ -759,7 +431,6 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "La letra 'd' al inicio de los permisos indica que es un directorio. '-' indica archivo regular."
   },
-
   {
     "profe": true,
     "unit": "Linux",
@@ -921,9 +592,8 @@ const preguntas_linux = [
     "exp": "Se puede salir de la sesión root con 'exit', 'logout' o 'su - nombre_usuario'."
   },
 
-  //POSIBLES PRUEBA CON NUEVOS ESCENARIOS
+  // ========== ESCENARIOS DE PRUEBA ==========
 
-  //Escenario 1: Nuevos empleados
   {
     "profe": true,
     "unit": "Linux",
@@ -940,8 +610,6 @@ const preguntas_linux = [
     "ans": 0,
     "exp": "El comando 'useradd' seguido del nombre crea el usuario y automáticamente su directorio personal en /home/nombre."
   },
-
-  //Escenario 2: Crear directorios por área
   {
     "profe": true,
     "unit": "Linux",
@@ -958,8 +626,6 @@ const preguntas_linux = [
     "ans": 3,
     "exp": "Se puede usar mkdir con llaves, con -p para crear rutas completas, o uno por uno."
   },
-
-  //Escenario 3: Asignar propietarios
   {
     "profe": true,
     "unit": "Linux",
@@ -976,9 +642,6 @@ const preguntas_linux = [
     "ans": 0,
     "exp": "El comando 'chown' cambia el propietario de un directorio. Se usa 'chown usuario directorio'."
   },
-
-  //Escenario 4: Usuario de baja
-
   {
     "profe": true,
     "unit": "Linux",
@@ -995,9 +658,6 @@ const preguntas_linux = [
     "ans": 0,
     "exp": "'userdel Carlos' elimina al usuario pero mantiene sus archivos. '-r' los elimina también."
   },
-
-  //Escenario 5: Usuario asume nuevo puesto
-
   {
     "profe": true,
     "unit": "Linux",
@@ -1014,9 +674,6 @@ const preguntas_linux = [
     "ans": 0,
     "exp": "'chown Ana /empresa/Finanzas' cambia el propietario de Finanzas a Ana."
   },
-
-  //Escenario 6: Crear grupo y asignar usuarios
-
   {
     "profe": true,
     "unit": "Linux",
@@ -1033,9 +690,6 @@ const preguntas_linux = [
     "ans": 0,
     "exp": "Se crea el grupo con 'groupadd' y se agregan usuarios con 'usermod -G grupo usuario'."
   },
-
-  //Escenario 7: Permisos según rol
-
   {
     "profe": true,
     "unit": "Linux",
@@ -1052,9 +706,6 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "750: propietario (7=rwx), grupo (5=r-x), otros (0=---). Johana hace todo, grupo solo lee y ejecuta, otros nada."
   },
-
-  //Escenario 8: Mover usuario entre directorios
-
   {
     "profe": true,
     "unit": "Linux",
@@ -1071,9 +722,6 @@ const preguntas_linux = [
     "ans": 0,
     "exp": "'chown Carlos /empresa/Finanzas' devuelve la propiedad de Finanzas a Carlos."
   },
-
-  //Escenario 9: Verificar estructura completa
-
   {
     "profe": true,
     "unit": "Linux",
@@ -1090,9 +738,6 @@ const preguntas_linux = [
     "ans": 0,
     "exp": "'ls -l' muestra permisos, propietario, grupo, tamaño y fecha de modificación."
   },
-
-  //Escenario 10: Escenario completo
-
   {
     "profe": true,
     "unit": "Linux",
@@ -1110,171 +755,7 @@ const preguntas_linux = [
     "exp": "El orden correcto es: 1) crear usuario, 2) crear grupo, 3) crear directorio, 4) asignar propietario, 5) asignar permisos."
   },
 
-
-  //PREGUNTAS PARA LA PRUEBA PRÁCTICA DE LINUX
-
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Se solicita crear los usuarios Johana (Directora de TI) y Carlos (Director de Finanzas) para la estructura de la empresa.",
-    "q": "¿Qué comando crea al usuario Johana con su directorio personal?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# useradd Johana\n[root@localhost ~]# passwd Johana\nNueva contraseña: \n[root@localhost ~]# useradd Carlos\n[root@localhost ~]# passwd Carlos\nNueva contraseña: \n[root@localhost ~]#</div>",
-    "opts": [
-      "useradd Johana y useradd Carlos",
-      "adduser Johana y adduser Carlos",
-      "newuser Johana y newuser Carlos",
-      "create Johana y create Carlos"
-    ],
-    "ans": 0,
-    "exp": "El comando 'useradd' seguido del nombre de usuario crea al usuario y su directorio personal en /home."
-  },
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Se debe crear la estructura de directorios TI y FINANZAS dentro de /empresa.",
-    "q": "¿Qué comando crea los directorios TI y FINANZAS?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# mkdir -p /empresa/TI\n[root@localhost ~]# mkdir -p /empresa/FINANZAS\n[root@localhost ~]#</div>",
-    "opts": [
-      "mkdir /empresa/TI /empresa/FINANZAS",
-      "mkdir -p /empresa/TI /empresa/FINANZAS",
-      "mkdir /empresa/{TI,FINANZAS}",
-      "Todas las anteriores"
-    ],
-    "ans": 3,
-    "exp": "Se puede crear directorios de varias formas: con mkdir uno por uno, con -p para crear la ruta completa, o con llaves."
-  },
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Se debe asignar a Johana como propietaria de TI y a Carlos de FINANZAS.",
-    "q": "¿Qué comando asigna a Johana como propietaria del directorio TI?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# chown Johana /empresa/TI\n[root@localhost ~]# chown Carlos /empresa/FINANZAS\n[root@localhost ~]#</div>",
-    "opts": [
-      "chown Johana /empresa/TI",
-      "chmod Johana /empresa/TI",
-      "chgrp Johana /empresa/TI",
-      "owner Johana /empresa/TI"
-    ],
-    "ans": 0,
-    "exp": "El comando 'chown' (change owner) cambia el propietario de un archivo o directorio."
-  },
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Se debe asignar permisos para que Johana tenga todos los permisos en TI y el grupo solo lectura y ejecución.",
-    "q": "¿Qué permisos debe tener Johana en /empresa/TI?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# chmod 750 /empresa/TI\n[root@localhost ~]# chmod 750 /empresa/FINANZAS\n[root@localhost ~]#</div>",
-    "opts": [
-      "chmod 700 /empresa/TI",
-      "chmod 750 /empresa/TI",
-      "chmod 755 /empresa/TI",
-      "chmod 770 /empresa/TI"
-    ],
-    "ans": 1,
-    "exp": "750: propietario (7=rwx), grupo (5=r-x), otros (0=---). Johana hace todo, grupo lee y ejecuta, otros nada."
-  },
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Se debe crear el grupo 'administracion' y agregar a Johana y Carlos.",
-    "q": "¿Qué comando crea el grupo y agrega a los usuarios?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# groupadd administracion\n[root@localhost ~]# usermod -G administracion Johana\n[root@localhost ~]# usermod -G administracion Carlos\n[root@localhost ~]#</div>",
-    "opts": [
-      "groupadd administracion; usermod -G administracion Johana; usermod -G administracion Carlos",
-      "addgroup administracion; adduser Johana administracion; adduser Carlos administracion",
-      "creategroup administracion; useradd Johana administracion; useradd Carlos administracion",
-      "Todas las anteriores"
-    ],
-    "ans": 0,
-    "exp": "Se crea el grupo con 'groupadd' y se agregan usuarios con 'usermod -G grupo usuario'."
-  },
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Se debe cambiar el grupo propietario de TI a 'administracion'.",
-    "q": "¿Qué comando cambia el grupo propietario de un directorio?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# chgrp administracion /empresa/TI\n[root@localhost ~]# ls -l /empresa\ndrwxr-x---. 2 Johana administracion 64 nov 16 15:39 TI\n[root@localhost ~]#</div>",
-    "opts": [
-      "chown Johana:administracion /empresa/TI",
-      "chgrp administracion /empresa/TI",
-      "chmod administracion /empresa/TI",
-      "Todas las anteriores"
-    ],
-    "ans": 3,
-    "exp": "Se puede cambiar el grupo con 'chgrp grupo directorio' o con 'chown usuario:grupo directorio'."
-  },
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Carlos no debe poder acceder al directorio TI. Solo Johana y el grupo administracion.",
-    "q": "¿Qué permisos debe tener TI para que Carlos no pueda acceder?",
-    "extra": "",
-    "opts": [
-      "chmod 750 /empresa/TI",
-      "chmod 700 /empresa/TI",
-      "chmod 770 /empresa/TI",
-      "chmod 755 /empresa/TI"
-    ],
-    "ans": 0,
-    "exp": "Con 750: propietario (7=rwx), grupo (5=r-x), otros (0=---). Carlos está en otros, no tiene acceso."
-  },
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Se debe crear un usuario llamado Lola Flores como Directora de TI.",
-    "q": "¿Qué comando crea a Lola Flores y le asigna una contraseña que nunca expire?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# useradd LolaFlores\n[root@localhost ~]# passwd -x -1 LolaFlores\n[root@localhost ~]#</div>",
-    "opts": [
-      "useradd LolaFlores y passwd -x -1 LolaFlores",
-      "useradd LolaFlores y passwd -d LolaFlores",
-      "adduser LolaFlores y passwd -x -1 LolaFlores",
-      "newuser LolaFlores y passwd -x -1 LolaFlores"
-    ],
-    "ans": 0,
-    "exp": "'useradd LolaFlores' crea al usuario. 'passwd -x -1 LolaFlores' hace que la contraseña nunca expire."
-  },
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Se debe restringir el acceso a la carpeta TI solo a Johana y al grupo administracion.",
-    "q": "¿Qué comando restringe el acceso a TI solo a Johana y al grupo administracion?",
-    "extra": "",
-    "opts": [
-      "chmod 750 /empresa/TI",
-      "chmod 700 /empresa/TI",
-      "chmod 770 /empresa/TI",
-      "chmod 755 /empresa/TI"
-    ],
-    "ans": 0,
-    "exp": "750: Johana tiene todos los permisos, el grupo administracion puede leer y ejecutar, otros no tienen acceso."
-  },
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "hard",
-    "case": "Se debe verificar la estructura completa de usuarios, grupos y permisos creados.",
-    "q": "¿Qué comando muestra todos los usuarios creados en el sistema?",
-    "extra": "",
-    "opts": [
-      "cat /etc/passwd",
-      "cat /etc/group",
-      "ls /home",
-      "Todas las anteriores"
-    ],
-    "ans": 3,
-    "exp": "Se puede ver los usuarios en /etc/passwd, los grupos en /etc/group, y los directorios personales en /home."
-  },
-
-
+  // ========== PREGUNTAS DE COMANDOS ADICIONALES ==========
 
   {
     "profe": true,
@@ -1532,6 +1013,9 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "La opción '-h' (help) del comando 'sudo' muestra un mensaje de ayuda con los usos y opciones disponibles del comando."
   },
+
+  // ========== PREGUNTAS DE PRUEBA PRÁCTICA ==========
+
   {
     "profe": false,
     "unit": "Linux",
@@ -1991,36 +1475,9 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "Linux identifica al usuario root mediante el símbolo #. Los usuarios normales utilizan el símbolo $ en la terminal."
   },
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "hard",
-    "q": "¿Qué comando permite eliminar un directorio junto con todo su contenido?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# rm -r Directorio\n[root@localhost ~]#</div>",
-    "opts": [
-      "rm Directorio",
-      "rm -r Directorio",
-      "rmdir Directorio",
-      "del Directorio"
-    ],
-    "ans": 1,
-    "exp": "La opción -r elimina directorios de forma recursiva."
-  },
-  {
-    "profe": false,
-    "unit": "Linux",
-    "diff": "easy",
-    "q": "¿Qué comando se utiliza para crear un directorio llamado Proyectos?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# mkdir Proyectos\n[root@localhost ~]# ls\nProyectos\n[root@localhost ~]#</div>",
-    "opts": [
-      "touch Proyectos",
-      "mkdir Proyectos",
-      "cd Proyectos",
-      "useradd Proyectos"
-    ],
-    "ans": 1,
-    "exp": "mkdir crea directorios dentro del sistema de archivos."
-  },
+
+  // ========== PREGUNTAS DE COMANDOS AVANZADOS ==========
+
   {
     "profe": false,
     "unit": "Linux - Comandos Básicos",
@@ -2041,21 +1498,6 @@ const preguntas_linux = [
     "unit": "Linux - Comandos Básicos",
     "diff": "easy",
     "q": "¿Qué comando muestra el directorio actual en el que te encuentras?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# pwd\n/root\n[root@localhost ~]#</div>",
-    "opts": [
-      "pwd",
-      "cd",
-      "ls",
-      "where"
-    ],
-    "ans": 0,
-    "exp": "El comando 'pwd' (Print Working Directory) imprime la ruta absoluta del directorio actual.\nEjemplo de salida:\n  /home/usuario/documentos"
-  },
-  {
-    "profe": false,
-    "unit": "Linux - Comandos Básicos",
-    "diff": "easy",
-    "q": "¿Qué comando muestra el directorio actual en el que te encuentra?",
     "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# cd /\n[root@localhost /]# pwd\n/\n[root@localhost /]# cd /home\n[root@localhost home]# pwd\n/home\n[root@localhost home]#</div>",
     "opts": [
       "cd",
@@ -2503,38 +1945,304 @@ const preguntas_linux = [
   },
   {
     "profe": false,
-    "unit": "Linux - Bash y Scripts",
-    "diff": "hard",
-    "case": "Tienes el siguiente pipeline y debes explicar qué hace cada parte:\ncat /var/log/auth.log | grep 'Failed password' | awk '{print $11}' | sort | uniq -c | sort -rn | head -10",
-    "q": "¿Qué hace este comando completo?",
+    "unit": "Linux",
+    "diff": "easy",
+    "case": "En la década de 1990, un estudiante finlandés desarrolló un núcleo de sistema operativo que se convertiría en uno de los proyectos de código abierto más importantes de la historia.",
+    "q": "¿Cuál fue la principal motivación de Linus Torvalds para crear Linux?",
     "extra": "",
     "opts": [
-      "Muestra las 10 IPs que más intentos fallidos de SSH tienen (posibles ataques de fuerza bruta)",
-      "Muestra los 10 usuarios que fallaron al iniciar sesión",
-      "Muestra los últimas 10 líneas del log de autenticación",
-      "Cuenta cuántos usuarios tienen contraseña fallida en el sistema"
+      "Crear un sistema operativo de pago con soporte técnico profesional",
+      "Desarrollar un sistema que compita directamente con Windows",
+      "Crear un sistema operativo que se comporte como UNIX y ejecute programas GNU",
+      "Reemplazar completamente el sistema Minix de Andrew Tanenbaum"
+    ],
+    "ans": 2,
+    "exp": "Linus Torvalds, estudiante de la Universidad de Helsinki, se inspiró en Minix y planteó crear un sistema operativo que se comportara como UNIX y ejecutara programas GNU."
+  },
+  {
+    "profe": false,
+    "unit": "Linux",
+    "diff": "easy",
+    "case": "Linux se ha convertido en uno de los sistemas operativos más utilizados en servidores y dispositivos móviles, destacando por su modelo de distribución.",
+    "q": "¿Cuáles son las dos características principales que diferencian a Linux de otros sistemas operativos?",
+    "extra": "",
+    "opts": [
+      "Es gratuito y tiene soporte técnico 24/7",
+      "Es libre (sin pago de licencias) y viene acompañado del código fuente",
+      "Es más rápido y tiene mejor interfaz gráfica",
+      "Es compatible con Windows y Mac"
+    ],
+    "ans": 1,
+    "exp": "Linux es libre (no requiere pago de licencia) y viene acompañado del código fuente, permitiendo su estudio y modificación."
+  },
+  {
+    "profe": false,
+    "unit": "Linux",
+    "diff": "medium",
+    "case": "Al instalar Red Hat Enterprise Linux en una máquina virtual, es necesario asignar recursos adecuados para un rendimiento óptimo.",
+    "q": "¿Cuáles son las especificaciones de hardware recomendadas para la máquina virtual en VirtualBox?",
+    "extra": "",
+    "opts": [
+      "2 GB de RAM, 1 CPU, 20 GB de disco duro",
+      "4 GB de RAM, 2 CPU, 30 GB de disco duro",
+      "8 GB de RAM, 4 CPU, 50 GB de disco duro",
+      "16 GB de RAM, 8 CPU, 100 GB de disco duro"
+    ],
+    "ans": 1,
+    "exp": "Según los pasos de instalación, se deben configurar 4 GB de RAM, 2 CPU y un disco duro de 30 GB."
+  },
+  {
+    "profe": false,
+    "unit": "Linux",
+    "diff": "medium",
+    "case": "Durante el arranque desde el ISO de Red Hat Enterprise Linux 10.0, aparece un menú con varias opciones de instalación.",
+    "q": "¿Qué opción se debe seleccionar al iniciar la instalación desde el ISO?",
+    "extra": `
+      <div class="terminal-box" style="background:#1a1a1a;color:#00ff00;padding:15px;font-family:monospace;border-radius:5px;">
+      <b>Red Hat Enterprise Linux 10.0</b><br><br>
+      <span style="color:#ffff00;">▶ Install Red Hat Enterprise Linux 10.0</span><br>
+      <span style="color:#ffff00;">▶ Test this media & install Red Hat Enterprise Linux 10.0</span><br>
+      <span style="color:#ffff00;">▶ Rescue a Red Hat Enterprise Linux system</span><br>
+      <span style="color:#ffff00;">▶ Run a memory test</span><br><br>
+      Tab - switch between elements | Enter - select
+      </div>
+      `,
+    "opts": [
+      "Test this media & install Red Hat Enterprise Linux 10.0",
+      "Install Red Hat Enterprise Linux 10.0",
+      "Rescue a Red Hat Enterprise Linux system",
+      "Run a memory test"
     ],
     "ans": 0,
-    "exp": "Este comando analiza intentos fallidos de SSH (detección de fuerza bruta):\n\n" +
-      "  cat /var/log/auth.log     → lee el log de autenticación\n" +
-      "  grep 'Failed password'    → filtra solo los intentos fallidos\n" +
-      "  awk '{print $11}'         → extrae el campo 11 (la IP de origen)\n" +
-      "  sort                      → ordena las IPs alfabéticamente\n" +
-      "  uniq -c                   → cuenta ocurrencias únicas\n" +
-      "  sort -rn                  → ordena numéricamente de mayor a menor\n" +
-      "  head -10                  → muestra solo las 10 primeras\n\n" +
-      "Salida típica (IP → cantidad de intentos):\n" +
-      "    342 192.168.1.200\n" +
-      "    128 10.0.0.55\n" +
-      "     45 172.16.0.10\n\n" +
-      "Este tipo de análisis es fundamental en ciberseguridad para:\n" +
-      "  → Detectar ataques de fuerza bruta\n" +
-      "  → Identificar IPs a bloquear con fail2ban o ufw"
-  }
-
+    "exp": "Se debe seleccionar 'Test this media & install Red Hat Enterprise Linux 10.0' para iniciar el proceso de instalación con verificación del medio."
+  },
+  {
+    "profe": false,
+    "unit": "Linux",
+    "diff": "easy",
+    "case": "Durante la instalación de Red Hat, se debe configurar la localización del sistema para adaptarse a la región del usuario.",
+    "q": "¿Qué configuraciones de idioma se deben seleccionar durante la instalación de Red Hat según los pasos?",
+    "extra": `
+      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
+      <b>📋 LOCALIZATION</b><br><br>
+      <span style="color:#00ffff;">▼ Language</span>  <span style="color:#ffa500;">[ Español Chile ]</span><br>
+      <span style="color:#00ffff;">▼ Keyboard</span>  <span style="color:#ffa500;">[ Castellano ]</span><br>
+      <span style="color:#00ffff;">▼ Time & Date</span>  <span style="color:#ffa500;">[ America/Santiago ]</span><br><br>
+      <span style="color:#888;">[Hecho]</span>
+      </div>
+      `,
+    "opts": [
+      "Inglés Estados Unidos y teclado en inglés",
+      "Español Chile y teclado en castellano",
+      "Español España y teclado en español",
+      "Portugués Brasil y teclado en portugués"
+    ],
+    "ans": 1,
+    "exp": "Se debe seleccionar el idioma Español Chile y el teclado en castellano como se muestra en la interfaz."
+  },
+  {
+    "profe": false,
+    "unit": "Linux",
+    "diff": "medium",
+    "case": "Durante la instalación de Red Hat, se deben configurar las cuentas de usuario para acceder al sistema después del arranque.",
+    "q": "¿Qué pasos se deben seguir para la creación del usuario durante la instalación de Red Hat?",
+    "extra": `
+      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
+      <b>👤 USER SETTINGS</b><br><br>
+      <span style="color:#00ffff;">▼ Root Password</span>  <span style="color:#ffa500;">[ ●●●●●●● ]</span><br>
+      <span style="color:#00ffff;">▼ User Creation</span><br>
+      &nbsp;&nbsp;Full name: <input placeholder="Nombre Apellido" style="background:#333;color:#fff;border:1px solid #555;"><br>
+      &nbsp;&nbsp;Username: <input placeholder="usuario" style="background:#333;color:#fff;border:1px solid #555;"><br>
+      &nbsp;&nbsp;Password: <input placeholder="●●●●●●●●" style="background:#333;color:#fff;border:1px solid #555;"><br>
+      &nbsp;&nbsp;☑ <span style="color:#ffa500;">Make this user administrator</span><br><br>
+      <span style="color:#888;">[Hecho]</span>
+      </div>
+      `,
+    "opts": [
+      "Crear solo la contraseña de root y omitir la creación del usuario",
+      "Crear el usuario con su nombre y apellido y marcarlo como administrador",
+      "Crear el usuario sin contraseña",
+      "Crear el usuario solo después de finalizar la instalación"
+    ],
+    "ans": 1,
+    "exp": "Se debe crear el usuario con nombre y apellido, y marcarlo como administrador con la opción 'Make this user administrator'."
+  },
+  {
+    "profe": false,
+    "unit": "Linux",
+    "diff": "hard",
+    "case": "El instalador de Red Hat permite seleccionar qué paquetes y servicios se instalarán según el rol del servidor.",
+    "q": "¿Qué opciones de software se deben marcar durante la instalación de Red Hat según los pasos?",
+    "extra": `
+      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
+      <b>📦 SOFTWARE SELECTION</b><br><br>
+      <span style="color:#ffa500;">Base Environment:</span><br>
+      ☑ <span style="color:#00ff00;">Server with GUI</span> - Servidor integrado y fácil de administrar con interfaz gráfica<br><br>
+      <span style="color:#ffa500;">Additional software for selected environment:</span><br>
+      ☑ <span style="color:#00ff00;">DNS Name Server</span><br>
+      ☑ <span style="color:#00ff00;">FTP Server</span><br>
+      ☑ <span style="color:#00ff00;">Mail Server</span><br>
+      ☐ Web Server<br>
+      ☐ Database Server<br><br>
+      <span style="color:#888;">[Hecho]</span>
+      </div>
+      `,
+    "opts": [
+      "Servidor con GUI, Servidor de nombres DNS, Servidor FTP y Servidores de correo",
+      "Solo Servidor con GUI y Servidor FTP",
+      "Servidor con GUI, Servidor web y Servidor de base de datos",
+      "Todas las opciones disponibles"
+    ],
+    "ans": 0,
+    "exp": "Se deben seleccionar 'Server with GUI' como base environment, y como adicionales: DNS Name Server, FTP Server y Mail Server."
+  },
+  {
+    "profe": false ,
+    "unit": "Linux",
+    "diff": "medium",
+    "case": "Durante la instalación de Red Hat, aparece una opción relacionada con la captura de información del sistema en caso de fallos.",
+    "q": "¿Qué es KDUMP y para qué sirve en la instalación de Red Hat?",
+    "extra": "",
+    "opts": [
+      "Un sistema de copia de seguridad de archivos",
+      "Un mecanismo de volcado de memoria de daños de kernel para troubleshooting",
+      "Un sistema de monitoreo de red",
+      "Un sistema de gestión de paquetes"
+    ],
+    "ans": 1,
+    "exp": "KDUMP es un mecanismo que captura información del sistema en caso de fallo del kernel, sirviendo para troubleshooting posterior."
+  },
+  {
+    "profe": false ,
+    "unit": "Linux",
+    "diff": "hard",
+    "case": "La conectividad de red es esencial para que el sistema pueda recibir actualizaciones y comunicarse con otros equipos.",
+    "q": "¿Cómo se configura la red durante la instalación de Red Hat?",
+    "extra": `
+      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
+      <b>🌐 NETWORK & HOSTNAME</b><br><br>
+      Interface: <span style="color:#00ffff;">enp0s3</span><br>
+      <span style="color:#ffa500;">Status:</span> <span style="color:#ff4444;">● Disconnected</span><br>
+      <span style="color:#ffa500;">Hostname:</span> <input placeholder="localhost.localdomain" style="background:#333;color:#fff;border:1px solid #555;"><br><br>
+      <span style="color:#ffa500;">IPv4 Settings:</span><br>
+      Method: <select style="background:#333;color:#fff;border:1px solid #555;"><option>DHCP</option><option>Manual</option></select><br><br>
+      <span style="color:#888;">[Configure] [Hecho]</span>
+      </div>
+      `,
+    "opts": [
+      "Las interfaces vienen habilitadas por defecto con IP estática",
+      "Las interfaces aparecen deshabilitadas con DHCP por defecto, y se pueden configurar IPs estáticas pulsando Configurar",
+      "Se debe configurar la red después de la instalación",
+      "No se requiere configuración de red durante la instalación"
+    ],
+    "ans": 1,
+    "exp": "Las interfaces aparecen deshabilitadas con DHCP. Para establecer IPs estáticas o modificar el Hostname, se debe pulsar 'Configure'."
+  },
+  {
+    "profe": false,
+    "unit": "Linux",
+    "diff": "hard",
+    "case": "Después de instalar Red Hat, es necesario autenticar el sistema para poder recibir actualizaciones y soporte oficial.",
+    "q": "¿Qué comando se utiliza para registrar el sistema con Red Hat Subscription Manager?",
+    "extra": `
+      <div class="terminal-box" style="background:#1a1a1a;color:#00ff00;padding:15px;font-family:monospace;border-radius:5px;">
+      [root@localhost ~]# <input placeholder="Comando de registro" style="background:#333;color:#00ff00;border:1px solid #555;width:400px;"><br>
+      <span style="color:#ffa500;">Enter username:</span> <input placeholder="correo@redhat.com" style="background:#333;color:#fff;border:1px solid #555;"><br>
+      <span style="color:#ffa500;">Enter password:</span> <input placeholder="●●●●●●●●" style="background:#333;color:#fff;border:1px solid #555;"><br><br>
+      <span style="color:#00ffff;">The system has been registered with ID: 12345678-90ab-cdef-1234-567890abcdef</span>
+      </div>
+      `,
+    "opts": [
+      "subscription-manager register --username usuario --password contraseña",
+      "register --username usuario --password contraseña",
+      "rhsm-register --username usuario --password contraseña",
+      "redhat-register --username usuario --password contraseña"
+    ],
+    "ans": 0,
+    "exp": "El comando correcto es 'subscription-manager register --username usuario --password contraseña' usando las credenciales de Red Hat."
+  },
+  {
+    "profe": false,
+    "unit": "Linux",
+    "diff": "easy",
+    "case": "Al iniciar sesión por primera vez en el sistema instalado, aparece una pantalla de bienvenida con varias opciones.",
+    "q": "¿Cómo se procede al iniciar sesión en Red Hat Enterprise Linux por primera vez?",
+    "extra": "",
+    "opts": [
+      "Se selecciona 'Empezar tour' y luego se registra el sistema",
+      "Se pulsa 'No gracias' en la bienvenida y luego se registra el sistema para actualizaciones",
+      "Se omite completamente el registro del sistema",
+      "Se configura inmediatamente el escritorio"
+    ],
+    "ans": 1,
+    "exp": "Se debe pulsar 'No gracias' en la pantalla de bienvenida y luego registrar el sistema para recibir actualizaciones."
+  },
+  {
+    "profe": false,
+    "unit": "Linux",
+    "diff": "easy",
+    "case": "Para identificar fácilmente la máquina virtual en VirtualBox, el nombre debe seguir un formato específico.",
+    "q": "¿Qué formato debe seguir el nombre de la máquina virtual en VirtualBox?",
+    "extra": `
+      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
+      <b>💻 VirtualBox - Create Virtual Machine</b><br><br>
+      <span style="color:#ffa500;">Name:</span> <input placeholder="RARSREDHAT" style="background:#333;color:#fff;border:1px solid #555;"><br>
+      <span style="color:#ffa500;">Folder:</span> /home/user/VirtualBox VMs<br>
+      <span style="color:#ffa500;">ISO Image:</span> rhel-10.0-x86_64-dvd.iso<br><br>
+      <span style="color:#ffa500;">ⓘ El nombre debe ser la inicial del nombre y apellido seguidas de REDHAT</span>
+      </div>
+      `,
+    "opts": [
+      "REDHAT + números",
+      "Iniciales de nombre y apellido + REDHAT",
+      "SOLO REDHAT",
+      "Nombre completo + REDHAT"
+    ],
+    "ans": 1,
+    "exp": "El nombre debe ser la inicial del nombre y apellido seguidas de REDHAT. Ejemplo: RARSREDHAT (R=nombre, ARS=apellidos)."
+  },
+  {
+    "profe": false,
+    "unit": "Linux",
+    "diff": "medium",
+    "case": "Para sistemas que requieren cumplir con estándares de seguridad específicos, el instalador ofrece políticas predefinidas.",
+    "q": "¿Para qué sirve la configuración de Security Policy en la instalación de Red Hat?",
+    "extra": `
+      <div class="terminal-box" style="background:#1a1a1a;color:#ffffff;padding:15px;font-family:monospace;border-radius:5px;">
+      <b>🔒 SECURITY POLICY</b><br><br>
+      <span style="color:#ffa500;">Security Profile:</span><br>
+      ☐ PCI-DSS (Payment Card Industry)<br>
+      ☐ OSPP (Operating System Protection Profile)<br><br>
+      <span style="color:#888;">⚠️ Si el sistema va a formar parte de un entorno PCI u OSPP,<br>aquí se puede habilitar una política de seguridad específica.</span><br><br>
+      <span style="color:#888;">[Hecho]</span>
+      </div>
+      `,
+    "opts": [
+      "Para configurar el firewall del sistema",
+      "Para habilitar una política de seguridad específica si el sistema forma parte de un entorno PCI u OSPP",
+      "Para instalar antivirus",
+      "Para configurar contraseñas complejas"
+    ],
+    "ans": 1,
+    "exp": "La política de seguridad permite habilitar una política específica en caso de que el sistema forme parte de un entorno PCI u OSPP."
+  },
+  {
+    "profe": false,
+    "unit": "Linux",
+    "diff": "easy",
+    "case": "Después de completar la instalación y configuración inicial, es recomendable preservar el estado de la máquina.",
+    "q": "¿Cuál es el último paso recomendado después de completar la instalación y registro del sistema?",
+    "extra": "",
+    "opts": [
+      "Apagar la máquina inmediatamente",
+      "Guardar la máquina virtual",
+      "Eliminar los archivos de instalación",
+      "Crear un punto de restauración"
+    ],
+    "ans": 1,
+    "exp": "Después de completar la instalación y el registro, se debe guardar la máquina virtual para preservar el estado."
+  },
 
 ];
-
-
 
 export default preguntas_linux;

@@ -64,7 +64,7 @@ function Carrusel({ nuevas = [] }) {
   const items = [...itemsFijos, ...itemsNuevas];
 
   function irASeccion(item) {
-    if (item.esOds) { window.open('https://www.pactomundial.org/que-puedes-hacer-tu/ods/', '_blank', 'noopener'); return; }
+    if (item.esOds) { window.open('', '_blank', 'noopener'); return; }
     navigate(item.key ? `/quiz/${item.key}` : '/cuestionarios');
   }
 
