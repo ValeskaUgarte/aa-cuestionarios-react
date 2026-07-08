@@ -71,6 +71,15 @@ export default function Registro() {
     if (form.password.length > 30)
       return setError('La contraseña no puede tener más de 30 caracteres.');
 
+    // 5.1 Exigencias mínimas de seguridad: al menos una mayúscula,
+    // una minúscula y un número (evita contraseñas débiles como "123456")
+    if (!/[A-Z]/.test(form.password))
+      return setError('La contraseña debe incluir al menos una letra mayúscula.');
+    if (!/[a-z]/.test(form.password))
+      return setError('La contraseña debe incluir al menos una letra minúscula.');
+    if (!/[0-9]/.test(form.password))
+      return setError('La contraseña debe incluir al menos un número.');
+
     // 6. Todo está bien — llamamos a la función registro del contexto
     // Esta función guarda el usuario en localStorage (usamos el nombre ya sin espacios extra)
     const result = registro(nombreLimpio, form.email, form.password, form.rol);
@@ -132,6 +141,9 @@ export default function Registro() {
               onChange={e => setForm(f => ({ ...f, password: e.target.value }))} 
               maxLength={30}
             />
+            <p className="input-hint">
+              Entre 6 y 30 caracteres, con al menos una mayúscula, una minúscula y un número.
+            </p>
           </div>
 
           {/* Campo confirmar contraseña */}

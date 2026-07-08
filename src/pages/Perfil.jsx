@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
+import { getActividad } from '../services/api';
 import './Perfil.css';
 
 // HOOKS Contexto de autenticación y navegación
@@ -29,6 +30,11 @@ export default function Perfil() {
     : null;
 
   const aprobados = historial.filter(h => h.nota >= 4.0).length;
+
+  // ACTIVIDAD DEL ADMIN: registro de sus acciones en el panel (crear/
+  // editar/eliminar preguntas y asignaturas), guardado en Local Storage.
+  // Solo se muestra si el usuario es administrador, a modo de demo.
+  const actividadAdmin = usuario.rol === 'admin' ? getActividad() : [];
 
   // RENDER
   return (
@@ -122,6 +128,29 @@ export default function Perfil() {
             </div>
           )}
         </div>
+
+        {/* ACTIVIDAD DEL ADMINISTRADOR — solo visible para el rol admin,
+            muestra sus últimas acciones en el panel como demostración
+            de la funcionalidad para la evaluación. */}
+        {usuario.rol === 'admin' && (
+          <div className="perfil-section">
+            <h3>Actividad reciente en el panel</h3>
+            {actividadAdmin.length === 0 ? (
+              <p className="perfil-empty">Aún no has hecho cambios en el panel de administración.</p>
+            ) : (
+              <div className="historial-lista">
+                {actividadAdmin.map((a, i) => (
+                  <div key={i} className="historial-item">
+                    <div className="historial-info">
+                      <p className="historial-asig">{a.texto}</p>
+                      <p className="historial-fecha">{new Date(a.fecha).toLocaleString('es-CL')}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/*ACCIONES Botón para cerrar sesión */}
 

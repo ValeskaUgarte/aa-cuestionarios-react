@@ -113,14 +113,6 @@
     {
       "pregunta": "Expande la IPv6 AA:8711::66DC",
       "asignatura": "sistemas_operativos",
-      "motivo": "Respuesta incorrecta",
-      "fecha": "2026-06-28T06:24:29.822Z",
-      "usuario": "anonimo",
-      "id": 1
-    },
-    {
-      "pregunta": "Expande la IPv6 AA:8711::66DC",
-      "asignatura": "sistemas_operativos",
       "motivo": "Error en la pregunta",
       "fecha": "2026-06-28T06:25:05.463Z",
       "usuario": "anonimo",

@@ -143,6 +143,18 @@ h1, h2, h3, h4 {
   background: var(--surface2); 
 }
 
+/* El link "Registrarse" usa .btn-primary (fondo morado, texto blanco),
+   pero .navbar-links a tiene más especificidad y le ganaba el color
+   gris por defecto, dejando el texto casi invisible sobre el morado. */
+.navbar-links a.btn-primary {
+  color: #fff;
+}
+
+.navbar-links a.btn-primary:hover {
+  color: #fff;
+  background: #7a5aa8;
+}
+
 /* NAVBAR RESPONSIVE Ajustes para móviles */
 @media (max-width: 600px) {
   .navbar {
@@ -329,6 +341,12 @@ h1, h2, h3, h4 {
   text-transform: uppercase;
 }
 
+.input-hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+
 .form-group { 
   margin-bottom: 1rem; 
 }
@@ -407,15 +425,23 @@ h1, h2, h3, h4 {
 }
 
 /* ADMIN FLASH Mensaje de confirmación
-    */
+   Fijo en pantalla (no dentro del flujo normal) para que se vea
+   siempre, sin importar en qué parte del formulario esté el admin. */
 .admin-flash {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
   background: #edf4ed;
   border: 1px solid #c8dcc8;
   color: #3a7a4a;
-  padding: 0.7rem 1rem;
+  padding: 0.7rem 1.2rem;
   border-radius: 10px;
-  margin-bottom: 1rem;
   font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  max-width: 90vw;
+  text-align: center;
 }
 
 /*LISTADO DE PREGUNTAS Panel de administración */

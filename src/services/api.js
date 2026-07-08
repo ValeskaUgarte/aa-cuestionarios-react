@@ -189,14 +189,15 @@ function setPreguntasLS(preguntas) {
 
 export const crearPregunta = (data) => {
   const preguntas = getPreguntasLS();
-  const nueva = { ...data, _id: Date.now().toString() };
+  const nueva = { ...data, _id: Date.now().toString(), createdAt: Date.now() };
   setPreguntasLS([...preguntas, nueva]);
   return Promise.resolve(nueva);
 };
 
 export const editarPregunta = (id, data) => {
   const preguntas = getPreguntasLS();
-  const actualizadas = preguntas.map(p => p._id === id ? { ...data, _id: id } : p);
+  const original = preguntas.find(p => p._id === id);
+  const actualizadas = preguntas.map(p => p._id === id ? { ...data, _id: id, createdAt: original?.createdAt ?? Date.now() } : p);
   setPreguntasLS(actualizadas);
   return Promise.resolve({ ...data, _id: id });
 };
@@ -234,7 +235,7 @@ function setAsignaturasLS(asigs) {
 
 export const crearAsignatura = (data) => {
   const asigs = getAsignaturasLS();
-  const nueva = { ...data, _id: Date.now().toString() };
+  const nueva = { ...data, _id: Date.now().toString(), createdAt: Date.now() };
   setAsignaturasLS([...asigs, nueva]);
   return Promise.resolve(nueva);
 };
@@ -419,4 +420,31 @@ export function eliminarReporte(id) {
     .catch(() => {
       setReportesLS(getReportesLS().filter(r => r.id !== id));
     });
+}
+
+// ══════════════════════════════════════════════════════════
+// REGISTRO DE ACTIVIDAD DEL ADMINISTRADOR
+// Guarda un historial simple de las acciones del admin (crear/editar/
+// eliminar preguntas y asignaturas, activar/desactivar) para mostrarlo
+// en su Perfil, a modo de demostración de la funcionalidad del panel.
+// Solo guarda las últimas 50 acciones para no llenar Local Storage.
+// ══════════════════════════════════════════════════════════
+
+const LS_KEY_ACTIVIDAD = 'admin_actividad';
+const MAX_ACTIVIDAD = 50;
+
+export function registrarActividad(texto) {
+  const actual = getActividadLS();
+  const nueva = { texto, fecha: Date.now() };
+  const actualizada = [nueva, ...actual].slice(0, MAX_ACTIVIDAD);
+  localStorage.setItem(LS_KEY_ACTIVIDAD, JSON.stringify(actualizada));
+}
+
+function getActividadLS() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY_ACTIVIDAD) || '[]'); }
+  catch { return []; }
+}
+
+export function getActividad() {
+  return getActividadLS();
 }

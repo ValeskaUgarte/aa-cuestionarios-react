@@ -8,7 +8,7 @@ import {
   crearPregunta, editarPregunta, eliminarPregunta,
   crearAsignatura, eliminarAsignatura,
   LISTA_ASIGNATURAS_ADMIN, getAsignaturasDesactivadas, toggleAsignaturaActiva,
-  getReportes, eliminarReporte
+  getReportes, eliminarReporte, registrarActividad
 } from '../services/api';
 
 // CONFIGURACIÓN INICIAL Valores por defecto para formularios
@@ -21,6 +21,9 @@ const MAX_UNIDAD = 40;
 const MAX_NOMBRE_ASIG = 60;
 const MAX_DESC_ASIG = 150;
 const MAX_EXTRA = 4000;
+const MAX_CASO = 800;
+const MIN_OPCIONES = 2;
+const MAX_OPCIONES = 6;
 
 // Plantillas listas para pegar y editar en el campo "Contenido extra".
 // Reutilizan las mismas clases CSS que ya usan las preguntas del banco
@@ -36,8 +39,9 @@ const PLANTILLA_CONSOLA = `<div class="terminal-box">
 $ comando de ejemplo
 salida simulada de la consola...
 </div>`;
-const EMPTY_P = { pregunta: '', opciones: ['', '', '', ''], respuestaCorrecta: 0, dificultad: 'easy', unidad: '', asignaturaId: '', explicacion: '', extra: '' };
-const EMPTY_A = { nombre: '', color: '#7c6dfa', descripcion: '' };
+// esDelProfesor: null = todavía no elegido (obligatorio elegir true o false)
+const EMPTY_P = { pregunta: '', caso: '', opciones: ['', '', '', ''], respuestaCorrecta: 0, dificultad: 'easy', unidad: '', asignaturaId: '', explicacion: '', extra: '', esDelProfesor: null };
+const EMPTY_A = { nombre: '', color: '#7c6dfa', descripcion: '', icono: '' };
 
 // ESTADOS DEL COMPONENTE
 export default function Admin() {
@@ -52,6 +56,8 @@ export default function Admin() {
   const [msg, setMsg] = useState('');                 // Mensajes de feedback
   const [reportes, setReportes] = useState([]);       // Lista de reportes de errores
   const [desactivadas, setDesactivadas] = useState([]); // Keys de cuestionarios desactivados
+  const [ordenPreguntas, setOrdenPreguntas] = useState('fecha'); // 'fecha' o 'nombre'
+  const [ordenAsignaturas, setOrdenAsignaturas] = useState('fecha'); // 'fecha' o 'nombre'
 
   // FUNCIONES AUXILIARES
   // Muestra un mensaje temporal (2.5 segundos)
@@ -72,6 +78,7 @@ export default function Admin() {
   function manejarToggleAsignatura(key) {
     toggleAsignaturaActiva(key);
     setDesactivadas(getAsignaturasDesactivadas());
+    registrarActividad(`Cambió el estado (activo/inactivo) de la asignatura "${key}"`);
   }
 
 
@@ -80,15 +87,26 @@ export default function Admin() {
 
   // CRUD DE PREGUNTAS Guardar, editar y eliminar
   async function guardarPregunta() {
-    // Validaciones de pregunta y asignatura obligatorias, opciones completas
     const preguntaLimpia = form.pregunta.trim();
-    if (!preguntaLimpia || !form.asignaturaId) return flash('Completa pregunta y asignatura.');
-    if (form.opciones.some(o => !o.trim())) return flash('Completa todas las opciones.');
+
+    // Reunimos TODOS los campos obligatorios que falten en una sola
+    // lista, para avisar de una vez cuáles hay que completar (en vez
+    // de mostrar un error a la vez y que el admin tenga que adivinar).
+    const faltantes = [];
+    if (!form.asignaturaId) faltantes.push('Asignatura');
+    if (!preguntaLimpia) faltantes.push('Pregunta');
+    if (form.opciones.some(o => !o.trim())) faltantes.push('Opciones de respuesta (todas)');
+    if (!form.explicacion.trim()) faltantes.push('Explicación');
+    if (form.esDelProfesor === null) faltantes.push('¿Es de una prueba del profesor? (Sí/No)');
+
+    if (faltantes.length) return flash(`Faltan campos obligatorios: ${faltantes.join(', ')}.`);
+
     // Validación de longitud máxima (evita textos desproporcionados)
     if (preguntaLimpia.length > MAX_PREGUNTA) return flash(`La pregunta no puede superar los ${MAX_PREGUNTA} caracteres.`);
     if (form.opciones.some(o => o.length > MAX_OPCION)) return flash(`Cada opción no puede superar los ${MAX_OPCION} caracteres.`);
     if (form.explicacion.length > MAX_EXPLICACION) return flash(`La explicación no puede superar los ${MAX_EXPLICACION} caracteres.`);
     if (form.extra.length > MAX_EXTRA) return flash(`El contenido extra no puede superar los ${MAX_EXTRA} caracteres.`);
+    if (form.caso.length > MAX_CASO) return flash(`El caso no puede superar los ${MAX_CASO} caracteres.`);
     try {
       const asig = asignaturas.find(a => a.key === form.asignaturaId || a._id === form.asignaturaId);
       if (!asig) return flash('Asignatura no encontrada.');
@@ -102,9 +120,11 @@ export default function Admin() {
       if (editId) {
         await editarPregunta(editId, payload);
         flash('Pregunta actualizada ✓');
+        registrarActividad(`Editó la pregunta "${preguntaLimpia.slice(0, 60)}"`);
       } else {
         await crearPregunta(payload);
         flash('Pregunta creada ✓');
+        registrarActividad(`Creó la pregunta "${preguntaLimpia.slice(0, 60)}"`);
       }
       setForm(EMPTY_P);
       setEditId(null);
@@ -114,17 +134,36 @@ export default function Admin() {
     }
   }
 
+  // Agrega una opción de respuesta más (hasta MAX_OPCIONES)
+  function agregarOpcion() {
+    if (form.opciones.length >= MAX_OPCIONES) return flash(`Máximo ${MAX_OPCIONES} opciones.`);
+    setForm(f => ({ ...f, opciones: [...f.opciones, ''] }));
+  }
+
+  // Quita la última opción de respuesta (hasta MIN_OPCIONES)
+  function quitarOpcion() {
+    if (form.opciones.length <= MIN_OPCIONES) return flash(`Mínimo ${MIN_OPCIONES} opciones.`);
+    setForm(f => {
+      const opciones = f.opciones.slice(0, -1);
+      // Si la respuesta correcta apuntaba a la opción que quitamos, la reseteamos a la primera
+      const respuestaCorrecta = f.respuestaCorrecta >= opciones.length ? 0 : f.respuestaCorrecta;
+      return { ...f, opciones, respuestaCorrecta };
+    });
+  }
+
   // Carga los datos de una pregunta en el formulario para editarla
   function editarP(p) {
     setForm({
       pregunta: p.pregunta,
+      caso: p.caso || '',
       opciones: p.opciones,
       respuestaCorrecta: p.respuestaCorrecta,
       dificultad: p.dificultad,
       unidad: p.unidad || '',
       asignaturaId: p.asignaturaId,
       explicacion: p.explicacion || '',
-      extra: p.extra || ''
+      extra: p.extra || '',
+      esDelProfesor: typeof p.esDelProfesor === 'boolean' ? p.esDelProfesor : null
     });
     setEditId(p._id || p.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -135,18 +174,22 @@ export default function Admin() {
     if (!confirm('¿Eliminar esta pregunta?')) return;
     await eliminarPregunta(id);
     flash('Eliminada ✓');
+    registrarActividad('Eliminó una pregunta del banco');
     cargar();
   }
 
   // CRUD DE ASIGNATURAS Guardar y eliminar
   async function guardarAsignatura() {
     const nombreLimpio = formA.nombre.trim();
-    if (!nombreLimpio) return flash('Escribe el nombre.');
+    const faltantes = [];
+    if (!nombreLimpio) faltantes.push('Nombre');
+    if (faltantes.length) return flash(`Faltan campos obligatorios: ${faltantes.join(', ')}.`);
     if (nombreLimpio.length > MAX_NOMBRE_ASIG) return flash(`El nombre no puede superar los ${MAX_NOMBRE_ASIG} caracteres.`);
     if (formA.descripcion.length > MAX_DESC_ASIG) return flash(`La descripción no puede superar los ${MAX_DESC_ASIG} caracteres.`);
     const payload = { ...formA, nombre: nombreLimpio, key: nombreLimpio.toLowerCase().replace(/\s+/g, '_') };
     await crearAsignatura(payload);
     flash('Asignatura creada ✓');
+    registrarActividad(`Creó la asignatura "${nombreLimpio}"`);
     setFormA(EMPTY_A);
     cargar();
   }
@@ -156,13 +199,26 @@ export default function Admin() {
     if (!confirm('¿Eliminar esta asignatura?')) return;
     await eliminarAsignatura(id);
     flash('Eliminada ✓');
+    registrarActividad('Eliminó una asignatura');
     cargar();
   }
 
   // FILTRADO Filtra preguntas por asignatura seleccionada
-  const pregsFiltradas = filtroAsig
+  const pregsFiltradas = (filtroAsig
     ? preguntas.filter(p => p.asignaturaId === filtroAsig || p.asignatura === filtroAsig)
-    : preguntas;
+    : preguntas
+  ).slice().sort((a, b) => {
+    if (ordenPreguntas === 'nombre') return (a.pregunta || '').localeCompare(b.pregunta || '');
+    // Por fecha: más nuevas primero. Las preguntas del banco estático no
+    // tienen createdAt, así que quedan al final (se tratan como fecha 0).
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
+
+  // Asignaturas ordenadas por fecha (más nuevas primero) o por nombre
+  const asignaturasOrdenadas = asignaturas.slice().sort((a, b) => {
+    if (ordenAsignaturas === 'nombre') return (a.nombre || '').localeCompare(b.nombre || '');
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
 
   // PANTALLA DE CARGA
   if (loading) return <><Navbar /><div className="loading">Cargando…</div></>;
@@ -210,7 +266,7 @@ export default function Admin() {
               <h3>{editId ? 'Editar pregunta' : 'Nueva pregunta'}</h3>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 2 }}>
-                  <label className="input-label">Asignatura</label>
+                  <label className="input-label">Asignatura *</label>
                   <select className="input" value={form.asignaturaId} onChange={e => setForm(f => ({ ...f, asignaturaId: e.target.value }))}>
                     <option value="">Selecciona</option>
                     {asignaturas.map(a => (
@@ -230,21 +286,34 @@ export default function Admin() {
                 </div>
               </div>
 
+              {/* Caso: contexto/escenario opcional que se muestra antes de
+                  la pregunta (ej: un caso de estudio para leer primero) */}
               <div className="form-group">
-                <label className="input-label">Pregunta</label>
+                <label className="input-label">Caso (opcional)</label>
+                <textarea className="input" rows={2} value={form.caso} onChange={e => setForm(f => ({ ...f, caso: e.target.value }))} placeholder="Contexto o escenario que se muestra antes de la pregunta…" maxLength={MAX_CASO} />
+                <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.caso.length}/{MAX_CASO}</span>
+              </div>
+
+              <div className="form-group">
+                <label className="input-label">Pregunta *</label>
                 <textarea className="input" rows={2} value={form.pregunta} onChange={e => setForm(f => ({ ...f, pregunta: e.target.value }))} placeholder="Escribe la pregunta…" maxLength={MAX_PREGUNTA} />
                 <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.pregunta.length}/{MAX_PREGUNTA}</span>
               </div>
 
+              <label className="input-label">Opciones de respuesta * ({form.opciones.length})</label>
               {form.opciones.map((op, i) => (
                 <div className="form-group" key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <input type="radio" name="correcta" checked={form.respuestaCorrecta === i} onChange={() => setForm(f => ({ ...f, respuestaCorrecta: i }))} />
                   <input className="input" value={op} onChange={e => { const opts = [...form.opciones]; opts[i] = e.target.value; setForm(f => ({ ...f, opciones: opts })); }} placeholder={`Opción ${String.fromCharCode(65 + i)}`} maxLength={MAX_OPCION} />
                 </div>
               ))}
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem' }}>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={agregarOpcion}>+ Agregar opción</button>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={quitarOpcion}>- Quitar opción</button>
+              </div>
 
               <div className="form-group">
-                <label className="input-label">Explicación</label>
+                <label className="input-label">Explicación *</label>
                 <textarea className="input" rows={2} value={form.explicacion} onChange={e => setForm(f => ({ ...f, explicacion: e.target.value }))} placeholder="Explicación de la respuesta correcta…" maxLength={MAX_EXPLICACION} />
                 <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.explicacion.length}/{MAX_EXPLICACION}</span>
               </div>
@@ -290,6 +359,23 @@ export default function Admin() {
                 )}
               </div>
 
+              {/* Origen de la pregunta: obligatorio elegir explícitamente,
+                  para distinguir preguntas de una prueba/archivo real del
+                  profesor vs. preguntas inventadas para estudiar. */}
+              <div className="form-group">
+                <label className="input-label">¿Es de una prueba o archivo del profesor? *</label>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                    <input type="radio" name="esDelProfesor" checked={form.esDelProfesor === true} onChange={() => setForm(f => ({ ...f, esDelProfesor: true }))} />
+                    Sí, viene de una prueba/archivo real
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                    <input type="radio" name="esDelProfesor" checked={form.esDelProfesor === false} onChange={() => setForm(f => ({ ...f, esDelProfesor: false }))} />
+                    No, es inventada para estudiar
+                  </label>
+                </div>
+              </div>
+
               <div style={{ display: 'flex', gap: '0.6rem' }}>
                 <button className="btn btn-primary" onClick={guardarPregunta}>{editId ? 'Actualizar' : 'Crear pregunta'}</button>
                 {editId && <button className="btn btn-ghost" onClick={() => { setForm(EMPTY_P); setEditId(null); }}>Cancelar</button>}
@@ -299,12 +385,18 @@ export default function Admin() {
             {/* Listado de preguntas */}
             <div className="admin-list-header">
               <h3>Banco ({pregsFiltradas.length})</h3>
-              <select className="input" style={{ width: 'auto' }} value={filtroAsig} onChange={e => setFiltroAsig(e.target.value)}>
-                <option value="">Todas</option>
-                {asignaturas.map(a => (
-                  <option key={a.key || a._id} value={a.key || a._id}>{a.nombre}</option>
-                ))}
-              </select>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <select className="input" style={{ width: 'auto' }} value={filtroAsig} onChange={e => setFiltroAsig(e.target.value)}>
+                  <option value="">Todas</option>
+                  {asignaturas.map(a => (
+                    <option key={a.key || a._id} value={a.key || a._id}>{a.nombre}</option>
+                  ))}
+                </select>
+                <select className="input" style={{ width: 'auto' }} value={ordenPreguntas} onChange={e => setOrdenPreguntas(e.target.value)}>
+                  <option value="fecha">Más recientes primero</option>
+                  <option value="nombre">Orden alfabético</option>
+                </select>
+              </div>
             </div>
 
             <div className="preguntas-lista">
@@ -315,7 +407,13 @@ export default function Admin() {
                     <span className="preg-asig">
                       {asignaturas.find(a => a.key === p.asignaturaId || a._id === p.asignaturaId)?.nombre ?? p.asignaturaId}
                     </span>
+                    {typeof p.esDelProfesor === 'boolean' && (
+                      <span className="badge" style={{ background: p.esDelProfesor ? '#e8f0fe' : '#f4f0fa', color: p.esDelProfesor ? '#3a5aa0' : '#7a6a9a' }}>
+                        {p.esDelProfesor ? '📄 Del profesor' : '✏️ Inventada'}
+                      </span>
+                    )}
                   </div>
+                  {p.caso && <p style={{ fontSize: '0.78rem', color: 'var(--muted)', fontStyle: 'italic' }}>Caso: {p.caso.slice(0, 80)}{p.caso.length > 80 ? '…' : ''}</p>}
                   <p className="preg-texto">{p.pregunta}</p>
                   <div className="preg-actions">
                     <button className="btn btn-ghost btn-sm" onClick={() => editarP(p)}>Editar</button>
@@ -334,12 +432,16 @@ export default function Admin() {
               <h3>Nueva asignatura</h3>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 3 }}>
-                  <label className="input-label">Nombre</label>
+                  <label className="input-label">Nombre *</label>
                   <input className="input" value={formA.nombre} onChange={e => setFormA(f => ({ ...f, nombre: e.target.value }))} placeholder="Ej: Base de Datos" maxLength={MAX_NOMBRE_ASIG} />
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
                   <label className="input-label">Color</label>
                   <input type="color" className="input" value={formA.color} onChange={e => setFormA(f => ({ ...f, color: e.target.value }))} style={{ height: '42px', padding: '2px' }} />
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label className="input-label">Ícono (emoji, opcional)</label>
+                  <input className="input" value={formA.icono} onChange={e => setFormA(f => ({ ...f, icono: e.target.value.slice(0, 4) }))} placeholder="📚" />
                 </div>
               </div>
               <div className="form-group">
@@ -349,11 +451,19 @@ export default function Admin() {
               <button className="btn btn-primary" onClick={guardarAsignatura}>Crear asignatura</button>
             </div>
 
+            <div className="admin-list-header">
+              <h3>Asignaturas ({asignaturasOrdenadas.length})</h3>
+              <select className="input" style={{ width: 'auto' }} value={ordenAsignaturas} onChange={e => setOrdenAsignaturas(e.target.value)}>
+                <option value="fecha">Más recientes primero</option>
+                <option value="nombre">Orden alfabético</option>
+              </select>
+            </div>
+
             <div className="asig-lista">
-              {asignaturas.map(a => (
+              {asignaturasOrdenadas.map(a => (
                 <div key={a.key || a._id} className="asig-item card">
                   <div style={{ flex: 1 }}>
-                    <p className="asig-nombre">{a.nombre}</p>
+                    <p className="asig-nombre">{a.icono ? `${a.icono} ` : ''}{a.nombre}</p>
                     <p className="asig-desc">{a.descripcion}</p>
                   </div>
                   <button className="btn btn-danger btn-sm" onClick={() => borrarA(a._id || a.key)}>Eliminar</button>

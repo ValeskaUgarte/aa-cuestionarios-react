@@ -13,6 +13,9 @@ const MAX_OPCION = 120;
 const MAX_EXPLICACION = 500;
 const MAX_UNIDAD = 40;
 const MAX_EXTRA = 4000;
+const MAX_CASO = 800;
+const MIN_OPCIONES = 2;
+const MAX_OPCIONES = 6;
 
 // Mismas plantillas que en Admin.jsx (ver comentario allá), para que
 // un colaborador también pueda agregar tablas o consolas simuladas.
@@ -48,13 +51,15 @@ export default function Colaborador() {
   // Estados de ingreso manual
   const [formP, setFormP] = useState({ 
     pregunta: '', 
+    caso: '',
     opciones: ['', '', '', ''], 
     respuestaCorrecta: -1, 
     dificultad: 'easy', 
     unidad: '', 
     asignaturaId: '', 
     explicacion: '',
-    extra: ''
+    extra: '',
+    esDelProfesor: null
   });
   const [msgManual, setMsgManual] = useState('');
 
@@ -236,20 +241,18 @@ REGLAS:
   async function guardarPreguntaManual() {
     setMsgManual('');
     
-    // Validaciones
     const preguntaLimpia = formP.pregunta.trim();
-    if (!preguntaLimpia) {
-      setMsgManual('Completa la pregunta.');
-      return;
-    }
-    
-    if (!formP.asignaturaId) {
-      setMsgManual('Selecciona una asignatura.');
-      return;
-    }
-    
-    if (formP.opciones.some(o => !o.trim())) {
-      setMsgManual('Completa todas las opciones.');
+
+    // Reunimos todos los campos obligatorios que falten en un solo aviso
+    const faltantes = [];
+    if (!formP.asignaturaId) faltantes.push('Asignatura');
+    if (!preguntaLimpia) faltantes.push('Pregunta');
+    if (formP.opciones.some(o => !o.trim())) faltantes.push('Opciones de respuesta (todas)');
+    if (!formP.explicacion.trim()) faltantes.push('Explicación');
+    if (formP.esDelProfesor === null) faltantes.push('¿Es de una prueba del profesor? (Sí/No)');
+
+    if (faltantes.length) {
+      setMsgManual(`Faltan campos obligatorios: ${faltantes.join(', ')}.`);
       return;
     }
 
@@ -299,13 +302,15 @@ REGLAS:
       // Resetear formulario
       setFormP({ 
         pregunta: '', 
+        caso: '',
         opciones: ['', '', '', ''], 
         respuestaCorrecta: 0, 
         dificultad: 'easy', 
         unidad: '', 
         asignaturaId: '', 
         explicacion: '',
-        extra: ''
+        extra: '',
+        esDelProfesor: null
       });
       
       setTimeout(() => setMsgManual(''), 3000);
@@ -321,6 +326,28 @@ REGLAS:
     nuevasOpciones[index] = value;
     setFormP({ ...formP, opciones: nuevasOpciones });
   };
+
+  // Agrega una opción de respuesta más (hasta MAX_OPCIONES)
+  function agregarOpcion() {
+    if (formP.opciones.length >= MAX_OPCIONES) {
+      setMsgManual(`Máximo ${MAX_OPCIONES} opciones.`);
+      return;
+    }
+    setFormP(f => ({ ...f, opciones: [...f.opciones, ''] }));
+  }
+
+  // Quita la última opción de respuesta (hasta MIN_OPCIONES)
+  function quitarOpcion() {
+    if (formP.opciones.length <= MIN_OPCIONES) {
+      setMsgManual(`Mínimo ${MIN_OPCIONES} opciones.`);
+      return;
+    }
+    setFormP(f => {
+      const opciones = f.opciones.slice(0, -1);
+      const respuestaCorrecta = f.respuestaCorrecta >= opciones.length ? 0 : f.respuestaCorrecta;
+      return { ...f, opciones, respuestaCorrecta };
+    });
+  }
 
   // RENDER Interfaz del panel
   return (
@@ -524,7 +551,20 @@ REGLAS:
             </div>
             
             <div className="form-group">
-              <label className="input-label">❓ Pregunta</label>
+              <label className="input-label">📝 Caso (opcional)</label>
+              <textarea
+                className="input"
+                rows={2}
+                value={formP.caso}
+                onChange={e => setFormP(f => ({ ...f, caso: e.target.value }))}
+                placeholder="Contexto o escenario que se muestra antes de la pregunta…"
+                maxLength={MAX_CASO}
+              />
+              <span style={{ fontSize: '0.75rem', color: '#8a7e9a' }}>{formP.caso.length}/{MAX_CASO}</span>
+            </div>
+
+            <div className="form-group">
+              <label className="input-label">❓ Pregunta *</label>
               <textarea 
                 className="input" 
                 rows={2} 
@@ -537,7 +577,7 @@ REGLAS:
             </div>
             
             <div className="form-group">
-              <label className="input-label">Opciones de respuesta</label>
+              <label className="input-label">Opciones de respuesta * ({formP.opciones.length})</label>
               <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>
                 👆 Selecciona el radio button de la opción correcta
               </p>
@@ -564,6 +604,10 @@ REGLAS:
                   {formP.respuestaCorrecta === i && <span style={{ color: 'green', fontWeight: 'bold' }}>✓ Correcta</span>}
                 </div>
               ))}
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={agregarOpcion}>+ Agregar opción</button>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={quitarOpcion}>- Quitar opción</button>
+              </div>
             </div>
 
             <div className="form-group">
@@ -614,6 +658,21 @@ REGLAS:
                   <div className="quiz-extra" dangerouslySetInnerHTML={{ __html: formP.extra }} />
                 </div>
               )}
+            </div>
+            
+            {/* Origen obligatorio: prueba/archivo real del profesor, o inventada */}
+            <div className="form-group">
+              <label className="input-label">¿Es de una prueba o archivo del profesor? *</label>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                  <input type="radio" name="esDelProfesor" checked={formP.esDelProfesor === true} onChange={() => setFormP(f => ({ ...f, esDelProfesor: true }))} />
+                  Sí, viene de una prueba/archivo real
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                  <input type="radio" name="esDelProfesor" checked={formP.esDelProfesor === false} onChange={() => setFormP(f => ({ ...f, esDelProfesor: false }))} />
+                  No, es inventada para estudiar
+                </label>
+              </div>
             </div>
             
             <button className="btn btn-primary" onClick={guardarPreguntaManual}>

@@ -54,6 +54,8 @@ export function AuthProvider({ children }) {
       return { ok: false, error: 'El nombre debe tener entre 2 y 50 caracteres.' };
     if (!password || password.length < 6 || password.length > 30)
       return { ok: false, error: 'La contraseña debe tener entre 6 y 30 caracteres.' };
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password))
+      return { ok: false, error: 'La contraseña debe incluir mayúscula, minúscula y número.' };
 
     const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
     // Verifica si el email ya está registrado (sin distinguir mayúsculas/minúsculas)

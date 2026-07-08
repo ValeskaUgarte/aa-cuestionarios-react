@@ -38,17 +38,30 @@ function OdsBadge({ num, titulo, detalle }) {
 
 function Carrusel() {
   const [actual, setActual] = useState(0);
+  const navigate = useNavigate();
+  // Cada item puede llevar a un cuestionario específico (key) o, si no
+  // corresponde a una sola asignatura (como "Últimos subidos" u "ODS"),
+  // a la página general de Cuestionarios.
   const items = [
-    { img: '/img/ultimas001.jpg', nombre: 'Ultimos cuestionarios subidos', meta: '140 Preguntas' },
-    { img: '/img/ODS.jpg', nombre: 'ODS presentes', meta: 'Cumplimiento ODS' },
-    { img: '/img/carrusel001.jpg', nombre: 'Sistemas Operativos', meta: 'En desarrollo' },
-    { img: '/img/carrusel002.jpg', nombre: 'Seguridad de la Información', meta: 'En desarrollo' },
+    { img: '/img/ultimas001.jpg', nombre: 'Ultimos cuestionarios subidos', meta: '140 Preguntas', key: null },
+    { img: '/img/ODS.jpg', nombre: 'ODS presentes', meta: 'Cumplimiento ODS', key: null },
+    { img: '/img/carrusel001.jpg', nombre: 'Sistemas Operativos', meta: 'En desarrollo', key: 'sistemas_operativos' },
+    { img: '/img/carrusel002.jpg', nombre: 'Seguridad de la Información', meta: 'En desarrollo', key: 'seguridad_informacion' },
   ];
+
+  function irASeccion(item) {
+    navigate(item.key ? `/quiz/${item.key}` : '/cuestionarios');
+  }
+
   return (
     <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', marginBottom: '2rem' }}>
       <div style={{ display: 'flex', transition: 'transform 0.4s ease', transform: `translateX(-${actual * 100}%)` }}>
         {items.map((item, i) => (
-          <div key={i} style={{ minWidth: '100%', position: 'relative' }}>
+          <div
+            key={i}
+            style={{ minWidth: '100%', position: 'relative', cursor: 'pointer' }}
+            onClick={() => irASeccion(item)}
+          >
             <img src={item.img} alt={item.nombre} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '16px' }} />
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.5)', color: '#fff', padding: '1rem', borderRadius: '0 0 16px 16px' }}>
               <p style={{ fontWeight: '700', fontSize: '1rem' }}>{item.nombre}</p>

@@ -33,6 +33,7 @@ export default function Cuestionario() {
   const [modalSinPreguntas, setModalSinPreguntas] = useState(false);
   const [modalDesactivado, setModalDesactivado] = useState(false); // Modal: asignatura desactivada por el admin
   const [desactivadas, setDesactivadas] = useState([]);            // Keys de asignaturas desactivadas (estado)
+  const [ordenAdmin, setOrdenAdmin] = useState('fecha');            // Orden de las asignaturas creadas por el admin: 'fecha' o 'nombre'
 
   // FUNCIÓN Navega al cuestionario de la asignatura seleccionada
   const irAlQuiz = (key) => {
@@ -66,8 +67,8 @@ export default function Cuestionario() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem' }}>
           <img src="/img/app002.jpg" style={{ width: '130px', objectFit: 'contain' }} alt="estudiante" />
           <div>
-            <div className="header-badge"></div>
-            <h1>Cuestionarios</h1>
+            <div className="header-badge">App de Estudio · Valeska Ugarte</div>
+            <h1>Cuestionarios de Estudio</h1>
             <p>Selecciona asignatura, cantidad de preguntas y comienza</p>
           </div>
           <img src="/img/app001.jpg" style={{ width: '130px', objectFit: 'contain' }} alt="estudiante" />
@@ -537,9 +538,21 @@ export default function Cuestionario() {
                 Cualquier asignatura nueva creada desde el panel de Admin
                 (que no esté en KEYS_ESTATICAS) se pinta acá, de forma
                 dinámica, con los mismos datos que ingresó el admin
-                (nombre, descripción, color) */}
+                (nombre, descripción, color, ícono) */}
+            {asignaturas.filter(a => !KEYS_ESTATICAS.includes(a.key)).length > 0 && (
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginBottom: '0.6rem' }}>
+                <select className="input" style={{ width: 'auto' }} value={ordenAdmin} onChange={e => setOrdenAdmin(e.target.value)}>
+                  <option value="fecha">Nuevas asignaturas: más recientes primero</option>
+                  <option value="nombre">Nuevas asignaturas: orden alfabético</option>
+                </select>
+              </div>
+            )}
             {asignaturas
               .filter(a => !KEYS_ESTATICAS.includes(a.key))
+              .slice()
+              .sort((a, b) => ordenAdmin === 'nombre'
+                ? (a.nombre || '').localeCompare(b.nombre || '')
+                : (b.createdAt || 0) - (a.createdAt || 0))
               .map(a => (
                 <div
                   key={a.key}
@@ -548,6 +561,20 @@ export default function Cuestionario() {
                   style={{ '--card-accent': a.color || undefined }}
                   onClick={() => irAlQuiz(a.key)}
                 >
+                  {/* Avatar: como estas asignaturas no tienen una imagen
+                      subida, usamos el ícono (emoji) que puso el admin, o
+                      si no puso ninguno, la primera letra del nombre sobre
+                      un círculo de color — así igual se ve algo visual,
+                      no una tarjeta vacía. */}
+                  <div style={{
+                    width: '48px', height: '48px', borderRadius: '50%',
+                    background: a.color || 'var(--accent)', color: '#fff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: a.icono ? '1.4rem' : '1.2rem', fontWeight: 700,
+                    marginBottom: '0.5rem'
+                  }}>
+                    {a.icono || (a.nombre || '?').charAt(0).toUpperCase()}
+                  </div>
                   <div className="subject-name">{a.nombre}</div>
                   <div className="subject-meta">{a.descripcion}</div>
                   <div><span className="coming-badge">

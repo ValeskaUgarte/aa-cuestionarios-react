@@ -285,10 +285,11 @@ if (esIdioma && !nivelElegido) {
             <span className="quiz-unidad">{pregunta.unidad}</span>
           </div>
 
-          {/* CASO PRÁCTICO */}
-          {pregunta.case && (
+          {/* CASO PRÁCTICO — "case" en las preguntas del banco estático,
+              "caso" en las preguntas creadas desde Admin/Colaborador */}
+          {(pregunta.case || pregunta.caso) && (
             <div className="quiz-case">
-              📖 <strong>Caso práctico:</strong> {pregunta.case}
+              📖 <strong>Caso práctico:</strong> {pregunta.case || pregunta.caso}
             </div>
           )}
 
