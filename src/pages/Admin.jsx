@@ -43,6 +43,17 @@ salida simulada de la consola...
 const EMPTY_P = { pregunta: '', caso: '', opciones: ['', '', '', ''], respuestaCorrecta: 0, dificultad: 'easy', unidad: '', asignaturaId: '', explicacion: '', extra: '', esDelProfesor: null };
 const EMPTY_A = { nombre: '', color: '#7c6dfa', descripcion: '', icono: '' };
 
+// Pequeño mensaje de advertencia que se muestra debajo de un campo
+// cuando ese campo específico tiene un error de validación.
+function CampoError({ mensaje }) {
+  if (!mensaje) return null;
+  return (
+    <span style={{ display: 'block', fontSize: '0.78rem', color: 'var(--danger, #ff4f6a)', marginTop: '0.25rem' }}>
+      ⚠️ {mensaje}
+    </span>
+  );
+}
+
 // ESTADOS DEL COMPONENTE
 export default function Admin() {
   const [tab, setTab] = useState('preguntas');        // Pestaña activa: preguntas, asignaturas, reportes
@@ -54,6 +65,7 @@ export default function Admin() {
   const [filtroAsig, setFiltroAsig] = useState('');   // Filtro por asignatura
   const [formA, setFormA] = useState(EMPTY_A);        // Formulario de asignatura
   const [msg, setMsg] = useState('');                 // Mensajes de feedback
+  const [errores, setErrores] = useState({});         // Errores por campo del formulario de pregunta (para mostrar debajo de cada uno)
   const [reportes, setReportes] = useState([]);       // Lista de reportes de errores
   const [desactivadas, setDesactivadas] = useState([]); // Keys de cuestionarios desactivados
   const [ordenPreguntas, setOrdenPreguntas] = useState('fecha'); // 'fecha' o 'nombre'
@@ -89,24 +101,33 @@ export default function Admin() {
   async function guardarPregunta() {
     const preguntaLimpia = form.pregunta.trim();
 
-    // Reunimos TODOS los campos obligatorios que falten en una sola
-    // lista, para avisar de una vez cuáles hay que completar (en vez
-    // de mostrar un error a la vez y que el admin tenga que adivinar).
-    const faltantes = [];
-    if (!form.asignaturaId) faltantes.push('Asignatura');
-    if (!preguntaLimpia) faltantes.push('Pregunta');
-    if (form.opciones.some(o => !o.trim())) faltantes.push('Opciones de respuesta (todas)');
-    if (!form.explicacion.trim()) faltantes.push('Explicación');
-    if (form.esDelProfesor === null) faltantes.push('¿Es de una prueba del profesor? (Sí/No)');
+    // Reunimos TODOS los errores por campo en un objeto, para poder
+    // mostrar la advertencia específica debajo de cada campo (en vez
+    // de un solo mensaje genérico que obliga a adivinar cuál falta).
+    const nuevosErrores = {};
+    if (!form.asignaturaId) nuevosErrores.asignaturaId = 'Selecciona una asignatura.';
+    if (!preguntaLimpia) nuevosErrores.pregunta = 'Escribe la pregunta.';
+    else if (preguntaLimpia.length > MAX_PREGUNTA) nuevosErrores.pregunta = `La pregunta no puede superar los ${MAX_PREGUNTA} caracteres.`;
 
-    if (faltantes.length) return flash(`Faltan campos obligatorios: ${faltantes.join(', ')}.`);
+    // Una entrada por cada opción vacía o demasiado larga, indexada por posición
+    const opcionesErr = {};
+    form.opciones.forEach((o, i) => {
+      if (!o.trim()) opcionesErr[i] = 'Completa esta opción.';
+      else if (o.length > MAX_OPCION) opcionesErr[i] = `Máximo ${MAX_OPCION} caracteres.`;
+    });
+    if (Object.keys(opcionesErr).length) nuevosErrores.opciones = opcionesErr;
 
-    // Validación de longitud máxima (evita textos desproporcionados)
-    if (preguntaLimpia.length > MAX_PREGUNTA) return flash(`La pregunta no puede superar los ${MAX_PREGUNTA} caracteres.`);
-    if (form.opciones.some(o => o.length > MAX_OPCION)) return flash(`Cada opción no puede superar los ${MAX_OPCION} caracteres.`);
-    if (form.explicacion.length > MAX_EXPLICACION) return flash(`La explicación no puede superar los ${MAX_EXPLICACION} caracteres.`);
-    if (form.extra.length > MAX_EXTRA) return flash(`El contenido extra no puede superar los ${MAX_EXTRA} caracteres.`);
-    if (form.caso.length > MAX_CASO) return flash(`El caso no puede superar los ${MAX_CASO} caracteres.`);
+    if (!form.explicacion.trim()) nuevosErrores.explicacion = 'Escribe la explicación de la respuesta correcta.';
+    else if (form.explicacion.length > MAX_EXPLICACION) nuevosErrores.explicacion = `La explicación no puede superar los ${MAX_EXPLICACION} caracteres.`;
+
+    if (form.esDelProfesor === null) nuevosErrores.esDelProfesor = 'Indica si es de una prueba del profesor o inventada.';
+
+    if (form.extra.length > MAX_EXTRA) nuevosErrores.extra = `El contenido extra no puede superar los ${MAX_EXTRA} caracteres.`;
+    if (form.caso.length > MAX_CASO) nuevosErrores.caso = `El caso no puede superar los ${MAX_CASO} caracteres.`;
+
+    setErrores(nuevosErrores);
+    if (Object.keys(nuevosErrores).length) return flash('Revisa los campos marcados en rojo.');
+
     try {
       const asig = asignaturas.find(a => a.key === form.asignaturaId || a._id === form.asignaturaId);
       if (!asig) return flash('Asignatura no encontrada.');
@@ -128,6 +149,7 @@ export default function Admin() {
       }
       setForm(EMPTY_P);
       setEditId(null);
+      setErrores({});
       cargar();
     } catch (error) {
       flash('Error al guardar la pregunta');
@@ -166,6 +188,7 @@ export default function Admin() {
       esDelProfesor: typeof p.esDelProfesor === 'boolean' ? p.esDelProfesor : null
     });
     setEditId(p._id || p.id);
+    setErrores({});
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -267,12 +290,13 @@ export default function Admin() {
               <div className="form-row">
                 <div className="form-group" style={{ flex: 2 }}>
                   <label className="input-label">Asignatura *</label>
-                  <select className="input" value={form.asignaturaId} onChange={e => setForm(f => ({ ...f, asignaturaId: e.target.value }))}>
+                  <select className="input" value={form.asignaturaId} onChange={e => { setForm(f => ({ ...f, asignaturaId: e.target.value })); setErrores(er => ({ ...er, asignaturaId: null })); }}>
                     <option value="">Selecciona</option>
                     {asignaturas.map(a => (
                       <option key={a.key || a._id} value={a.key || a._id}>{a.nombre}</option>
                     ))}
                   </select>
+                  <CampoError mensaje={errores.asignaturaId} />
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
                   <label className="input-label">Dificultad</label>
@@ -290,21 +314,44 @@ export default function Admin() {
                   la pregunta (ej: un caso de estudio para leer primero) */}
               <div className="form-group">
                 <label className="input-label">Caso (opcional)</label>
-                <textarea className="input" rows={2} value={form.caso} onChange={e => setForm(f => ({ ...f, caso: e.target.value }))} placeholder="Contexto o escenario que se muestra antes de la pregunta…" maxLength={MAX_CASO} />
+                <textarea className="input" rows={2} value={form.caso} onChange={e => { setForm(f => ({ ...f, caso: e.target.value })); setErrores(er => ({ ...er, caso: null })); }} placeholder="Contexto o escenario que se muestra antes de la pregunta…" maxLength={MAX_CASO} />
                 <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.caso.length}/{MAX_CASO}</span>
+                <CampoError mensaje={errores.caso} />
               </div>
 
               <div className="form-group">
                 <label className="input-label">Pregunta *</label>
-                <textarea className="input" rows={2} value={form.pregunta} onChange={e => setForm(f => ({ ...f, pregunta: e.target.value }))} placeholder="Escribe la pregunta…" maxLength={MAX_PREGUNTA} />
+                <textarea className="input" rows={2} value={form.pregunta} onChange={e => { setForm(f => ({ ...f, pregunta: e.target.value })); setErrores(er => ({ ...er, pregunta: null })); }} placeholder="Escribe la pregunta…" maxLength={MAX_PREGUNTA} />
                 <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.pregunta.length}/{MAX_PREGUNTA}</span>
+                <CampoError mensaje={errores.pregunta} />
               </div>
 
               <label className="input-label">Opciones de respuesta * ({form.opciones.length})</label>
               {form.opciones.map((op, i) => (
-                <div className="form-group" key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                  <input type="radio" name="correcta" checked={form.respuestaCorrecta === i} onChange={() => setForm(f => ({ ...f, respuestaCorrecta: i }))} />
-                  <input className="input" value={op} onChange={e => { const opts = [...form.opciones]; opts[i] = e.target.value; setForm(f => ({ ...f, opciones: opts })); }} placeholder={`Opción ${String.fromCharCode(65 + i)}`} maxLength={MAX_OPCION} />
+                <div className="form-group" key={i}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    <input type="radio" name="correcta" checked={form.respuestaCorrecta === i} onChange={() => setForm(f => ({ ...f, respuestaCorrecta: i }))} />
+                    <input
+                      className="input"
+                      value={op}
+                      onChange={e => {
+                        const opts = [...form.opciones];
+                        opts[i] = e.target.value;
+                        setForm(f => ({ ...f, opciones: opts }));
+                        setErrores(er => {
+                          if (!er.opciones) return er;
+                          const opcionesErr = { ...er.opciones };
+                          delete opcionesErr[i];
+                          const resto = { ...er };
+                          if (Object.keys(opcionesErr).length) resto.opciones = opcionesErr; else delete resto.opciones;
+                          return resto;
+                        });
+                      }}
+                      placeholder={`Opción ${String.fromCharCode(65 + i)}`}
+                      maxLength={MAX_OPCION}
+                    />
+                  </div>
+                  <CampoError mensaje={errores.opciones?.[i]} />
                 </div>
               ))}
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem' }}>
@@ -314,8 +361,9 @@ export default function Admin() {
 
               <div className="form-group">
                 <label className="input-label">Explicación *</label>
-                <textarea className="input" rows={2} value={form.explicacion} onChange={e => setForm(f => ({ ...f, explicacion: e.target.value }))} placeholder="Explicación de la respuesta correcta…" maxLength={MAX_EXPLICACION} />
+                <textarea className="input" rows={2} value={form.explicacion} onChange={e => { setForm(f => ({ ...f, explicacion: e.target.value })); setErrores(er => ({ ...er, explicacion: null })); }} placeholder="Explicación de la respuesta correcta…" maxLength={MAX_EXPLICACION} />
                 <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.explicacion.length}/{MAX_EXPLICACION}</span>
+                <CampoError mensaje={errores.explicacion} />
               </div>
 
               {/* Contenido extra: para preguntas que necesitan mostrar una
@@ -343,12 +391,13 @@ export default function Admin() {
                   className="input"
                   rows={4}
                   value={form.extra}
-                  onChange={e => setForm(f => ({ ...f, extra: e.target.value }))}
+                  onChange={e => { setForm(f => ({ ...f, extra: e.target.value })); setErrores(er => ({ ...er, extra: null })); }}
                   placeholder="Usa los botones de arriba para insertar una plantilla, o pega tu propio HTML…"
                   maxLength={MAX_EXTRA}
                   style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
                 />
                 <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.extra.length}/{MAX_EXTRA}</span>
+                <CampoError mensaje={errores.extra} />
 
                 {/* Vista previa: así se va a ver dentro del cuestionario */}
                 {form.extra && (
@@ -366,19 +415,20 @@ export default function Admin() {
                 <label className="input-label">¿Es de una prueba o archivo del profesor? *</label>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                    <input type="radio" name="esDelProfesor" checked={form.esDelProfesor === true} onChange={() => setForm(f => ({ ...f, esDelProfesor: true }))} />
+                    <input type="radio" name="esDelProfesor" checked={form.esDelProfesor === true} onChange={() => { setForm(f => ({ ...f, esDelProfesor: true })); setErrores(er => ({ ...er, esDelProfesor: null })); }} />
                     Sí, viene de una prueba/archivo real
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                    <input type="radio" name="esDelProfesor" checked={form.esDelProfesor === false} onChange={() => setForm(f => ({ ...f, esDelProfesor: false }))} />
+                    <input type="radio" name="esDelProfesor" checked={form.esDelProfesor === false} onChange={() => { setForm(f => ({ ...f, esDelProfesor: false })); setErrores(er => ({ ...er, esDelProfesor: null })); }} />
                     No, es inventada para estudiar
                   </label>
                 </div>
+                <CampoError mensaje={errores.esDelProfesor} />
               </div>
 
               <div style={{ display: 'flex', gap: '0.6rem' }}>
                 <button className="btn btn-primary" onClick={guardarPregunta}>{editId ? 'Actualizar' : 'Crear pregunta'}</button>
-                {editId && <button className="btn btn-ghost" onClick={() => { setForm(EMPTY_P); setEditId(null); }}>Cancelar</button>}
+                {editId && <button className="btn btn-ghost" onClick={() => { setForm(EMPTY_P); setEditId(null); setErrores({}); }}>Cancelar</button>}
               </div>
             </div>
 
