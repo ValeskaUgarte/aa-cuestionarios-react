@@ -327,13 +327,15 @@ export default function Admin() {
                 <CampoError mensaje={errores.pregunta} />
               </div>
 
-              <label htmlFor="opciones" className="input-label">Opciones de respuesta * ({form.opciones.length})</label>
+              
               {form.opciones.map((op, i) => (
+                
                 <div className="form-group" key={i}>
+                  <label htmlFor={`opcion${i}`} className="input-label">Opciones de respuesta * ({form.opciones.length})</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                     <input type="radio" name="correcta" checked={form.respuestaCorrecta === i} onChange={() => setForm(f => ({ ...f, respuestaCorrecta: i }))} />
                     <input
-                    id={`opcion`}
+                    id={`opcion${i}`}
                       className="input"
                       value={op}
                       onChange={e => {

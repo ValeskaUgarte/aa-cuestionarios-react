@@ -651,7 +651,7 @@ REGLAS:
 
             {/* Contenido extra: tabla o consola simulada (opcional) */}
             <div className="form-group">
-              <label className="input-label">🖥️ Contenido extra (tabla o consola, opcional)</label>
+              <label htmlFor="extra" className="input-label">🖥️ Contenido extra (tabla o consola, opcional)</label>
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
                 <button
                   type="button"
@@ -669,6 +669,7 @@ REGLAS:
                 </button>
               </div>
               <textarea
+              id="extra"
                 className="input"
                 rows={4}
                 value={formP.extra}
