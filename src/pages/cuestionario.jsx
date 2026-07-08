@@ -1,698 +1,714 @@
-// CUESTIONARIO.JSX Página principal de selección de cuestionarios
+// COLABORADOR.JSX Panel para colaboradores y moderadores
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAsignaturas, getAsignaturasDesactivadas } from '../services/api';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
-import './cuestionario.css';
+import './Colaborador.css';
+import { getAsignaturas, crearPregunta } from '../services/api';
 
-// Keys de las asignaturas que ya tienen su tarjeta escrita a mano más
-// abajo en este archivo. Cualquier asignatura que llegue desde
-// getAsignaturas() y NO esté en esta lista fue creada dinámicamente
-// desde el panel de administración, así que se renderiza aparte
-// (ver bloque "ASIGNATURAS CREADAS POR EL ADMINISTRADOR").
-const KEYS_ESTATICAS = [
-  'administracion', 'algebra', 'backend', 'bd_estructurados', 'bd_no_estructurados',
-  'chino', 'coreano', 'frontend', 'funciones_matrices', 'fundamentos_bd',
-  'hardware_software', 'ingenieria_software', 'ingles_avanzado', 'ingles_basico',
-  'ingles_intermedio', 'japones', 'lenguaje_css', 'lenguaje_javascript',
-  'lenguaje_python', 'linux', 'metodologia_agil', 'mobile_iot',
-  'modelamiento_informaticas', 'prog_html', 'seguridad-examen',
-  'seguridad_informacion', 'sistemas_operativos',
-];
+// LÍMITES DE CARACTERES Evita entradas desproporcionadas en el formulario manual
+const MAX_PREGUNTA = 300;
+const MAX_OPCION = 120;
+const MAX_EXPLICACION = 500;
+const MAX_UNIDAD = 40;
+const MAX_EXTRA = 4000;
+const MAX_CASO = 800;
+const MIN_OPCIONES = 2;
+const MAX_OPCIONES = 6;
 
-// ESTADOS
-export default function Cuestionario() {
-  const [asignaturas, setAsignaturas] = useState([]);  // Lista de asignaturas
-  const [loading, setLoading] = useState(true);        // Estado de carga
-  const [count, setCount] = useState(999);             // Cantidad de preguntas (999 = todas)
-  const [modo, setModo] = useState('normal');          // Modo: 'normal' o 'levels'
-  const navigate = useNavigate();                      // Para redirigir al quiz
-  const { usuario, toggleFavorita } = useAuth();       // Usuario y función de favoritos
-  const [modalSinPreguntas, setModalSinPreguntas] = useState(false);
-  const [modalDesactivado, setModalDesactivado] = useState(false); // Modal: asignatura desactivada por el admin
-  const [desactivadas, setDesactivadas] = useState([]);            // Keys de asignaturas desactivadas (estado)
-  const [ordenAdmin, setOrdenAdmin] = useState('fecha');            // Orden de las asignaturas creadas por el admin: 'fecha' o 'nombre'
+// Mismas plantillas que en Admin.jsx (ver comentario allá), para que
+// un colaborador también pueda agregar tablas o consolas simuladas.
+const PLANTILLA_TABLA = `<table class="subnet-table">
+  <tr><th>Columna 1</th><th>Columna 2</th></tr>
+  <tr><td>Dato A</td><td>Dato B</td></tr>
+  <tr><td>Dato C</td><td>Dato D</td></tr>
+</table>`;
 
-  // FUNCIÓN Navega al cuestionario de la asignatura seleccionada
-  const irAlQuiz = (key) => {
-  if (!key || key.trim() === '') return;
+const PLANTILLA_CONSOLA = `<div class="terminal-box">
+$ comando de ejemplo
+salida simulada de la consola...
+</div>`;
 
-  // Si el administrador desactivó esta asignatura, bloqueamos el acceso
-  if (desactivadas.includes(key)) {
-    setModalDesactivado(true);
-    return;
-  }
+// Pequeño mensaje de advertencia que se muestra debajo de un campo
+// cuando ese campo específico tiene un error de validación.
+function CampoError({ mensaje }) {
+  if (!mensaje) return null;
+  return (
+    <span style={{ display: 'block', fontSize: '0.78rem', color: '#ff4f6a', marginTop: '0.25rem' }}>
+      ⚠️ {mensaje}
+    </span>
+  );
+}
 
-  const asig = asignaturas.find(a => a.key === key);
-  if (!asig || asig.totalPreguntas === 0) {
-    setModalSinPreguntas(true);
-    return;
-  }
-  navigate(`/quiz/${key}`, { state: { count, modo } });
-};
+//HOOKS Autenticación y navegación
+export default function Colaborador() {
+  const { usuario } = useAuth();
+  const navigate = useNavigate();
 
-  // EFECTO INICIAL Carga las asignaturas y el estado activo/inactivo al montar el componente
+  // Estado del formulario 
+  const [asignatura, setAsignatura] = useState('');
+  const [material, setMaterial] = useState('');
+  const [cantidad, setCantidad] = useState(10);
+  const [dificultad, setDificultad] = useState('mixed');
+  const [generando, setGenerando] = useState(false);
+  const [preguntasGeneradas, setPreguntasGeneradas] = useState([]);
+  const [error, setError] = useState('');
+  const [enviado, setEnviado] = useState(false);
+  // Estados de tabs y asignaturas
+  const [tab, setTab] = useState('manual'); 
+  const [asignaturas, setAsignaturas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  // Estados de ingreso manual
+  const [formP, setFormP] = useState({ 
+    pregunta: '', 
+    caso: '',
+    opciones: ['', '', '', ''], 
+    respuestaCorrecta: -1, 
+    dificultad: 'easy', 
+    unidad: '', 
+    asignaturaId: '', 
+    explicacion: '',
+    extra: '',
+    esDelProfesor: null
+  });
+  const [msgManual, setMsgManual] = useState('');
+  const [erroresP, setErroresP] = useState({}); // Errores por campo del formulario manual (para mostrar debajo de cada uno)
+
+  // EFECTO INICIAL - Carga asignaturas al montar el componente
   useEffect(() => {
-    getAsignaturas().then(setAsignaturas).finally(() => setLoading(false));
-    setDesactivadas(getAsignaturasDesactivadas());
+    const cargarAsignaturas = async () => {
+      try {
+        setLoading(true);
+        const data = await getAsignaturas();
+        console.log('Asignaturas cargadas:', data); // Debug
+        setAsignaturas(data);
+      } catch (error) {
+        console.error('Error cargando asignaturas:', error);
+        setAsignaturas([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    cargarAsignaturas();
   }, []);
 
-  // RENDER
+  // VERIFICACIÓN DE ACCESO Usuario autenticado y con rol válido
+  if (!usuario) {
+    return (
+      <>
+        <Navbar />
+        <main className="page">
+          <div className="colab-error">
+            <h2>Acceso restringido</h2>
+            <p>Debes iniciar sesión para acceder a esta página.</p>
+            <button className="btn btn-primary" onClick={() => navigate('/login')}>Iniciar sesión</button>
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  if (usuario.rol !== 'colaborador' && usuario.rol !== 'moderador') {
+    return (
+      <>
+        <Navbar />
+        <main className="page">
+          <div className="colab-error">
+            <h2>Acceso restringido</h2>
+            <p>Solo colaboradores y moderadores pueden acceder a esta página.</p>
+            <button className="btn btn-primary" onClick={() => navigate('/')}>Volver al inicio</button>
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  // FUNCIÓN GENERAR PREGUNTAS Llama a la API de Claude (IA)
+  async function generarPreguntas() {
+    setError('');
+    
+    if (!asignatura.trim()) {
+      setError('Escribe el nombre de la asignatura.');
+      return;
+    }
+    
+    if (!material.trim() || material.trim().length < 50) {
+      setError('El material debe tener al menos 50 caracteres.');
+      return;
+    }
+
+    setGenerando(true);
+    setPreguntasGeneradas([]);
+
+    try {
+      const response = await fetch('/api/anthropic/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-3-5-sonnet-20241022',
+          max_tokens: 4000,
+          messages: [{
+            role: 'user',
+            content: `Eres un generador de preguntas de estudio. A partir del siguiente material, genera exactamente ${cantidad} preguntas de opción múltiple.
+
+ASIGNATURA: ${asignatura}
+DIFICULTAD: ${dificultad === 'mixed' ? 'mezcla de easy, medium y hard' : dificultad}
+
+MATERIAL:
+${material}
+
+FORMATO DE RESPUESTA — responde SOLO con un array JSON válido, sin texto adicional, sin markdown, sin bloques de código:
+[
+  {
+    "q": "texto de la pregunta",
+    "opts": ["opción A", "opción B", "opción C", "opción D"],
+    "ans": 0,
+    "exp": "explicación de por qué es correcta",
+    "diff": "easy|medium|hard",
+    "unit": "tema o unidad del material"
+  }
+]
+
+REGLAS:
+- "ans" es el índice (0-3) de la opción correcta en "opts"
+- Las opciones deben ser plausibles y no obvias
+- La explicación debe ser educativa y clara
+- Basa las preguntas SOLO en el material proporcionado
+- Genera exactamente ${cantidad} preguntas`
+          }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error en la API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (!data.content || !data.content[0] || !data.content[0].text) {
+        throw new Error('Respuesta inválida de la API');
+      }
+      
+      // Extraemos el texto de la respuesta
+      const texto = data.content[0].text.trim();
+      
+      // Parseamos el JSON - limpiar posibles markdown
+      let cleanText = texto;
+      // Remover bloques de código markdown
+      cleanText = cleanText.replace(/```json\s*/g, '');
+      cleanText = cleanText.replace(/```\s*/g, '');
+      cleanText = cleanText.trim();
+      
+      const preguntas = JSON.parse(cleanText);
+      
+      if (!Array.isArray(preguntas) || preguntas.length === 0) {
+        throw new Error('No se generaron preguntas válidas');
+      }
+      
+      setPreguntasGeneradas(preguntas);
+      setError('');
+
+    // Procesa la respuesta y extrae las preguntas
+    } catch (err) {
+      console.error('Error al generar preguntas:', err);
+      setError('Error al generar preguntas. Intenta de nuevo. ' + err.message);
+    } finally {
+      setGenerando(false);
+    }
+  }
+
+  // FUNCIÓN ENVIAR A REVISIÓN Guarda preguntas como pendientes a revisión del moderador
+  function enviarARevision() {
+    if (preguntasGeneradas.length === 0) {
+      setError('No hay preguntas para enviar.');
+      return;
+    }
+
+    // Guardamos en localStorage como "pendientes"
+    const pendientes = JSON.parse(localStorage.getItem('preguntas_pendientes') || '[]');
+    
+    const nuevasSolicitud = {
+      id: Date.now().toString(),
+      colaborador: usuario.nombre || usuario.email || 'Anónimo',
+      colaboradorId: usuario.id || usuario._id,
+      asignatura: asignatura,
+      fecha: new Date().toISOString(),
+      estado: 'pendiente',
+      preguntas: preguntasGeneradas
+    };
+
+    pendientes.push(nuevasSolicitud);
+    localStorage.setItem('preguntas_pendientes', JSON.stringify(pendientes));
+    
+    setEnviado(true);
+    setPreguntasGeneradas([]);
+    setMaterial('');
+    setAsignatura('');
+    
+    setTimeout(() => setEnviado(false), 5000);
+  }
+
+  // FUNCIÓN GUARDAR PREGUNTA MANUAL Guarda pregunta creada por el usuario
+  async function guardarPreguntaManual() {
+    setMsgManual('');
+    
+    const preguntaLimpia = formP.pregunta.trim();
+
+    // Reunimos TODOS los errores por campo en un objeto, para poder
+    // mostrar la advertencia específica debajo de cada campo (en vez
+    // de un solo mensaje genérico que obliga a adivinar cuál falta).
+    const nuevosErrores = {};
+    if (!formP.asignaturaId) nuevosErrores.asignaturaId = 'Selecciona una asignatura.';
+    if (!preguntaLimpia) nuevosErrores.pregunta = 'Escribe la pregunta.';
+    else if (preguntaLimpia.length > MAX_PREGUNTA) nuevosErrores.pregunta = `La pregunta no puede superar los ${MAX_PREGUNTA} caracteres.`;
+
+    const opcionesErr = {};
+    formP.opciones.forEach((o, i) => {
+      if (!o.trim()) opcionesErr[i] = 'Completa esta opción.';
+      else if (o.length > MAX_OPCION) opcionesErr[i] = `Máximo ${MAX_OPCION} caracteres.`;
+    });
+    if (Object.keys(opcionesErr).length) nuevosErrores.opciones = opcionesErr;
+
+    if (!formP.explicacion.trim()) nuevosErrores.explicacion = 'Escribe la explicación de la respuesta correcta.';
+    else if (formP.explicacion.length > MAX_EXPLICACION) nuevosErrores.explicacion = `La explicación no puede superar los ${MAX_EXPLICACION} caracteres.`;
+
+    if (formP.esDelProfesor === null) nuevosErrores.esDelProfesor = 'Indica si es de una prueba del profesor o inventada.';
+
+    if (formP.extra.length > MAX_EXTRA) nuevosErrores.extra = `El contenido extra no puede superar los ${MAX_EXTRA} caracteres.`;
+    if (formP.caso.length > MAX_CASO) nuevosErrores.caso = `El caso no puede superar los ${MAX_CASO} caracteres.`;
+
+    setErroresP(nuevosErrores);
+    if (Object.keys(nuevosErrores).length) {
+      setMsgManual('Revisa los campos marcados en rojo.');
+      return;
+    }
+
+    try {
+      // Buscar la asignatura seleccionada
+      const asig = asignaturas.find(a => a.key === formP.asignaturaId || String(a.id) === formP.asignaturaId);
+      
+      if (!asig) {
+        setMsgManual('Asignatura no encontrada.');
+        return;
+      }
+
+      // Preparar datos para guardar
+      const preguntaData = {
+        ...formP,
+        pregunta: preguntaLimpia,
+        asignatura: asig.key || asig.nombre,
+        asignaturaId: asig.key || asig._id,
+        // Asegurar que la respuesta correcta sea un número
+        respuestaCorrecta: parseInt(formP.respuestaCorrecta) || 0
+      };
+
+      console.log('Guardando pregunta:', preguntaData); // Debug
+      
+      await crearPregunta(preguntaData);
+      
+      setMsgManual('✅ Pregunta guardada exitosamente');
+      
+      // Resetear formulario
+      setFormP({ 
+        pregunta: '', 
+        caso: '',
+        opciones: ['', '', '', ''], 
+        respuestaCorrecta: 0, 
+        dificultad: 'easy', 
+        unidad: '', 
+        asignaturaId: '', 
+        explicacion: '',
+        extra: '',
+        esDelProfesor: null
+      });
+      setErroresP({});
+      
+      setTimeout(() => setMsgManual(''), 3000);
+    } catch (error) {
+      console.error('Error guardando pregunta:', error);
+      setMsgManual('Error al guardar la pregunta: ' + error.message);
+    }
+  }
+
+  // FUNCIÓN AUXILIAR Cambia el valor de una opción
+  const handleOpcionChange = (index, value) => {
+    const nuevasOpciones = [...formP.opciones];
+    nuevasOpciones[index] = value;
+    setFormP({ ...formP, opciones: nuevasOpciones });
+  };
+
+  // Agrega una opción de respuesta más (hasta MAX_OPCIONES)
+  function agregarOpcion() {
+    if (formP.opciones.length >= MAX_OPCIONES) {
+      setMsgManual(`Máximo ${MAX_OPCIONES} opciones.`);
+      return;
+    }
+    setFormP(f => ({ ...f, opciones: [...f.opciones, ''] }));
+  }
+
+  // Quita la última opción de respuesta (hasta MIN_OPCIONES)
+  function quitarOpcion() {
+    if (formP.opciones.length <= MIN_OPCIONES) {
+      setMsgManual(`Mínimo ${MIN_OPCIONES} opciones.`);
+      return;
+    }
+    setFormP(f => {
+      const opciones = f.opciones.slice(0, -1);
+      const respuestaCorrecta = f.respuestaCorrecta >= opciones.length ? 0 : f.respuestaCorrecta;
+      return { ...f, opciones, respuestaCorrecta };
+    });
+  }
+
+  // RENDER Interfaz del panel
   return (
     <>
-      <Navbar /> 
-      <header>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem' }}>
-          <img src="/img/app002.jpg" style={{ width: '130px', objectFit: 'contain' }} alt="estudiante" />
-          <div>
-            <div className="header-badge">App de Estudio · Valeska Ugarte</div>
-            <h1>Cuestionarios de Estudio</h1>
-            <p>Selecciona asignatura, cantidad de preguntas y comienza</p>
-          </div>
-          <img src="/img/app001.jpg" style={{ width: '130px', objectFit: 'contain' }} alt="estudiante" />
+      <Navbar />
+      <main className="page">
+        <div className="colab-header">
+          <h1>📝 Panel del Colaborador</h1>
+          <p>Genera o ingresa preguntas de estudio para las asignaturas</p>
         </div>
-      </header>
 
-      <main className="cuestionario-page">
-        <div id="screen-start">
-          <p className="start-title">¿Qué quieres estudiar hoy?</p>
-          <p className="start-sub">
-            Las preguntas del profe siempre aparecen primero
-          </p>
-             {/* Panel de configuración */}
-          <div className="config-panel">
-            <h3>Selección de Cantidad de Preguntas</h3>
-            <div className="config-row">
-              <span className="config-label">
-                Número de preguntas (las primeras siempre son en base al material entregados por la asignatura):
-              </span>
-              <div className="count-btns" id="count-btns">
-                {[10, 20, 30, 32, 50, 55].map(n => (
-                  <button key={n} className={`count-btn${count === n ? ' selected' : ''}`} onClick={() => setCount(n)}>{n}</button>
-                ))}
-                <button className={`count-btn${count === 999 ? ' selected' : ''}`} onClick={() => setCount(999)}>Todas</button>
-              </div>
-            </div>
+        <div className="admin-tabs">
+          <button 
+            className={`tab ${tab === 'ia' ? 'tab-active' : ''}`} 
+            onClick={() => setTab('ia')}
+          >
+            🤖 Generar con IA
+          </button>
+          <button 
+            className={`tab ${tab === 'manual' ? 'tab-active' : ''}`} 
+            onClick={() => setTab('manual')}
+          >
+            ✏️ Ingresar manual
+          </button>
+        </div>
 
-            {/* GRID DE ASIGNATURAS Tarjetas con imagen y datos */}
-
-          <div className="subject-grid" id="subject-grid">
-
-            <div className={`subject-card${desactivadas.includes('seguridad_informacion') ? ' subject-disabled' : ''}`} id="card-seguridad_informacion" onClick={() => irAlQuiz('seguridad_informacion')}>
-              <img src="img/Seguridad de la Información01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Seguridad de la Información</div>
-              <div className="subject-meta">Prueba 1 · Solo las 32 primeras preguntas son de la prueba</div>
-              <div><span className="coming-badge">Material - 140 Preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('seguridad_informacion') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('seguridad_informacion'); }}
-                >
-                  {usuario.favoritas?.includes('seguridad_informacion') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('sistemas_operativos') ? ' subject-disabled' : ''}`} id="card-sistemas_operativos" onClick={() => irAlQuiz('sistemas_operativos')}>
-              <img src="img/Sistemas Operativos02.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Sistemas Operativos</div>
-              <div className="subject-meta">Prueba 1 · Subnetting, Las primeras 38 preguntas son los cuestionarios del profesor y una prueba</div>
-              <div><span className="coming-badge">Material de Clases - 131 Preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('sistemas_operativos') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('sistemas_operativos'); }}
-                >
-                  {usuario.favoritas?.includes('sistemas_operativos') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('seguridad-examen') ? ' subject-disabled' : ''}`} id="card-seguridad-examen" onClick={() => irAlQuiz('seguridad-examen')}>
-              <img src="img/Seguridad de la Información02.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Fundamentos de Seguridad de la Información</div>
-              <div className="subject-meta">Cuestionario Examen Final otorgado por el profesor</div>
-              <div><span className="coming-badge">Cuestionario Examen - 55 Preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('seguridad-examen') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('seguridad-examen'); }}
-                >
-                  {usuario.favoritas?.includes('seguridad-examen') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('algebra') ? ' subject-disabled' : ''}`} id="card-algebra" onClick={() => irAlQuiz('algebra')}>
-              <img src="img/Algebra01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Resolución de Problemas de Álgebra</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('algebra') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('algebra'); }}
-                >
-                  {usuario.favoritas?.includes('algebra') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('funciones_matrices') ? ' subject-disabled' : ''}`} id="card-funciones_matrices" onClick={() => irAlQuiz('funciones_matrices')}>
-              <img src="img/FuncionesMatrices01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Funciones y Matrices</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('funciones_matrices') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('funciones_matrices'); }}
-                >
-                  {usuario.favoritas?.includes('funciones_matrices') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('metodologia_agil') ? ' subject-disabled' : ''}`} id="card-metodologia_agil" onClick={() => irAlQuiz('metodologia_agil')}>
-              <img src="img/Desarrollo Agil01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Metodología de Desarrollo Ágil</div>
-              <div className="subject-meta">Rol del Scrum Master y características del equipo (T-shaped, cross-functional), Gobernanza mínima y gestión de exclusiones en el Acta, Cálculo de capacidad y reserva para deuda técnica, Técnicas de elicitación (shadowing, 5 Whys), Métricas ágiles (Velocidad, Burndown)</div>
-              <div><span className="coming-badge">Material - 91 preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('metodologia_agil') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('metodologia_agil'); }}
-                >
-                  {usuario.favoritas?.includes('metodologia_agil') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('frontend') ? ' subject-disabled' : ''}`} id="card-frontend" onClick={() => irAlQuiz('frontend')}>
-              <img src="img/Programación FrontEnd01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Programación Front End</div>
-              <div className="subject-meta">Pendiente: FrontEnd HTML, CSS, JavaScript, React, Vue, TypeScript, Angular, etc. </div>
-              <div><span className="coming-badge">Material - 121 preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('frontend') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('frontend'); }}
-                >
-                  {usuario.favoritas?.includes('frontend') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('backend') ? ' subject-disabled' : ''}`} id="card-backend" onClick={() => irAlQuiz('backend')}>
-              <img src="img/Programación BackEnd01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Programación Back End</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('backend') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('backend'); }}
-                >
-                  {usuario.favoritas?.includes('backend') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('bd_estructurados') ? ' subject-disabled' : ''}`} id="card-bd_estructurados" onClick={() => irAlQuiz('bd_estructurados')}>
-              <img src="img/bdestructuradas01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Base de Datos Estructurados</div>
-              <div className="subject-meta">preguntas prácticas de diferentes lenguajes/tecnologías, incluyendo campos interactivos para que el usuario complete</div>
-              <div><span className="coming-badge">Material - En desarrollo 15 preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('bd_estructurados') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('bd_estructurados'); }}
-                >
-                  {usuario.favoritas?.includes('bd_estructurados') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('bd_no_estructurados') ? ' subject-disabled' : ''}`} id="card-bd_no_estructurados" onClick={() => irAlQuiz('bd_no_estructurados')}>
-              <img src="img/bdnoestructuradas01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Base de Datos No Estructurados</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>           
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('bd_no_estructurados') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('bd_no_estructurados'); }}
-                >
-                  {usuario.favoritas?.includes('bd_no_estructurados') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('fundamentos_bd') ? ' subject-disabled' : ''}`} id="card-fundamentos_bd" onClick={() => irAlQuiz('fundamentos_bd')}>
-              <img src="img/Base de datos01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Fundamentos de Base de Datos</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('fundamentos_bd') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('fundamentos_bd'); }}
-                >
-                  {usuario.favoritas?.includes('fundamentos_bd') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('administracion') ? ' subject-disabled' : ''}`} id="card-administracion" onClick={() => irAlQuiz('administracion')}>
-              <img src="img/Administración01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Administración</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('administracion') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('administracion'); }}
-                >
-                  {usuario.favoritas?.includes('administracion') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('ingenieria_software') ? ' subject-disabled' : ''}`} id="card-ingenieria_software" onClick={() => irAlQuiz('ingenieria_software')}>
-              <img src="img/Inhgenieriasoftware01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Ingeniería de Software</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('ingenieria_software') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('ingenieria_software'); }}
-                >
-                  {usuario.favoritas?.includes('ingenieria_software') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('hardware_software') ? ' subject-disabled' : ''}`} id="card-hardware_software" onClick={() => irAlQuiz('hardware_software')}>
-              <img src="img/Hardware y Software01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Fundamentos de Hardware y Software</div>
-              <div className="subject-meta">Hardware, redes, sistemas operativos, impresoras, seguridad y ética para técnicos de TI.</div>
-              <div><span className="coming-badge">Material - 164 Preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('hardware_software') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('hardware_software'); }}
-                >
-                  {usuario.favoritas?.includes('hardware_software') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('modelamiento_informaticas') ? ' subject-disabled' : ''}`} id="card-modelamiento_informaticas" onClick={() => irAlQuiz('modelamiento_informaticas')}>
-              <img src="img/Modelamiento01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Modelamiento de Soluciones Informáticas</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('modelamiento_informaticas') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('modelamiento_informaticas'); }}
-                >
-                  {usuario.favoritas?.includes('modelamiento_informaticas') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('mobile_iot') ? ' subject-disabled' : ''}`} id="card-mobile_iot" onClick={() => irAlQuiz('mobile_iot')}>
-              <img src="img/Apps Móviles para IoT02.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Aplicaciones Móviles IoT</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('mobile_iot') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('mobile_iot'); }}
-                >
-                  {usuario.favoritas?.includes('mobile_iot') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('ingles_basico') ? ' subject-disabled' : ''}`} id="card-ingles_basico" onClick={() => irAlQuiz('ingles_basico')}>
-              <img src="img/Ingles Imicial01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Inglés Inicial</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('ingles_basico') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('ingles_basico'); }}
-                >
-                  {usuario.favoritas?.includes('ingles_basico') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('ingles_intermedio') ? ' subject-disabled' : ''}`} id="card-ingles_intermedio" onClick={() => irAlQuiz('ingles_intermedio')}>
-              <img src="img/InglesIntermedio01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Inglés Intermedio</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('ingles_intermedio') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('ingles_intermedio'); }}
-                >
-                  {usuario.favoritas?.includes('ingles_intermedio') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('ingles_avanzado') ? ' subject-disabled' : ''}`} id="card-ingles_avanzado" onClick={() => irAlQuiz('ingles_avanzado')}>
-              <img src="img/Inglesavanzado01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Inglés Avanzado</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('ingles_avanzado') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('ingles_avanzado'); }}
-                >
-                  {usuario.favoritas?.includes('ingles_avanzado') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('lenguaje_python') ? ' subject-disabled' : ''}`} id="card-lenguaje_python" onClick={() => irAlQuiz('lenguaje_python')}>
-              <img src="img/lenguaje_python.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Lenguaje de Programación Python</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('lenguaje_python') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('lenguaje_python'); }}
-                >
-                  {usuario.favoritas?.includes('lenguaje_python') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('lenguaje_javascript') ? ' subject-disabled' : ''}`} id="card-lenguaje_javascript" onClick={() => irAlQuiz('lenguaje_javascript')}>
-              <img src="img/lenguaje_java01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Lenguaje de Programación JavaScript</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('lenguaje_javascript') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('lenguaje_javascript'); }}
-                >
-                  {usuario.favoritas?.includes('lenguaje_javascript') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('prog_html') ? ' subject-disabled' : ''}`} id="card-prog__html" onClick={() => irAlQuiz('prog_html')}>
-              <img src="img/lenguaje_html01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Programación HTML</div>
-              <div className="subject-meta">Ejercicios prácticos de HTML (estructura, formularios, tablas), CSS (Flexbox, modelo de caja, media queries) y JavaScript (DOM, eventos, validación, localStorage).</div>
-              <div><span className="coming-badge">Material - 143 preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('prog__html') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('prog__html'); }}
-                >
-                  {usuario.favoritas?.includes('prog__html') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('lenguaje_css') ? ' subject-disabled' : ''}`} id="card-lenguaje_css" onClick={() => irAlQuiz('lenguaje_css')}>
-              <img src="img/lenguaje_css01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Lenguaje de Programación CSS</div>
-              <div className="subject-meta">Pendiente: agregar preguntas</div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('lenguaje_css') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('lenguaje_css'); }}
-                >
-                  {usuario.favoritas?.includes('lenguaje_css') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            
-            <div className={`subject-card${desactivadas.includes('linux') ? ' subject-disabled' : ''}`} id="card-linux" onClick={() => irAlQuiz('linux')}>
-              <img src="img/linux002.jpg" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Linux</div>
-              <div className="subject-meta">Contiene cuestionario desarrollado a partir de las PPt para la instalación y desarrollo de RedHat en maquina virtual VirtualBox</div>
-              <div><span className="coming-badge">Aun de darrollo</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('linux') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('linux'); }}
-                >
-                  {usuario.favoritas?.includes('linux') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-
-            <div className={`subject-card${desactivadas.includes('japones') ? ' subject-disabled' : ''}`} id="card-japones" onClick={() => irAlQuiz('japones')}>
-              <img src="img/japones01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Japonés</div>
-              <div className="subject-meta">hiragana, katakana, saludos, números, kanji básico, keigo honorífico/humilde, pasiva de sufrimiento, causativa-pasiva, yojijukugo, expresiones, onomatopeyas, lecturas especiales,  japonés clásico, dialectos regionales, keigo ultraformal</div>
-              <div><span className="coming-badge">Material - 300 preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('japones') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('japones'); }}
-                >
-                  {usuario.favoritas?.includes('japones') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('chino') ? ' subject-disabled' : ''}`} id="card-chino" onClick={() => irAlQuiz('chino')}>
-              <img src="img/Chino01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Chino</div>
-              <div className="subject-meta">tonos, pinyin, saludos, pronombres, verbos, preguntas,contadores, tiempo, familia, direcciones, adjetivos, gramática con 了 y 把, expresiones, chengyu, expresiones avanzadas, proverbios clásicos, textos clásicos, keigo chino formal, dialectos cantonés </div>
-              <div><span className="coming-badge">Material - Aun sin preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('chino') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('chino'); }}
-                >
-                  {usuario.favoritas?.includes('chino') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            <div className={`subject-card${desactivadas.includes('coreano') ? ' subject-disabled' : ''}`} id="card-coreano" onClick={() => irAlQuiz('coreano')}>
-              <img src="img/Coreano03.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
-              <div className="subject-name">Coreano</div>
-              <div className="subject-meta">Hangul vocales/consonantes, saludos, números sino/nativos, hanja básico, verbos básicos, partículas, tiempos verbales, adjetivos, adverbios, contadores, familia, comparaciones, comida, dialectos regionales, proverbios coreanos, keigo ultraformal</div>
-              <div><span className="coming-badge">Material - 210 Preguntas</span></div>
-              {/* Solo aparece si hay sesión iniciada */}
-              {usuario && (
-                <button
-                  className={`fav-btn ${usuario.favoritas?.includes('coreano') ? 'fav-activa' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); toggleFavorita('coreano'); }}
-                >
-                  {usuario.favoritas?.includes('coreano') ? 'Guardada' : 'Guardar'}
-                </button>
-              )}
-              </div>
-
-            {/* ASIGNATURAS CREADAS POR EL ADMINISTRADOR
-                Cualquier asignatura nueva creada desde el panel de Admin
-                (que no esté en KEYS_ESTATICAS) se pinta acá, de forma
-                dinámica, con los mismos datos que ingresó el admin
-                (nombre, descripción, color, ícono) */}
-            {asignaturas.filter(a => !KEYS_ESTATICAS.includes(a.key)).length > 0 && (
-              <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginBottom: '0.6rem' }}>
-                <select className="input" style={{ width: 'auto' }} value={ordenAdmin} onChange={e => setOrdenAdmin(e.target.value)}>
-                  <option value="fecha">Nuevas asignaturas: más recientes primero</option>
-                  <option value="nombre">Nuevas asignaturas: orden alfabético</option>
-                </select>
+        {tab === 'ia' && (
+          <div className="colab-ia-section">
+            {enviado && (
+              <div className="colab-flash success">
+                ✅ Preguntas enviadas a revisión exitosamente.
               </div>
             )}
-            {asignaturas
-              .filter(a => !KEYS_ESTATICAS.includes(a.key))
-              .slice()
-              .sort((a, b) => ordenAdmin === 'nombre'
-                ? (a.nombre || '').localeCompare(b.nombre || '')
-                : (b.createdAt || 0) - (a.createdAt || 0))
-              .map(a => (
-                <div
-                  key={a.key}
-                  className={`subject-card${desactivadas.includes(a.key) ? ' subject-disabled' : ''}`}
-                  id={`card-${a.key}`}
-                  style={{ '--card-accent': a.color || undefined }}
-                  onClick={() => irAlQuiz(a.key)}
-                >
-                  {/* Avatar: como estas asignaturas no tienen una imagen
-                      subida, usamos el ícono (emoji) que puso el admin, o
-                      si no puso ninguno, la primera letra del nombre sobre
-                      un círculo de color — así igual se ve algo visual,
-                      no una tarjeta vacía. */}
-                  <div style={{
-                    width: '48px', height: '48px', borderRadius: '50%',
-                    background: a.color || 'var(--accent)', color: '#fff',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: a.icono ? '1.4rem' : '1.2rem', fontWeight: 700,
-                    marginBottom: '0.5rem'
-                  }}>
-                    {a.icono || (a.nombre || '?').charAt(0).toUpperCase()}
-                  </div>
-                  <div className="subject-name">{a.nombre}</div>
-                  <div className="subject-meta">{a.descripcion}</div>
-                  <div><span className="coming-badge">
-                    {a.totalPreguntas > 0 ? `${a.totalPreguntas} preguntas` : 'Aún sin preguntas'}
-                  </span></div>
-                  {usuario && (
-                    <button
-                      className={`fav-btn ${usuario.favoritas?.includes(a.key) ? 'fav-activa' : ''}`}
-                      onClick={(e) => { e.stopPropagation(); toggleFavorita(a.key); }}
+            
+            {error && (
+              <div className="colab-error-msg error">
+                ❌ {error}
+              </div>
+            )}
+
+            <div className="colab-form card">
+              <h3>Generar preguntas con IA</h3>
+              
+              <div className="form-group">
+                <label className="input-label">Asignatura</label>
+                <input 
+                  className="input" 
+                  placeholder="Ej: Fundamentos de Seguridad" 
+                  value={asignatura} 
+                  onChange={e => setAsignatura(e.target.value)} 
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="input-label">Cantidad de preguntas</label>
+                <div className="count-btns">
+                  {[5, 10, 15, 20, 30].map(n => (
+                    <button 
+                      key={n} 
+                      className={`count-btn${cantidad === n ? ' selected' : ''}`} 
+                      onClick={() => setCantidad(n)}
                     >
-                      {usuario.favoritas?.includes(a.key) ? 'Guardada' : 'Guardar'}
+                      {n}
                     </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label className="input-label">Dificultad</label>
+                <select 
+                  className="input" 
+                  value={dificultad} 
+                  onChange={e => setDificultad(e.target.value)}
+                >
+                  <option value="mixed">Mixta</option>
+                  <option value="easy">Fácil</option>
+                  <option value="medium">Media</option>
+                  <option value="hard">Difícil</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label className="input-label">Material de estudio</label>
+                <textarea 
+                  className="input" 
+                  rows={10} 
+                  placeholder="Pega aquí el texto del material..." 
+                  value={material} 
+                  onChange={e => setMaterial(e.target.value)} 
+                />
+                <span className="colab-chars">{material.length} caracteres</span>
+              </div>
+              
+              <button 
+                className="btn btn-primary" 
+                onClick={generarPreguntas} 
+                disabled={generando}
+              >
+                {generando ? '⏳ Generando...' : '🚀 Generar preguntas con IA'}
+              </button>
+            </div>
+
+            {preguntasGeneradas.length > 0 && (
+              <div className="colab-preview card">
+                <div className="colab-preview-header">
+                  <h3>📋 Vista previa — {preguntasGeneradas.length} preguntas</h3>
+                  <button className="btn btn-success" onClick={enviarARevision}>
+                    📤 Enviar a revisión
+                  </button>
+                </div>
+                
+                {preguntasGeneradas.map((p, i) => (
+                  <div key={i} className="colab-pregunta">
+                    <div className="colab-pregunta-header">
+                      <span className={`badge badge-${p.diff || 'medium'}`}>
+                        {p.diff || 'medium'}
+                      </span>
+                      <span className="colab-unidad">{p.unit || 'Sin unidad'}</span>
+                      <span className="colab-num">#{i + 1}</span>
+                    </div>
+                    <p className="colab-q">{p.q}</p>
+                    <div className="colab-opts">
+                      {p.opts && p.opts.map((op, j) => (
+                        <div 
+                          key={j} 
+                          className={`colab-opt ${j === p.ans ? 'colab-opt-correcta' : ''}`}
+                        >
+                          <span className="colab-letra">{String.fromCharCode(65 + j)}</span>
+                          <span>{op}</span>
+                          {j === p.ans && <span className="check-mark">✓</span>}
+                        </div>
+                      ))}
+                    </div>
+                    <p className="colab-exp">💡 {p.exp}</p>
+                  </div>
+                ))}
+                
+                <button className="btn btn-success" onClick={enviarARevision}>
+                  📤 Enviar a revisión
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab === 'manual' && (
+          <div className="admin-form card">
+            <h3>✏️ Ingresar pregunta manualmente</h3>
+            
+            {msgManual && (
+              <div className={`admin-flash ${msgManual.includes('✅') ? 'success' : 'error'}`}>
+                {msgManual}
+              </div>
+            )}
+            
+            <div className="form-row">
+              <div className="form-group" style={{ flex: 2 }}>
+                <label className="input-label">📚 Asignatura</label>
+                <select 
+                  className="input" 
+                  value={formP.asignaturaId} 
+                  onChange={e => { setFormP(f => ({ ...f, asignaturaId: e.target.value })); setErroresP(er => ({ ...er, asignaturaId: null })); }}
+                >
+                  <option value="">Selecciona una asignatura</option>
+                  {loading ? (
+                    <option value="">Cargando asignaturas...</option>
+                  ) : (
+                    asignaturas && asignaturas.map(a => (
+                      <option key={a.key ?? a._id} value={a.key ?? a._id}>
+                        {a.nombre} {a.totalPreguntas !== undefined ? `(${a.totalPreguntas} preguntas)` : ''}
+                      </option>
+                    ))
                   )}
+                </select>
+                <CampoError mensaje={erroresP.asignaturaId} />
+              </div>
+              
+              <div className="form-group" style={{ flex: 1 }}>
+                <label className="input-label">📊 Dificultad</label>
+                <select 
+                  className="input" 
+                  value={formP.dificultad} 
+                  onChange={e => setFormP(f => ({ ...f, dificultad: e.target.value }))}
+                >
+                  <option value="easy">🟢 Fácil</option>
+                  <option value="medium">🟡 Media</option>
+                  <option value="hard">🔴 Difícil</option>
+                </select>
+              </div>
+              
+              <div className="form-group" style={{ flex: 1 }}>
+                <label className="input-label">📂 Unidad</label>
+                <input 
+                  className="input" 
+                  value={formP.unidad} 
+                  onChange={e => setFormP(f => ({ ...f, unidad: e.target.value }))} 
+                  placeholder="Ej: Unidad 1" 
+                  maxLength={MAX_UNIDAD}
+                />
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label className="input-label">📝 Caso (opcional)</label>
+              <textarea
+                className="input"
+                rows={2}
+                value={formP.caso}
+                onChange={e => { setFormP(f => ({ ...f, caso: e.target.value })); setErroresP(er => ({ ...er, caso: null })); }}
+                placeholder="Contexto o escenario que se muestra antes de la pregunta…"
+                maxLength={MAX_CASO}
+              />
+              <span style={{ fontSize: '0.75rem', color: '#8a7e9a' }}>{formP.caso.length}/{MAX_CASO}</span>
+              <CampoError mensaje={erroresP.caso} />
+            </div>
+
+            <div className="form-group">
+              <label className="input-label">❓ Pregunta *</label>
+              <textarea 
+                className="input" 
+                rows={2} 
+                value={formP.pregunta} 
+                onChange={e => { setFormP(f => ({ ...f, pregunta: e.target.value })); setErroresP(er => ({ ...er, pregunta: null })); }} 
+                placeholder="Escribe la pregunta…" 
+                maxLength={MAX_PREGUNTA}
+              />
+              <span style={{ fontSize: '0.75rem', color: '#8a7e9a' }}>{formP.pregunta.length}/{MAX_PREGUNTA}</span>
+              <CampoError mensaje={erroresP.pregunta} />
+            </div>
+            
+            <div className="form-group">
+              <label className="input-label">Opciones de respuesta * ({formP.opciones.length})</label>
+              <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>
+                👆 Selecciona el radio button de la opción correcta
+              </p>
+              {formP.opciones.map((op, i) => (
+                <div key={i} style={{ marginBottom: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    <input 
+                      type="radio" 
+                      name="correcta" 
+                      checked={formP.respuestaCorrecta === i} 
+                      onChange={() => setFormP(f => ({ ...f, respuestaCorrecta: i }))} 
+                    />
+                    <input 
+                      className="input" 
+                      value={op} 
+                      onChange={e => {
+                        const nuevasOpciones = [...formP.opciones];
+                        nuevasOpciones[i] = e.target.value;
+                        setFormP({ ...formP, opciones: nuevasOpciones });
+                        setErroresP(er => {
+                          if (!er.opciones) return er;
+                          const opcionesErr = { ...er.opciones };
+                          delete opcionesErr[i];
+                          const resto = { ...er };
+                          if (Object.keys(opcionesErr).length) resto.opciones = opcionesErr; else delete resto.opciones;
+                          return resto;
+                        });
+                      }} 
+                      placeholder={`Opción ${String.fromCharCode(65 + i)}`} 
+                      style={{ flex: 1 }}
+                      maxLength={MAX_OPCION}
+                    />
+                    {formP.respuestaCorrecta === i && <span style={{ color: 'green', fontWeight: 'bold' }}>✓ Correcta</span>}
+                  </div>
+                  <CampoError mensaje={erroresP.opciones?.[i]} />
                 </div>
               ))}
-
-          </div>
-
-       
-            {/* CONFIGURACIÓN ADICIONAL - Modo de estudio y orden */}
-
-            <div className="config-row" style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '0.8rem' }}>
-              <span className="config-label">Modo de estudio:</span>
-              <div style={{ display: 'flex', gap: '0.8rem' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <input type="radio" name="studyMode" value="normal" checked={modo === 'normal'} onChange={() => setModo('normal')} />
-                  Cuestionario normal
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <input type="radio" name="studyMode" value="levels" checked={modo === 'levels'} onChange={() => setModo('levels')} />
-                  Por niveles
-                </label>
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={agregarOpcion}>+ Agregar opción</button>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={quitarOpcion}>- Quitar opción</button>
               </div>
             </div>
 
-            <div className="config-row">
-              <span className="config-label">Orden:</span>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-soft)' }}>
-                Preguntas del profe primero · 🔀 Aleatorio · 🔤 Opciones mezcladas
-              </span>
+            <div className="form-group">
+              <label className="input-label">💡 Explicación</label>
+              <textarea 
+                className="input" 
+                rows={2} 
+                value={formP.explicacion} 
+                onChange={e => { setFormP(f => ({ ...f, explicacion: e.target.value })); setErroresP(er => ({ ...er, explicacion: null })); }} 
+                placeholder="Explicación de por qué la respuesta es correcta…" 
+                maxLength={MAX_EXPLICACION}
+              />
+              <span style={{ fontSize: '0.75rem', color: '#8a7e9a' }}>{formP.explicacion.length}/{MAX_EXPLICACION}</span>
+              <CampoError mensaje={erroresP.explicacion} />
             </div>
-          </div>
 
-          {/* INFO ROW - Información resumida del cuestionario */}
-
-          <div className="info-row" id="info-row">
-            <div className="info-pill"><strong>{count === 999 ? 'Todas' : count}</strong> preguntas</div>
-            <div className="info-pill"><strong>incluye</strong> cuestionario del profe</div>
-            <div className="info-pill">Escala 1.0 – 7.0</div>
-          </div>
-
-          {/* MODAL, sin proguntas aun */}
-
-          {modalSinPreguntas && (
-            <div style={{
-              position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              zIndex: 9999
-            }}>
-              <div style={{
-                background: 'white', borderRadius: '20px', padding: '2rem',
-                textAlign: 'center', maxWidth: '380px', margin: '1rem',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
-              }}>
-                <img
-                  src="https://png.pngtree.com/png-clipart/20250501/original/pngtree-3d-cartoon-girl-sleeping-on-bed-png-image_20915456.png"
-                  style={{ width: '100px', marginBottom: '1rem' }}
-                />
-                <h3 style={{ marginBottom: '0.8rem', fontFamily: 'Space Grotesk' }}>Por flojera 😴</h3>
-                <p style={{ color: '#8a7e9a', marginBottom: '0.5rem' }}>
-                  Esta asignatura aún no tiene preguntas cargadas.
-                </p>
-                <p style={{ color: '#8a7e9a', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-                  De a poquito voy poniendo las preguntas...<br />Porque somos felices, con poco 🌸
-                </p>
+            {/* Contenido extra: tabla o consola simulada (opcional) */}
+            <div className="form-group">
+              <label className="input-label">🖥️ Contenido extra (tabla o consola, opcional)</label>
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
                 <button
-                  className="btn btn-primary"
-                  onClick={() => setModalSinPreguntas(false)}
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setFormP(f => ({ ...f, extra: (f.extra ? f.extra + '\n' : '') + PLANTILLA_TABLA }))}
                 >
-                  Entendido
+                  + Insertar tabla
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setFormP(f => ({ ...f, extra: (f.extra ? f.extra + '\n' : '') + PLANTILLA_CONSOLA }))}
+                >
+                  + Insertar consola
                 </button>
               </div>
+              <textarea
+                className="input"
+                rows={4}
+                value={formP.extra}
+                onChange={e => { setFormP(f => ({ ...f, extra: e.target.value })); setErroresP(er => ({ ...er, extra: null })); }}
+                placeholder="Usa los botones de arriba para insertar una plantilla, o pega tu propio HTML…"
+                maxLength={MAX_EXTRA}
+                style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
+              />
+              <span style={{ fontSize: '0.75rem', color: '#8a7e9a' }}>{formP.extra.length}/{MAX_EXTRA}</span>
+              <CampoError mensaje={erroresP.extra} />
+              {formP.extra && (
+                <div style={{ marginTop: '0.6rem' }}>
+                  <span className="input-label" style={{ marginBottom: '0.3rem' }}>Vista previa</span>
+                  <div className="quiz-extra" dangerouslySetInnerHTML={{ __html: formP.extra }} />
+                </div>
+              )}
             </div>
-          )}
-
-          {/* MODAL, asignatura desactivada por el administrador */}
-
-          {modalDesactivado && (
-            <div style={{
-              position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              zIndex: 9999
-            }}>
-              <div style={{
-                background: 'white', borderRadius: '20px', padding: '2rem',
-                textAlign: 'center', maxWidth: '380px', margin: '1rem',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
-              }}>
-                <h3 style={{ marginBottom: '0.8rem', fontFamily: 'Space Grotesk' }}>Cuestionario desactivado 🔒</h3>
-                <p style={{ color: '#8a7e9a', marginBottom: '1.5rem' }}>
-                  Esta asignatura fue desactivada temporalmente por el administrador. Vuelve a intentarlo más tarde.
-                </p>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => setModalDesactivado(false)}
-                >
-                  Entendido
-                </button>
+            
+            {/* Origen obligatorio: prueba/archivo real del profesor, o inventada */}
+            <div className="form-group">
+              <label className="input-label">¿Es de una prueba o archivo del profesor? *</label>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                  <input type="radio" name="esDelProfesor" checked={formP.esDelProfesor === true} onChange={() => { setFormP(f => ({ ...f, esDelProfesor: true })); setErroresP(er => ({ ...er, esDelProfesor: null })); }} />
+                  Sí, viene de una prueba/archivo real
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                  <input type="radio" name="esDelProfesor" checked={formP.esDelProfesor === false} onChange={() => { setFormP(f => ({ ...f, esDelProfesor: false })); setErroresP(er => ({ ...er, esDelProfesor: null })); }} />
+                  No, es inventada para estudiar
+                </label>
               </div>
+              <CampoError mensaje={erroresP.esDelProfesor} />
             </div>
-          )}
-
-        </div>
+            
+            <button className="btn btn-primary" onClick={guardarPreguntaManual}>
+              💾 Guardar pregunta
+            </button>
+          </div>
+        )}
       </main>
-
-      
     </>
   );
 }

@@ -10,6 +10,27 @@ header {
   text-align: center;
 }
 
+/* Encabezado con las 2 imágenes y el bloque de título/subtítulo.
+   Escritorio (por defecto): "imagen — título — imagen", igual que
+   siempre fue. Este layout SOLO cambia en celular (ver @media abajo). */
+.cuestionario-header-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "img1 texto img2";
+  align-items: center;
+  justify-items: center;
+  gap: 2rem;
+}
+
+.cuestionario-header-img1 { grid-area: img1; }
+.cuestionario-header-img2 { grid-area: img2; }
+.cuestionario-header-texto { grid-area: texto; }
+
+.cuestionario-header-img {
+  width: 130px;
+  object-fit: contain;
+}
+
 .header-badge {
   display: inline-block;
   background: var(--surface);
@@ -261,6 +282,26 @@ header p {
 
 /* RESPONSIVE */
 @media (max-width: 600px) {
+  /* ENCABEZADO en celular: las dos imágenes juntas, una al lado de la
+     otra, centradas arriba; el título/subtítulo queda debajo, ocupando
+     todo el ancho. En escritorio esto NO aplica (fuera de este @media
+     se mantiene el layout original en fila: imagen-título-imagen). */
+  .cuestionario-header-row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "img1 img2"
+      "texto texto";
+    gap: 0.5rem 0.6rem;
+  }
+
+  .cuestionario-header-img {
+    width: 90px;
+    justify-self: end;
+  }
+
+  .cuestionario-header-img1 { justify-self: end; }
+  .cuestionario-header-img2 { justify-self: start; }
+
   .subject-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.6rem;
