@@ -36,20 +36,35 @@ function OdsBadge({ num, titulo, detalle }) {
 }
 
 
-function Carrusel() {
+function Carrusel({ nuevas = [] }) {
   const [actual, setActual] = useState(0);
   const navigate = useNavigate();
   // Cada item puede llevar a un cuestionario específico (key) o, si no
   // corresponde a una sola asignatura (como "Últimos subidos" u "ODS"),
   // a la página general de Cuestionarios.
-  const items = [
+  const itemsFijos = [
     { img: '/img/ultimas001.jpg', nombre: 'Ultimos cuestionarios subidos', meta: '140 Preguntas', key: null },
-    { img: '/img/ODS.jpg', nombre: 'ODS presentes', meta: 'Cumplimiento ODS', key: null },
+    { img: '/img/ODS.jpg', nombre: 'ODS presentes', meta: 'Cumplimiento ODS', key: null, esOds: true },
     { img: '/img/carrusel001.jpg', nombre: 'Sistemas Operativos', meta: 'En desarrollo', key: 'sistemas_operativos' },
     { img: '/img/carrusel002.jpg', nombre: 'Seguridad de la Información', meta: 'En desarrollo', key: 'seguridad_informacion' },
   ];
 
+  // Asignaturas creadas desde el panel de administración: no tienen
+  // una imagen subida, así que se muestran con un fondo de color y su
+  // ícono/inicial (igual que en la página de Cuestionarios), en vez de
+  // dejarlas fuera del carrusel.
+  const itemsNuevas = nuevas.map(a => ({
+    nombre: a.nombre,
+    meta: a.totalPreguntas > 0 ? `${a.totalPreguntas} preguntas` : 'Aún sin preguntas',
+    key: a.key,
+    color: a.color,
+    icono: a.icono,
+  }));
+
+  const items = [...itemsFijos, ...itemsNuevas];
+
   function irASeccion(item) {
+    if (item.esOds) { window.open('https://www.pactomundial.org/que-puedes-hacer-tu/ods/', '_blank', 'noopener'); return; }
     navigate(item.key ? `/quiz/${item.key}` : '/cuestionarios');
   }
 
@@ -62,7 +77,18 @@ function Carrusel() {
             style={{ minWidth: '100%', position: 'relative', cursor: 'pointer' }}
             onClick={() => irASeccion(item)}
           >
-            <img src={item.img} alt={item.nombre} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '16px' }} />
+            {item.img ? (
+              <img src={item.img} alt={item.nombre} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '16px' }} />
+            ) : (
+              <div style={{
+                width: '100%', height: '200px', borderRadius: '16px',
+                background: item.color || 'var(--accent)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '3rem', color: '#fff', fontWeight: 700
+              }}>
+                {item.icono || (item.nombre || '?').charAt(0).toUpperCase()}
+              </div>
+            )}
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.5)', color: '#fff', padding: '1rem', borderRadius: '0 0 16px 16px' }}>
               <p style={{ fontWeight: '700', fontSize: '1rem' }}>{item.nombre}</p>
               <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>{item.meta}</p>
@@ -155,7 +181,7 @@ export default function Home() {
         </div>
 
         {/* API SECTION — links directos a los endpoints de la API externa */}
-        <Carrusel />
+        <Carrusel nuevas={asignaturas.filter(a => a.createdAt)} />
         <div className="api-section">
           <p className="api-titulo">API disponible</p>
           <div className="api-links">

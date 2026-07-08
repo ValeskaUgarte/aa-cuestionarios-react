@@ -7,7 +7,7 @@ import {
   getAsignaturas, getPreguntas,
   crearPregunta, editarPregunta, eliminarPregunta,
   crearAsignatura, eliminarAsignatura,
-  LISTA_ASIGNATURAS_ADMIN, getAsignaturasDesactivadas, toggleAsignaturaActiva,
+  getAsignaturasDesactivadas, toggleAsignaturaActiva,
   getReportes, eliminarReporte, registrarActividad
 } from '../services/api';
 
@@ -435,17 +435,23 @@ export default function Admin() {
             {/* Listado de preguntas */}
             <div className="admin-list-header">
               <h3>Banco ({pregsFiltradas.length})</h3>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <select className="input" style={{ width: 'auto' }} value={filtroAsig} onChange={e => setFiltroAsig(e.target.value)}>
-                  <option value="">Todas</option>
-                  {asignaturas.map(a => (
-                    <option key={a.key || a._id} value={a.key || a._id}>{a.nombre}</option>
-                  ))}
-                </select>
-                <select className="input" style={{ width: 'auto' }} value={ordenPreguntas} onChange={e => setOrdenPreguntas(e.target.value)}>
-                  <option value="fecha">Más recientes primero</option>
-                  <option value="nombre">Orden alfabético</option>
-                </select>
+              <div className="admin-list-controls">
+                <div className="select-compact-wrap">
+                  <span className="select-compact-label">Asignatura:</span>
+                  <select className="select-compact" value={filtroAsig} onChange={e => setFiltroAsig(e.target.value)}>
+                    <option value="">Todas</option>
+                    {asignaturas.map(a => (
+                      <option key={a.key || a._id} value={a.key || a._id}>{a.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="select-compact-wrap">
+                  <span className="select-compact-label">Ordenar:</span>
+                  <select className="select-compact" value={ordenPreguntas} onChange={e => setOrdenPreguntas(e.target.value)}>
+                    <option value="fecha">Recientes</option>
+                    <option value="nombre">Alfabético</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -503,10 +509,13 @@ export default function Admin() {
 
             <div className="admin-list-header">
               <h3>Asignaturas ({asignaturasOrdenadas.length})</h3>
-              <select className="input" style={{ width: 'auto' }} value={ordenAsignaturas} onChange={e => setOrdenAsignaturas(e.target.value)}>
-                <option value="fecha">Más recientes primero</option>
-                <option value="nombre">Orden alfabético</option>
-              </select>
+              <div className="select-compact-wrap">
+                <span className="select-compact-label">Ordenar:</span>
+                <select className="select-compact" value={ordenAsignaturas} onChange={e => setOrdenAsignaturas(e.target.value)}>
+                  <option value="fecha">Recientes</option>
+                  <option value="nombre">Alfabético</option>
+                </select>
+              </div>
             </div>
 
             <div className="asig-lista">
@@ -582,12 +591,12 @@ export default function Admin() {
             sin perder sus preguntas. Puedes reactivarlo cuando quieras.
           </p>
           <div className="asig-lista">
-            {LISTA_ASIGNATURAS_ADMIN.map(a => {
+            {asignaturas.map(a => {
               const activa = !desactivadas.includes(a.key);
               return (
                 <div key={a.key} className="asig-item card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ flex: 1 }}>
-                    <p className="asig-nombre">{a.nombre}</p>
+                    <p className="asig-nombre">{a.icono ? `${a.icono} ` : ''}{a.nombre}</p>
                     <p className="asig-desc" style={{ color: activa ? 'var(--accent2, #00d4a0)' : 'var(--danger, #ff4f6a)' }}>
                       {activa ? '🟢 Activo (visible para estudiantes)' : '🔴 Desactivado (oculto)'}
                     </p>

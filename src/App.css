@@ -454,6 +454,44 @@ h1, h2, h3, h4 {
   gap: 0.5rem; 
 }
 
+/* Controles de filtro/orden del listado: más chicos y discretos que un
+   .input normal, para que no compitan visualmente con el título de la
+   sección ni se vean "invasivos" cuando hay varios uno al lado del otro. */
+.admin-list-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.select-compact-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.select-compact-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.select-compact {
+  width: auto;
+  background: #fff8f0;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0.35rem 0.6rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  outline: none;
+  transition: border-color 0.2s;
+  max-width: 180px;
+}
+
+.select-compact:focus { border-color: var(--accent); }
+
 .preguntas-lista { 
   display: flex; 
   flex-direction: column; 
