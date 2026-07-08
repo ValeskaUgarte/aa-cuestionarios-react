@@ -66,8 +66,8 @@ export default function Cuestionario() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem' }}>
           <img src="/img/app002.jpg" style={{ width: '130px', objectFit: 'contain' }} alt="estudiante" />
           <div>
-            <div className="header-badge">App de Estudio · Valeska Ugarte</div>
-            <h1>Cuestionarios de Estudio</h1>
+            <div className="header-badge"></div>
+            <h1>Cuestionarios</h1>
             <p>Selecciona asignatura, cantidad de preguntas y comienza</p>
           </div>
           <img src="/img/app001.jpg" style={{ width: '130px', objectFit: 'contain' }} alt="estudiante" />

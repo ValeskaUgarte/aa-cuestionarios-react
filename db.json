@@ -133,6 +133,14 @@
       "fecha": "2026-06-28T20:06:43.233Z",
       "usuario": "anonimo",
       "id": 4
+    },
+    {
+      "pregunta": "algo",
+      "asignatura": "algo",
+      "motivo": "Contenido inapropiado",
+      "fecha": "2026-07-07T21:03:43.411Z",
+      "usuario": "anonimo",
+      "id": 5
     }
   ]
 }
