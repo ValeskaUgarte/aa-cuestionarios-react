@@ -31,7 +31,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/perfil" element={
-            <RutaProtegida roles={['estudiante', 'colaborador', 'admin']}>
+            <RutaProtegida>
               <Perfil />
             </RutaProtegida>
           } />

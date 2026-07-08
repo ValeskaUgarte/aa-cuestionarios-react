@@ -54,7 +54,8 @@ export default function Perfil() {
             <h1 className="perfil-nombre">{usuario.nombre}</h1>
             <p className="perfil-rol">
               {usuario.rol === 'estudiante' ? 'Estudiante' :
-              usuario.rol === 'colaborador' ? 'Colaborador' : 'Moderador'}
+              usuario.rol === 'colaborador' ? 'Colaborador' :
+              usuario.rol === 'admin' ? 'Administrador' : 'Moderador'}
             </p>
             <p className="perfil-email">{usuario.email}</p>
           </div>
@@ -120,7 +121,7 @@ export default function Perfil() {
                     <p className="historial-fecha">{new Date(h.fecha).toLocaleDateString('es-CL')}</p>
                   </div>
                   <div className="historial-resultado">
-                    <span className="historial-nota">{h.nota.toFixed(1)}</span>
+                    <span className="historial-nota">{(h.nota ?? 0).toFixed(1)}</span>
                     <span className="historial-detalle">{h.correctas}/{h.total}</span>
                   </div>
                 </div>
