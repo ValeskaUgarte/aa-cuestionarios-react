@@ -274,6 +274,16 @@ header p {
   padding: 0.35rem 0.6rem;
 }
 
+/* ── HEADER ESCRITORIO (con las mismas propiedades que antes iban inline;
+   deben vivir aquí para que la media query de abajo pueda ocultarlo en
+   móvil — un estilo inline nunca puede ser sobreescrito por una clase) ── */
+.header-desktop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
 /* ── HEADER MÓVIL (oculto por defecto; visible solo en pantalla angosta) ── */
 .header-mobile {
   display: none;

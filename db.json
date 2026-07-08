@@ -149,6 +149,14 @@
       "fecha": "2026-07-08T19:35:10.653Z",
       "usuario": "anonimo",
       "id": 7
+    },
+    {
+      "pregunta": "haciendo pruebas desde este perfil de colaborador",
+      "asignatura": "algo",
+      "motivo": "Respuesta incorrecta",
+      "fecha": "2026-07-08T20:30:07.799Z",
+      "usuario": "anonimo",
+      "id": 8
     }
   ]
 }
