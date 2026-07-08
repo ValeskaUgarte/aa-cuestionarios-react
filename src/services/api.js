@@ -187,11 +187,47 @@ function setPreguntasLS(preguntas) {
   localStorage.setItem(LS_KEY, JSON.stringify(preguntas));
 }
 
+// ══════════════════════════════════════════════════════════
+// MODERACIÓN (aprobación de contenido)
+// Regla: si quien crea la pregunta/asignatura es 'admin', queda
+// "aprobado" de inmediato (se confía en el admin). Si es 'colaborador'
+// o 'moderador', queda "pendiente" hasta que un admin la apruebe desde
+// el panel de Admin (tab "Revisión"). Esto evita que un colaborador
+// tenga, en la práctica, los mismos privilegios que un administrador.
+// ══════════════════════════════════════════════════════════
+export function estadoSegunRol(rol) {
+  return rol === 'admin' ? 'aprobado' : 'pendiente';
+}
+
 export const crearPregunta = (data) => {
   const preguntas = getPreguntasLS();
-  const nueva = { ...data, _id: Date.now().toString(), createdAt: Date.now() };
+  // Si quien llama no especificó "estado" explícitamente, se asume
+  // pendiente por seguridad (mejor pedir aprobación de más que de menos).
+  const nueva = {
+    ...data,
+    estado: data.estado || 'pendiente',
+    _id: Date.now().toString(),
+    createdAt: Date.now(),
+  };
   setPreguntasLS([...preguntas, nueva]);
   return Promise.resolve(nueva);
+};
+
+// Aprueba una pregunta pendiente (usado por el admin en el panel de Revisión)
+export const aprobarPregunta = (id) => {
+  const preguntas = getPreguntasLS();
+  const actualizadas = preguntas.map(p => p._id === id ? { ...p, estado: 'aprobado' } : p);
+  setPreguntasLS(actualizadas);
+  return Promise.resolve({ id, estado: 'aprobado' });
+};
+
+// Rechaza (elimina) una pregunta pendiente
+export const rechazarPregunta = (id) => eliminarPregunta(id);
+
+// Devuelve solo las preguntas creadas por colaboradores/moderadores que
+// están esperando revisión del admin (para el tab "Revisión" del Admin)
+export const getPreguntasPendientes = () => {
+  return Promise.resolve(getPreguntasLS().filter(p => p.estado === 'pendiente'));
 };
 
 export const editarPregunta = (id, data) => {
@@ -209,7 +245,10 @@ export const eliminarPregunta = (id) => {
 };
 
 export const getPreguntas = () => {
-  const delAdmin = getPreguntasLS();
+  // Solo preguntas ya aprobadas (o creadas por el admin, sin campo estado).
+  // Las pendientes de colaboradores/moderadores se ven aparte, en el tab
+  // "Revisión" del Admin (ver getPreguntasPendientes).
+  const delAdmin = getPreguntasLS().filter(p => p.estado !== 'pendiente');
   const delArchivo = ASIGNATURAS.flatMap(a =>
   a.preguntas.map((p, index) => ({
     ...normalizar(p),
@@ -235,9 +274,34 @@ function setAsignaturasLS(asigs) {
 
 export const crearAsignatura = (data) => {
   const asigs = getAsignaturasLS();
-  const nueva = { ...data, _id: Date.now().toString(), createdAt: Date.now() };
+  // Igual que crearPregunta: si no viene "estado" explícito, pendiente
+  // por defecto (así una asignatura propuesta por un colaborador no
+  // aparece de inmediato en la lista pública de Cuestionarios).
+  const nueva = {
+    ...data,
+    estado: data.estado || 'pendiente',
+    _id: Date.now().toString(),
+    createdAt: Date.now(),
+  };
   setAsignaturasLS([...asigs, nueva]);
   return Promise.resolve(nueva);
+};
+
+// Aprueba una asignatura pendiente (la hace visible para todos)
+export const aprobarAsignatura = (id) => {
+  const asigs = getAsignaturasLS();
+  const actualizadas = asigs.map(a => a._id === id ? { ...a, estado: 'aprobado' } : a);
+  setAsignaturasLS(actualizadas);
+  return Promise.resolve({ id, estado: 'aprobado' });
+};
+
+// Rechaza (elimina) una asignatura pendiente
+export const rechazarAsignatura = (id) => eliminarAsignatura(id);
+
+// Asignaturas propuestas por colaboradores/moderadores que esperan
+// revisión del admin (para el tab "Revisión")
+export const getAsignaturasPendientes = () => {
+  return Promise.resolve(getAsignaturasLS().filter(a => a.estado === 'pendiente'));
 };
 
 export const editarAsignatura = (id, data) => {
@@ -262,15 +326,19 @@ export const eliminarAsignatura = (id) => {
 // porque nunca llegaron a esa API. Se usa siempre Local Storage + banco
 // estático, que es donde realmente vive esta información.
 export function getAsignaturas() {
-  const delAdmin = getAsignaturasLS();
+  // Solo asignaturas aprobadas (o del banco estático, sin campo estado).
+  // Las propuestas pendientes de colaboradores/moderadores no deben
+  // aparecer todavía en Cuestionarios/Home ni en los selects normales.
+  const delAdmin = getAsignaturasLS().filter(a => a.estado !== 'pendiente');
   const delArchivo = ASIGNATURAS.map(({ preguntas, ...rest }) => ({
     ...rest,
     totalPreguntas: preguntas.length,
   }));
   // Las asignaturas creadas desde el Admin no traen totalPreguntas de
   // fábrica: lo calculamos contando cuántas preguntas guardadas en
-  // Local Storage apuntan a esa asignatura (por asignaturaId).
-  const preguntasAdmin = getPreguntasLS();
+  // Local Storage apuntan a esa asignatura (por asignaturaId), sin
+  // contar las preguntas que todavía están pendientes de aprobación.
+  const preguntasAdmin = getPreguntasLS().filter(p => p.estado !== 'pendiente');
   const delAdminConTotal = delAdmin.map(a => ({
     ...a,
     totalPreguntas: preguntasAdmin.filter(
@@ -285,7 +353,9 @@ export function getPreguntasPorAsignatura(key) {
   const asig = ASIGNATURAS.find(a => a.key === key);
   const delArchivo = asig ? asig.preguntas.map(normalizar) : [];
   const delAdmin = getPreguntasLS()
-    .filter(p => p.asignatura === key || p.asignaturaId === key)
+    // Excluye pendientes: un estudiante no debe ver (ni rendir) preguntas
+    // que un colaborador subió y que todavía no aprueba el administrador.
+    .filter(p => (p.asignatura === key || p.asignaturaId === key) && p.estado !== 'pendiente')
     .map(p => ({
       pregunta: p.pregunta,
       opciones: p.opciones,

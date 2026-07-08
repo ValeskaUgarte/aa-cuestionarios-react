@@ -2,13 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+import { useAuth } from '../context/AuthContext';
 // Importa las funciones de API para CRUD de preguntas y asignaturas
 import {
   getAsignaturas, getPreguntas,
   crearPregunta, editarPregunta, eliminarPregunta,
   crearAsignatura, eliminarAsignatura,
   getAsignaturasDesactivadas, toggleAsignaturaActiva,
-  getReportes, eliminarReporte, registrarActividad
+  getReportes, eliminarReporte, registrarActividad,
+  // Moderación: pendientes + aprobar/rechazar (ver services/api.js)
+  getPreguntasPendientes, aprobarPregunta, rechazarPregunta,
+  getAsignaturasPendientes, aprobarAsignatura, rechazarAsignatura,
 } from '../services/api';
 
 // CONFIGURACIÓN INICIAL Valores por defecto para formularios
@@ -56,9 +60,16 @@ function CampoError({ mensaje }) {
 
 // ESTADOS DEL COMPONENTE
 export default function Admin() {
-  const [tab, setTab] = useState('preguntas');        // Pestaña activa: preguntas, asignaturas, reportes
-  const [preguntas, setPreguntas] = useState([]);     // Lista de preguntas
-  const [asignaturas, setAsignaturas] = useState([]); // Lista de asignaturas
+  const { usuario, listarUsuarios, nombrarModerador, revocarModerador } = useAuth();
+  // esAdmin: solo el rol 'admin' ve la gestión completa (crear/eliminar
+  // asignaturas y preguntas ya aprobadas, activar/desactivar, nombrar
+  // moderadores). Un 'moderador' solo debe ver "Revisión" y "Reportes":
+  // así se cumple que no tenga los mismos privilegios que el admin.
+  const esAdmin = usuario?.rol === 'admin';
+
+  const [tab, setTab] = useState(esAdmin ? 'preguntas' : 'revision'); // Pestaña activa
+  const [preguntas, setPreguntas] = useState([]);     // Lista de preguntas (ya aprobadas)
+  const [asignaturas, setAsignaturas] = useState([]); // Lista de asignaturas (ya aprobadas)
   const [loading, setLoading] = useState(true);       // Estado de carga
   const [form, setForm] = useState(EMPTY_P);          // Formulario de pregunta (nueva/edición)
   const [editId, setEditId] = useState(null);         // ID de la pregunta que se está editando
@@ -72,18 +83,36 @@ export default function Admin() {
   const [ordenAsignaturas, setOrdenAsignaturas] = useState('fecha'); // 'fecha' o 'nombre'
   const [asigDetalle, setAsigDetalle] = useState(null); // Asignatura cuyo detalle (preguntas) se está viendo, o null
 
+  // ── MODERACIÓN: preguntas y asignaturas pendientes de aprobación ──
+  const [preguntasPend, setPreguntasPend] = useState([]);
+  const [asignaturasPend, setAsignaturasPend] = useState([]);
+
+  // ── MODERADORES: lista de usuarios registrados (solo admin la usa) ──
+  const [usuarios, setUsuarios] = useState([]);
+
   // FUNCIONES AUXILIARES
   // Muestra un mensaje temporal (2.5 segundos)
   function flash(txt) { setMsg(txt); setTimeout(() => setMsg(''), 3200); }
 
-  // CARGA DE DATOS Obtiene preguntas, asignaturas y reportes
+  // CARGA DE DATOS Obtiene preguntas, asignaturas, reportes y lo pendiente de revisión
   function cargar() {
   return Promise.all([
     getPreguntas(),
     getAsignaturas(),
-    getReportes() // viene de Local Storage, no depende de json-server
+    getReportes(), // viene de Local Storage, no depende de json-server
+    getPreguntasPendientes(),
+    getAsignaturasPendientes(),
   ])
-    .then(([p, a, r]) => { setPreguntas(p); setAsignaturas(a); setReportes(r); })
+    .then(([p, a, r, pp, ap]) => {
+      setPreguntas(p);
+      setAsignaturas(a);
+      setReportes(r);
+      setPreguntasPend(pp);
+      setAsignaturasPend(ap);
+      // La lista de usuarios (para nombrar moderadores) solo la necesita
+      // el admin; se recarga aquí para que se mantenga sincronizada.
+      if (esAdmin) setUsuarios(listarUsuarios());
+    })
     .finally(() => setLoading(false));
 }
 
@@ -137,7 +166,10 @@ export default function Admin() {
         pregunta: preguntaLimpia,
         asignatura: asig.key || asig.nombre,
         asignaturaId: asig.key || asig._id,
-        respuestaCorrecta: parseInt(form.respuestaCorrecta) || 0
+        respuestaCorrecta: parseInt(form.respuestaCorrecta) || 0,
+        // El admin publica directo: no pasa por revisión (a diferencia
+        // de lo que crea un colaborador/moderador desde su propio panel).
+        estado: 'aprobado',
       };
       if (editId) {
         await editarPregunta(editId, payload);
@@ -210,7 +242,9 @@ export default function Admin() {
     if (faltantes.length) return flash(`Faltan campos obligatorios: ${faltantes.join(', ')}.`);
     if (nombreLimpio.length > MAX_NOMBRE_ASIG) return flash(`El nombre no puede superar los ${MAX_NOMBRE_ASIG} caracteres.`);
     if (formA.descripcion.length > MAX_DESC_ASIG) return flash(`La descripción no puede superar los ${MAX_DESC_ASIG} caracteres.`);
-    const payload = { ...formA, nombre: nombreLimpio, key: nombreLimpio.toLowerCase().replace(/\s+/g, '_') };
+    // El admin publica directo (estado 'aprobado'); un colaborador que
+    // propone una asignatura desde su panel siempre queda 'pendiente'.
+    const payload = { ...formA, nombre: nombreLimpio, key: nombreLimpio.toLowerCase().replace(/\s+/g, '_'), estado: 'aprobado' };
     await crearAsignatura(payload);
     flash('Asignatura creada ✓');
     registrarActividad(`Creó la asignatura "${nombreLimpio}"`);
@@ -225,6 +259,59 @@ export default function Admin() {
     flash('Eliminada ✓');
     registrarActividad('Eliminó una asignatura');
     cargar();
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // ACCIONES DEL TAB "REVISIÓN" - aprobar/rechazar lo que enviaron
+  // colaboradores y moderadores. Disponibles tanto para admin como
+  // para moderador (por eso NO se filtran por esAdmin).
+  // ══════════════════════════════════════════════════════════
+  async function aprobarPreg(id) {
+    await aprobarPregunta(id);
+    flash('Pregunta aprobada ✓');
+    registrarActividad('Aprobó una pregunta pendiente');
+    cargar();
+  }
+
+  async function rechazarPreg(id) {
+    if (!confirm('¿Rechazar (eliminar) esta pregunta pendiente?')) return;
+    await rechazarPregunta(id);
+    flash('Pregunta rechazada');
+    registrarActividad('Rechazó una pregunta pendiente');
+    cargar();
+  }
+
+  async function aprobarAsig(id) {
+    await aprobarAsignatura(id);
+    flash('Asignatura aprobada ✓');
+    registrarActividad('Aprobó una asignatura pendiente');
+    cargar();
+  }
+
+  async function rechazarAsig(id) {
+    if (!confirm('¿Rechazar (eliminar) esta asignatura pendiente?')) return;
+    await rechazarAsignatura(id);
+    flash('Asignatura rechazada');
+    registrarActividad('Rechazó una asignatura pendiente');
+    cargar();
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // ACCIONES DEL TAB "MODERADORES" (solo admin)
+  // ══════════════════════════════════════════════════════════
+  function handleNombrarModerador(id) {
+    nombrarModerador(id);
+    setUsuarios(listarUsuarios());
+    flash('Usuario nombrado moderador ✓');
+    registrarActividad('Nombró a un usuario como moderador');
+  }
+
+  function handleRevocarModerador(id) {
+    if (!confirm('¿Quitar el rol de moderador a este usuario?')) return;
+    revocarModerador(id);
+    setUsuarios(listarUsuarios());
+    flash('Rol de moderador revocado');
+    registrarActividad('Revocó el rol de moderador a un usuario');
   }
 
   // FILTRADO Filtra preguntas por asignatura seleccionada
@@ -268,22 +355,136 @@ export default function Admin() {
         {msg && <div className="admin-flash">{msg}</div>}
 
         <div className="admin-tabs">
-          <button className={`tab ${tab === 'preguntas' ? 'tab-active' : ''}`} onClick={() => setTab('preguntas')}>
-            Preguntas <span className="tab-count">{preguntas.length}</span>
+          {/* "Revisión" es lo primero que ve un moderador: preguntas y
+              asignaturas pendientes de aprobación. Disponible para admin
+              y moderador. Los demás tabs de gestión completa (crear/
+              eliminar directamente, activar/desactivar, moderadores)
+              son SOLO para 'admin': así el moderador ayuda a revisar
+              pero no tiene los mismos privilegios que el administrador. */}
+          <button className={`tab ${tab === 'revision' ? 'tab-active' : ''}`} onClick={() => setTab('revision')}>
+            🕓 Revisión <span className="tab-count">{preguntasPend.length + asignaturasPend.length}</span>
           </button>
-          <button className={`tab ${tab === 'asignaturas' ? 'tab-active' : ''}`} onClick={() => setTab('asignaturas')}>
-            Asignaturas <span className="tab-count">{asignaturas.length}</span>
-          </button>
+          {esAdmin && (
+            <button className={`tab ${tab === 'preguntas' ? 'tab-active' : ''}`} onClick={() => setTab('preguntas')}>
+              Preguntas <span className="tab-count">{preguntas.length}</span>
+            </button>
+          )}
+          {esAdmin && (
+            <button className={`tab ${tab === 'asignaturas' ? 'tab-active' : ''}`} onClick={() => setTab('asignaturas')}>
+              Asignaturas <span className="tab-count">{asignaturas.length}</span>
+            </button>
+          )}
           <button className={`tab ${tab === 'reportes' ? 'tab-active' : ''}`} onClick={() => setTab('reportes')}>
             Reportes <span className="tab-count">{reportes.length}</span>
           </button>
-          <button className={`tab ${tab === 'estado' ? 'tab-active' : ''}`} onClick={() => setTab('estado')}>
-            Estado <span className="tab-count">{desactivadas.length}</span>
-          </button>
+          {esAdmin && (
+            <button className={`tab ${tab === 'estado' ? 'tab-active' : ''}`} onClick={() => setTab('estado')}>
+              Estado <span className="tab-count">{desactivadas.length}</span>
+            </button>
+          )}
+          {esAdmin && (
+            <button className={`tab ${tab === 'moderadores' ? 'tab-active' : ''}`} onClick={() => setTab('moderadores')}>
+              👤 Moderadores
+            </button>
+          )}
         </div>
 
+        {/* TAB REVISIÓN - preguntas y asignaturas pendientes de aprobación */}
+        {tab === 'revision' && (
+          <div>
+            <h3 style={{ marginBottom: '0.6rem' }}>📚 Asignaturas pendientes ({asignaturasPend.length})</h3>
+            {asignaturasPend.length === 0 ? (
+              <p style={{ color: 'var(--muted)', padding: '1rem 0' }}>No hay asignaturas pendientes.</p>
+            ) : (
+              <div className="asig-lista" style={{ marginBottom: '1.5rem' }}>
+                {asignaturasPend.map(a => (
+                  <div key={a._id} className="asig-item card">
+                    <div style={{ flex: 1 }}>
+                      <p className="asig-nombre">{a.icono ? `${a.icono} ` : ''}{a.nombre}</p>
+                      <p className="asig-desc">{a.descripcion}</p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>
+                        Propuesta por: {a.creadoPorNombre || 'desconocido'} ({a.creadoPorRol || '—'})
+                      </p>
+                    </div>
+                    <div className="preg-actions">
+                      <button className="btn btn-primary btn-sm" onClick={() => aprobarAsig(a._id)}>✅ Aprobar</button>
+                      <button className="btn btn-danger btn-sm" onClick={() => rechazarAsig(a._id)}>❌ Rechazar</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <h3 style={{ marginBottom: '0.6rem' }}>❓ Preguntas pendientes ({preguntasPend.length})</h3>
+            {preguntasPend.length === 0 ? (
+              <p style={{ color: 'var(--muted)', padding: '1rem 0' }}>No hay preguntas pendientes.</p>
+            ) : (
+              <div className="preguntas-lista">
+                {preguntasPend.map(p => (
+                  <div key={p._id} className="preg-item">
+                    <div className="preg-info">
+                      <span className={`badge badge-${p.dificultad || 'medium'}`}>{p.dificultad}</span>
+                      <span className="preg-asig">{p.asignatura}</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--muted)', marginLeft: 'auto' }}>
+                        {p.creadoPorNombre || 'desconocido'} ({p.creadoPorRol || '—'})
+                      </span>
+                    </div>
+                    {p.caso && <p style={{ fontSize: '0.78rem', color: 'var(--muted)', fontStyle: 'italic' }}>Caso: {p.caso}</p>}
+                    <p className="preg-texto">{p.pregunta}</p>
+                    <div className="colab-opts">
+                      {p.opciones && p.opciones.map((op, j) => (
+                        <div key={j} className={`colab-opt ${j === p.respuestaCorrecta ? 'colab-opt-correcta' : ''}`}>
+                          <span className="colab-letra">{String.fromCharCode(65 + j)}</span>
+                          <span>{op}</span>
+                          {j === p.respuestaCorrecta && <span className="check-mark">✓</span>}
+                        </div>
+                      ))}
+                    </div>
+                    {p.explicacion && <p className="colab-exp">💡 {p.explicacion}</p>}
+                    <div className="preg-actions">
+                      <button className="btn btn-primary btn-sm" onClick={() => aprobarPreg(p._id)}>✅ Aprobar</button>
+                      <button className="btn btn-danger btn-sm" onClick={() => rechazarPreg(p._id)}>❌ Rechazar</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB MODERADORES (solo admin) - nombrar/revocar moderadores entre
+            los usuarios ya registrados (estudiantes o colaboradores) */}
+        {esAdmin && tab === 'moderadores' && (
+          <div>
+            <p style={{ color: 'var(--muted)', marginBottom: '1rem' }}>
+              Nombra a un usuario registrado como moderador para que te ayude a aprobar o
+              rechazar preguntas y asignaturas pendientes desde el tab "Revisión".
+              Un moderador no puede crear/eliminar directamente ni nombrar a otros moderadores.
+            </p>
+            {usuarios.length === 0 ? (
+              <p style={{ color: 'var(--muted)', padding: '2rem', textAlign: 'center' }}>No hay usuarios registrados.</p>
+            ) : (
+              <div className="asig-lista">
+                {usuarios.map(u => (
+                  <div key={u.id} className="asig-item card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ flex: 1 }}>
+                      <p className="asig-nombre">{u.nombre}</p>
+                      <p className="asig-desc">{u.email} · rol actual: <strong>{u.rol}</strong></p>
+                    </div>
+                    {u.rol === 'moderador' ? (
+                      <button className="btn btn-danger btn-sm" onClick={() => handleRevocarModerador(u.id)}>Quitar moderador</button>
+                    ) : (
+                      <button className="btn btn-primary btn-sm" onClick={() => handleNombrarModerador(u.id)}>Nombrar moderador</button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* TAB PREGUNTAS */}
-        {tab === 'preguntas' && (
+        {esAdmin && tab === 'preguntas' && (
           <div>
             {/* Formulario nueva/editar pregunta */}
             <div className="admin-form card">
@@ -449,7 +650,7 @@ export default function Admin() {
         )}
 
         {/* TAB ASIGNATURAS */}
-        {tab === 'asignaturas' && (
+        {esAdmin && tab === 'asignaturas' && (
           <div>
             {asigDetalle ? (
               // ── DETALLE: preguntas de UNA asignatura, con editar/eliminar ──
@@ -608,7 +809,7 @@ export default function Admin() {
         )}
 
       {/* TAB ESTADO - Activar/desactivar cuestionarios */}
-      {tab === 'estado' && (
+      {esAdmin && tab === 'estado' && (
         <div>
           <p style={{ color: 'var(--muted)', marginBottom: '1rem' }}>
             Desactiva temporalmente un cuestionario para ocultarlo de la página de Cuestionarios,

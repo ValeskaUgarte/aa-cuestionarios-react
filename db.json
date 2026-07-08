@@ -133,6 +133,22 @@
       "fecha": "2026-07-07T21:03:43.411Z",
       "usuario": "anonimo",
       "id": 5
+    },
+    {
+      "pregunta": "Esto es solo una simple pregunta\nadivina",
+      "asignatura": "ssss",
+      "motivo": "Error en la pregunta",
+      "fecha": "2026-07-08T19:35:09.093Z",
+      "usuario": "anonimo",
+      "id": 6
+    },
+    {
+      "pregunta": "Esto es solo una simple pregunta\nadivina",
+      "asignatura": "ssss",
+      "motivo": "Error en la pregunta",
+      "fecha": "2026-07-08T19:35:10.653Z",
+      "usuario": "anonimo",
+      "id": 7
     }
   ]
 }

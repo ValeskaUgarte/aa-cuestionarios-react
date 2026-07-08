@@ -119,6 +119,43 @@ export function AuthProvider({ children }) {
     actualizarUsuario({ historial: [...historial, resultado] });
   }
 
+  // ══════════════════════════════════════════════════════════
+  // MODERADORES - El administrador puede nombrar a un usuario
+  // registrado (estudiante o colaborador) como "moderador", para que
+  // lo ayude a aprobar/rechazar preguntas y asignaturas pendientes.
+  // Un moderador NO tiene los permisos completos de admin (no puede
+  // nombrar a otros moderadores, ni activar/desactivar cuestionarios).
+  // ══════════════════════════════════════════════════════════
+
+  // Devuelve la lista de usuarios registrados (sin la contraseña, para
+  // no exponerla en el panel de Admin) — no incluye al admin fijo,
+  // que no vive en localStorage.
+  function listarUsuarios() {
+    const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+    return usuarios.map(({ password, ...resto }) => resto);
+  }
+
+  // Cambia el rol de un usuario por su id (ej: 'estudiante' -> 'moderador').
+  // Si el usuario cuyo rol se cambia es el que está logueado en ESTE
+  // navegador, también actualizamos su sesión para que el cambio se
+  // refleje al instante (sin tener que cerrar sesión y volver a entrar).
+  function cambiarRolUsuario(id, nuevoRol) {
+    const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+    const actualizados = usuarios.map(u => u.id === id ? { ...u, rol: nuevoRol } : u);
+    localStorage.setItem('usuarios', JSON.stringify(actualizados));
+    if (usuario && usuario.id === id) {
+      const actualizado = { ...usuario, rol: nuevoRol };
+      localStorage.setItem('usuario_actual', JSON.stringify(actualizado));
+      setUsuario(actualizado);
+    }
+  }
+
+  // Nombra moderador (atajo sobre cambiarRolUsuario)
+  function nombrarModerador(id) { cambiarRolUsuario(id, 'moderador'); }
+
+  // Quita el rol de moderador y deja al usuario como 'estudiante'
+  function revocarModerador(id) { cambiarRolUsuario(id, 'estudiante'); }
+
   // PROVIDER - Expone todos los datos y funciones a los hijos
   return (
     <AuthContext.Provider value={{ 
@@ -129,7 +166,11 @@ export function AuthProvider({ children }) {
       registro, 
       toggleFavorita, 
       guardarResultado, 
-      actualizarUsuario 
+      actualizarUsuario,
+      listarUsuarios,
+      cambiarRolUsuario,
+      nombrarModerador,
+      revocarModerador
     }}>
       {children}
     </AuthContext.Provider>

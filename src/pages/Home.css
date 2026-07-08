@@ -249,20 +249,34 @@
 
 /* RESPONSIVE Ajustes para móviles (celular) */
 @media (max-width: 600px) {
-  /* Hero: imagen chica al lado del texto, en vez de desaparecer */
+  /* Hero en celular: ANTES quedaba igual que en escritorio (imagen-texto-imagen
+     en fila). Ahora usamos flex-wrap para que las DOS imágenes ("los monitos")
+     queden juntas, una al lado de la otra, en la primera fila, y el título
+     (hero-content) pase a una segunda fila debajo, ocupando todo el ancho. */
   .hero-layout {
     flex-direction: row;
+    flex-wrap: wrap;           /* permite que el contenido "salte" a la fila de abajo */
     align-items: center;
+    justify-content: center;
     gap: 0.6rem;
   }
 
+  /* order: 1 en las dos imágenes para que se muestren primero, juntas */
+  .hero-img-left,
+  .hero-img-right {
+    order: 1;
+  }
+
   .hero-content {
+    order: 2;               /* el título queda después de las imágenes */
+    flex-basis: 100%;       /* fuerza el salto de línea: ocupa toda la fila */
     width: 100%;
     text-align: center;
+    margin-top: 0.4rem;
   }
 
   .hero-img {
-    width: 70px;
+    width: 90px;
     flex-shrink: 0;
     display: block;
   }

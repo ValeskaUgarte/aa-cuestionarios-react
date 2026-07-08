@@ -35,13 +35,18 @@ export default function App() {
               <Perfil />
             </RutaProtegida>
           } />
+          {/* 'moderador' también entra al panel de Admin: Admin.jsx internamente
+              le muestra solo las pestañas de revisión/reportes, no la gestión
+              completa (asignaturas, estado, nombrar moderadores) que es solo
+              del 'admin'. Antes 'moderador' no estaba en esta lista y por eso
+              quedaba bloqueado aquí mismo, sin llegar nunca a Colaborador.jsx. */}
           <Route path="/admin" element={
-            <RutaProtegida roles={['admin']}>
+            <RutaProtegida roles={['admin', 'moderador']}>
               <Admin />
             </RutaProtegida>
           } />
           <Route path="/colaborador" element={
-            <RutaProtegida roles={['colaborador', 'admin']}>
+            <RutaProtegida roles={['colaborador', 'admin', 'moderador']}>
               <Colaborador />
             </RutaProtegida>
           } />
