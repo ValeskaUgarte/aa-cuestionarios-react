@@ -2,151 +2,47 @@ const preguntas_linux = [
 
   // ========== PREGUNTAS DE INSTALACIÓN Y CONFIGURACIÓN ==========
 
-  
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "medium",
-    "case": "Desde la terminal, se puede consultar información detallada sobre la versión del sistema operativo instalado.",
-    "q": "¿Qué comando se utiliza para verificar la versión de Red Hat instalada?",
-    "extra": `
-      <div class="terminal-box" style="background:#1a1a1a;color:#00ff00;padding:15px;font-family:monospace;border-radius:5px;">
-      [rromero@localhost ~]$ <input placeholder="Comando para ver versión" style="background:#333;color:#00ff00;border:1px solid #555;width:300px;"><br>
-      <span style="color:#00ffff;">Red Hat Enterprise Linux release 10.0 (Plow)</span>
-      </div>
-      `,
-    "opts": [
-      "uname -r",
-      "version",
-      "cat /etc/redhat-release",
-      "system-info"
-    ],
-    "ans": 2,
-    "exp": "El comando 'cat /etc/redhat-release' muestra la versión de Red Hat instalada, como se ve en la terminal."
-  },
-  
-
-  // ========== PREGUNTAS DE COMANDOS BÁSICOS ==========
 
   {
     "profe": true,
     "unit": "Linux",
-    "diff": "easy",
-    "case": "En la terminal de Linux, el prompt muestra información sobre el usuario y sus privilegios a través de símbolos específicos.",
-    "q": "¿Qué diferencia al símbolo $ del símbolo # en la terminal de Linux?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Organigrama de la empresa:<br><img src='/img/diagrama_empresa.jpg' alt='Organigrama' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra la estructura jerárquica de la empresa con los usuarios Jimena, Clara y Valeria.</span></div>",
+    "diff": "hard",
+    "case": "El profesor pide crear los usuarios Jimena, Clara y Valeria para la estructura de carpetas compartidas.",
+    "q": "¿Qué comando se utiliza para crear un nuevo usuario en Linux?",
+    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# useradd Jimena\n[root@localhost ~]# id Jimena\nuid=1001(Jimena) gid=1001(Jimena) groups=1001(Jimena)\n[root@localhost ~]#</div>",
     "opts": [
-      "$ indica usuario root y # indica usuario normal",
-      "$ indica usuario normal y # indica usuario root o superusuario",
-      "Ambos indican usuario root",
-      "Ambos indican usuario normal"
-    ],
-    "ans": 1,
-    "exp": "El símbolo $ se utiliza para indicar que estamos logueados con un usuario normal, mientras que # indica que estamos con privilegios de administrador o root."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "medium",
-    "case": "El comando 'ls' permite listar archivos con diferentes niveles de detalle según las opciones que se le pasen.",
-    "q": "¿Qué muestra el comando 'ls -l' al listar el contenido de un directorio?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra cómo deben quedar organizadas las carpetas: CarpetasCompartidas → AltaGerencia, Estrategias, Tacticas.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# ls -l\ntotal 0\ndrwxr-xr-x. 2 root root 64 nov 16 15:39 AltaGerencia\ndrwxr-xr-x. 2 root root 46 nov 16 15:55 Estrategias\ndrwxr-xr-x. 2 root root 6 nov 16 15:21 Tacticas\n[root@localhost Carpetascompartidas]#</div></div>",
-    "opts": [
-      "Solo los nombres de los archivos",
-      "Permisos, propietario, grupo, tamaño y fecha de modificación",
-      "Solo el tamaño de los archivos",
-      "La fecha de creación de los archivos"
-    ],
-    "ans": 1,
-    "exp": "El comando 'ls -l' muestra los permisos, número de enlaces, propietario, grupo, tamaño en bytes, fecha/hora de modificación y nombre del archivo o directorio."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "medium",
-    "case": "El comando 'ls' puede listar el contenido de cualquier directorio del sistema especificando su ruta.",
-    "q": "¿Qué muestra el comando 'ls /' en Linux?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# ls\nanaconda-ks.cfg\n[root@localhost ~]# ls /\nafs boot etc lib media opt root sbin sys usr\nbin dev home lib64 mnt proc run srv tmp var\n[root@localhost ~]#</div>",
-    "opts": [
-      "Lista el contenido del directorio raíz del sistema",
-      "Lista el contenido del directorio home",
-      "Lista el contenido del directorio actual",
-      "Muestra una lista de todos los usuarios del sistema"
+      "useradd",
+      "adduser",
+      "newuser",
+      "createuser"
     ],
     "ans": 0,
-    "exp": "El comando 'ls /' lista el contenido del directorio raíz del sistema, mostrando todas las carpetas principales como bin, dev, etc, home, usr, var, entre otras."
+    "exp": "La simulación muestra la ejecución para generar una entrada en el archivo /etc/passwd y crear el entorno del usuario, verificando posteriormente su existencia con el comando id."
   },
+
   {
     "profe": true,
     "unit": "Linux",
-    "diff": "easy",
-    "case": "Cuando se trabaja en la terminal, es importante saber en qué directorio nos encontramos para ejecutar comandos correctamente.",
-    "q": "¿Qué función cumple el comando 'pwd' en Linux?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# pwd\n/root\n[root@localhost ~]# cd /home\n[root@localhost home]# pwd\n/home\n[root@localhost home]#</div>",
+    "diff": "hard",
+    "case": "El profesor pide crear la estructura de carpetas: CarpetasCompartidas → AltaGerencia, Estrategias, Tacticas.",
+    "q": "¿Qué comando se utiliza para crear un directorio llamado 'AltaGerencia' dentro de CarpetasCompartidas?",
+    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# cd CarpetasCompartidas\n[root@localhost CarpetasCompartidas]# command AltaGerencia\n[root@localhost CarpetasCompartidas]# ls -d AltaGerencia\nAltaGerencia\n[root@localhost CarpetasCompartidas]#</div>",
     "opts": [
-      "Lista los archivos del directorio",
-      "Cambia de directorio",
-      "Muestra la ruta del directorio de trabajo actual",
-      "Crea un nuevo directorio"
+      "mkdir",
+      "create",
+      "newdir",
+      "dir"
     ],
-    "ans": 2,
-    "exp": "El comando 'pwd' (print working directory) muestra la ruta completa del directorio de trabajo actual donde te encuentras."
+    "ans": 0,
+    "exp": "El proceso ilustra la creación de un nuevo nodo de tipo directorio en el sistema de archivos actual, validando su existencia mediante la bandera -d en el listado."
   },
   {
     "profe": true,
     "unit": "Linux",
     "diff": "hard",
-    "case": "Para administrar un sistema Linux, es necesario crear cuentas de usuario para cada persona que vaya a utilizarlo.",
-    "q": "¿Qué comando se utiliza para crear un nuevo usuario llamado 'Jimena' en Linux?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Organigrama de la empresa:<br><img src='/img/diagrama_empresa.jpg' alt='Organigrama' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Jimena es la CEO y tiene acceso a todas las carpetas.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# useradd Jimena\n[root@localhost ~]# passwd Jimena\nCambiando la contraseña del usuario Jimena.\nNueva contraseña: \nVuelva a escribir la nueva contraseña: \npasswd: todos los tokens de autenticación se actualizaron exit\n[root@localhost ~]#</div></div>",
-    "opts": [
-      "adduser Jimena",
-      "useradd Jimena",
-      "createuser Jimena",
-      "newuser Jimena"
-    ],
-    "ans": 1,
-    "exp": "El comando 'useradd' seguido del nombre de usuario (useradd Jimena) crea un nuevo usuario. Luego se debe usar 'passwd' para asignar una contraseña."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "medium",
-    "case": "Después de crear un usuario, es necesario asignarle una contraseña para que pueda iniciar sesión.",
-    "q": "¿Qué comando se utiliza para asignar una contraseña al usuario 'Clara'?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Organigrama de la empresa:<br><img src='/img/diagrama_empresa.jpg' alt='Organigrama' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Clara es Directora de Cuentas y tiene acceso a la carpeta AltaGerencia.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# useradd Clara\n[root@localhost ~]# passwd Clara\nCambiando la contraseña del usuario Clara.\nNueva contraseña: \nVuelva a escribir la nueva contraseña: \npasswd: todos los tokens de autenticación se actualizaron exit\n[root@localhost ~]#</div></div>",
-    "opts": [
-      "passwd Clara",
-      "password Clara",
-      "changepwd Clara",
-      "setpass Clara"
-    ],
-    "ans": 0,
-    "exp": "El comando 'passwd' seguido del nombre de usuario (passwd Clara) permite asignar o cambiar la contraseña del usuario especificado."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "easy",
-    "case": "Para organizar archivos en Linux, se utilizan directorios que se crean con un comando específico.",
-    "q": "¿Qué comando se utiliza para crear un directorio llamado 'AltaGerencia'?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra la estructura completa de carpetas que debes crear.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# cd /home/Jimena\n[root@localhost Jimena]# mkdir Carpetascompartidas\n[root@localhost Jimena]# ls\nCarpetascompartidas\n[root@localhost Jimena]# cd Carpetascompartidas\n[root@localhost Carpetascompartidas]# mkdir AltaGerencia\n[root@localhost Carpetascompartidas]# ls\nAltaGerencia\n[root@localhost Carpetascompartidas]#</div></div>",
-    "opts": [
-      "create AltaGerencia",
-      "mkdir AltaGerencia",
-      "newdir AltaGerencia",
-      "dir AltaGerencia"
-    ],
-    "ans": 1,
-    "exp": "El comando 'mkdir' seguido del nombre del directorio (mkdir AltaGerencia) crea un nuevo directorio en la ubicación actual."
-  },
-  {
-    "profe": true,
-    "unit": "Linux",
-    "diff": "medium",
-    "case": "Para ahorrar tiempo, es posible crear varios directorios con un solo comando.",
-    "q": "¿Cómo se crean múltiples directorios de una sola vez con 'mkdir'?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas2.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Los tres directorios internos que debes crear: AltaGerencia, Estrategias y Tacticas.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost ~]# cd /home/Jimena/Carpetascompartidas\n[root@localhost Carpetascompartidas]# mkdir AltaGerencia Estrategias Tacticas\n[root@localhost Carpetascompartidas]# ls\nAltaGerencia  Estrategias  Tacticas\n[root@localhost Carpetascompartidas]#</div></div>",
+    "case": "El profesor pide crear los directorios AltaGerencia, Estrategias y Tacticas dentro de CarpetasCompartidas.",
+    "q": "¿Cómo se crean varios directorios de una sola vez en Linux?",
+    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# command dir1 dir2 dir3\n[root@localhost ~]# ls -F | grep /\ndir1/ dir2/ dir3/\n[root@localhost ~]#</div>",
     "opts": [
       "mkdir dir1 dir2 dir3",
       "mkdir {dir1,dir2,dir3}",
@@ -154,23 +50,236 @@ const preguntas_linux = [
       "Todas las anteriores"
     ],
     "ans": 3,
-    "exp": "Se pueden crear múltiples directorios de varias formas: 'mkdir dir1 dir2 dir3', 'mkdir {dir1,dir2,dir3}', o usando ';' para ejecutar múltiples comandos."
+    "exp": "La consola demuestra que existen múltiples sintaxis operativas en el shell para inicializar más de una entrada de directorio en una única instrucción."
+  },
+  {
+    "profe": true,
+    "unit": "Linux",
+    "diff": "hard",
+    "case": "El profesor pide verificar los permisos de la estructura de carpetas creada.",
+    "q": "¿Qué comando muestra los permisos, propietario, grupo y fecha de modificación de los directorios?",
+    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# command -l\ndrwxr-xr-x 2 root root 4096 Nov 16 10:00 dir1\n-rw-r--r-- 1 root root    0 Nov 16 10:01 file1\n[root@localhost ~]#</div>",
+    "opts": [
+      "ls",
+      "ls -l",
+      "ls -a",
+      "dir"
+    ],
+    "ans": 1,
+    "exp": "La salida muestra el formato extendido de metadatos, incluyendo los bits de modo, propietario, grupo, tamaño y marca de tiempo."
+  },
+  {
+    "profe": true,
+    "unit": "Linux",
+    "diff": "hard",
+    "case": "El profesor pide crear archivos dentro de los directorios de la estructura.",
+    "q": "¿Qué comando crea archivos vacíos en Linux?",
+    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# command archivo.txt\n[root@localhost ~]# ls -l archivo.txt\n-rw-r--r-- 1 root root 0 Nov 16 10:05 archivo.txt\n[root@localhost ~]#</div>",
+    "opts": [
+      "touch",
+      "create",
+      "new",
+      "mkfile"
+    ],
+    "ans": 0,
+    "exp": "El comando utilizado actualiza la marca de tiempo de acceso y modificación de un archivo; si este no existe, lo crea con un tamaño de cero bytes."
+  },
+
+  
+  {
+    "profe": true,
+    "unit": "Linux",
+    "diff": "medium",
+    "case": "Desde la terminal, se puede consultar información detallada sobre la versión del sistema operativo instalado.",
+    "q": "¿Qué comando se utiliza para verificar la versión de Red Hat instalada?",
+    "extra": `<div class="terminal-box" style="background:#1a1a1a;color:#00ff00;padding:15px;font-family:monospace;border-radius:5px;">
+    [rromero@localhost ~]$ <input placeholder="Comando para ver versión" style="background:#333;color:#00ff00;border:1px solid #555;width:300px;">
+    </div>`,
+    "opts": [
+      "uname -r",
+      "version",
+      "cat /etc/redhat-release",
+      "system-info"
+    ],
+    "ans": 2,
+    "exp": "El comando 'cat /etc/redhat-release' lee el archivo de configuración del sistema que contiene la información de la versión de Red Hat instalada."
+  },
+
+  // ========== PREGUNTAS DE COMANDOS BÁSICOS ==========
+  {
+    "profe": true,
+    "unit": "Linux",
+    "diff": "easy",
+    "case": "En la terminal de Linux, el prompt muestra información sobre el usuario y sus privilegios a través de símbolos específicos.",
+    "q": "¿Qué diferencia al símbolo $ del símbolo # en la terminal de Linux?",
+    "extra": `<div style="background:#1a1a1a;color:#00ff00;padding:15px;font-family:monospace;border-radius:5px;">
+    [usuario@localhost ~]$<br>
+    [root@localhost ~]#
+    </div>`,
+    "opts": [
+      "$ indica usuario root y # indica usuario normal",
+      "$ indica usuario normal y # indica usuario root o superusuario",
+      "Ambos indican usuario root",
+      "Ambos indican usuario normal"
+    ],
+    "ans": 1,
+    "exp": "El símbolo $ se utiliza para indicar un usuario estándar, mientras que # denota que la sesión tiene privilegios de superusuario o administrador (root)."
+  },
+  {
+    "profe": true,
+    "unit": "Linux",
+    "diff": "medium",
+    "case": "El comando 'ls' permite listar archivos con diferentes niveles de detalle según las opciones que se le pasen.",
+    "q": "¿Qué muestra el comando 'ls -l' al listar el contenido de un directorio?",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# ls -l<br>
+drwxr-xr-x. 2 root root 64 nov 16 15:39 Documentos<br>
+-rw-r--r--. 1 root root 0 nov 16 16:00 nota.txt
+</div>`,
+    "opts": [
+      "Solo los nombres de los archivos",
+      "Permisos, propietario, grupo, tamaño y fecha de modificación",
+      "Solo el tamaño de los archivos",
+      "La fecha de creación de los archivos"
+    ],
+    "ans": 1,
+    "exp": "El comando 'ls -l' (formato de lista larga) despliega una tabla con permisos, enlaces, usuario propietario, grupo, tamaño en bytes, fecha de última modificación y nombre del elemento."
+  },
+  {
+    "profe": true,
+    "unit": "Linux",
+    "diff": "medium",
+    "case": "El comando 'ls' puede listar el contenido de cualquier directorio del sistema especificando su ruta.",
+    "q": "¿Qué muestra el comando 'ls /' en Linux?",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# ls /<br>
+bin boot dev etc home lib lib64 media mnt opt proc root run sbin srv sys tmp usr var
+</div>`,
+    "opts": [
+      "Lista el contenido del directorio raíz del sistema",
+      "Lista el contenido del directorio home",
+      "Lista el contenido del directorio actual",
+      "Muestra una lista de todos los usuarios del sistema"
+    ],
+    "ans": 0,
+    "exp": "El carácter '/' representa el directorio raíz en sistemas Linux; al ejecutar 'ls /' listamos el contenido de dicho directorio jerárquico superior."
+  },
+  {
+    "profe": true,
+    "unit": "Linux",
+    "diff": "easy",
+    "case": "Cuando se trabaja en la terminal, es importante saber en qué directorio nos encontramos para ejecutar comandos correctamente.",
+    "q": "¿Qué función cumple el comando 'pwd' en Linux?",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# pwd<br>
+/root
+</div>`,
+    "opts": [
+      "Lista los archivos del directorio",
+      "Cambia de directorio",
+      "Muestra la ruta del directorio de trabajo actual",
+      "Crea un nuevo directorio"
+    ],
+    "ans": 2,
+    "exp": "El comando 'pwd' proviene de 'Print Working Directory', y su función es imprimir en pantalla la ruta absoluta de la ubicación actual."
+  },
+  {
+    "profe": true,
+    "unit": "Linux",
+    "diff": "hard",
+    "case": "Para administrar un sistema Linux, es necesario crear cuentas de usuario para cada persona que vaya a utilizarlo.",
+    "q": "¿Qué comando se utiliza para crear un nuevo usuario?",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# <input placeholder="comando usuario" style="background:#333;color:#00ff00;border:1px solid #555;"> nombre_usuario
+</div>`,
+    "opts": [
+      "adduser",
+      "useradd",
+      "createuser",
+      "newuser"
+    ],
+    "ans": 1,
+    "exp": "El comando 'useradd' es la herramienta estándar en sistemas basados en Red Hat para añadir una nueva cuenta de usuario al sistema."
+  },
+  {
+    "profe": true,
+    "unit": "Linux",
+    "diff": "medium",
+    "case": "Después de crear un usuario, es necesario asignarle una contraseña para que pueda iniciar sesión.",
+    "q": "¿Qué comando se utiliza para asignar una contraseña a un usuario existente?",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# <input placeholder="comando" style="background:#333;color:#00ff00;border:1px solid #555;"> nombre_usuario
+</div>`,
+    "opts": [
+      "passwd",
+      "password",
+      "changepwd",
+      "setpass"
+    ],
+    "ans": 0,
+    "exp": "El comando 'passwd' permite establecer o actualizar el token de autenticación (contraseña) del usuario especificado."
+  },
+  {
+    "profe": true,
+    "unit": "Linux",
+    "diff": "easy",
+    "case": "Para organizar archivos en Linux, se utilizan directorios que se crean con un comando específico.",
+    "q": "¿Qué comando se utiliza para crear un nuevo directorio?",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# <input placeholder="comando" style="background:#333;color:#00ff00;border:1px solid #555;"> nombre_directorio
+</div>`,
+    "opts": [
+      "create",
+      "mkdir",
+      "newdir",
+      "dir"
+    ],
+    "ans": 1,
+    "exp": "El comando 'mkdir' (make directory) es el comando fundamental para la creación de nuevos directorios en el sistema de archivos."
+  },
+  {
+    "profe": true,
+    "unit": "Linux",
+    "diff": "medium",
+    "case": "Para ahorrar tiempo, es posible crear varios directorios con un solo comando.",
+    "q": "¿Cómo se crean múltiples directorios de una sola vez con 'mkdir'?",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# mkdir dir1 dir2 dir3
+</div>`,
+    "opts": [
+      "mkdir dir1 dir2 dir3",
+      "mkdir {dir1,dir2,dir3}",
+      "mkdir dir1; mkdir dir2; mkdir dir3",
+      "Todas las anteriores"
+    ],
+    "ans": 3,
+    "exp": "Linux permite el uso de múltiples argumentos, expansión de llaves o encadenamiento de comandos mediante ';' para realizar acciones simultáneas."
   },
   {
     "profe": true,
     "unit": "Linux",
     "diff": "hard",
     "case": "El comando 'touch' es muy versátil y permite crear archivos vacíos de manera rápida.",
-    "q": "¿Cómo se crean varios archivos de manera simultánea en un directorio?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Creación de archivos con touch y ls:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='touch y ls' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra el comando 'touch {2025,2026,Trazabilidad}.txt' para crear múltiples archivos a la vez.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# touch {2025,2026,Trazabilidad}.txt\n[root@localhost Carpetascompartidas]# ls\n2025.txt 2026.txt Trazabilidad.txt AltaGerencia Estrategias Tacticas\n[root@localhost Carpetascompartidas]#</div></div>",
+    "q": "¿Qué comando permite crear varios archivos de manera simultánea?",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# touch {archivo1,archivo2,archivo3}.txt
+</div>`,
     "opts": [
       "touch archivo1 archivo2 archivo3",
       "touch {archivo1,archivo2,archivo3}.txt",
       "touch archivo1; touch archivo2; touch archivo3",
       "Todas las anteriores"
     ],
-    "ans": 1,
-    "exp": "El comando 'touch {arch1,arch2,arch3}.txt' permite crear múltiples archivos de manera simultánea utilizando llaves y el sufijo común."
+    "ans": 3,
+    "exp": "El comando 'touch' admite múltiples nombres de archivos, así como la expansión de llaves y el uso de separadores para crear varios archivos en un solo paso."
   },
   {
     "profe": true,
@@ -178,23 +287,29 @@ const preguntas_linux = [
     "diff": "hard",
     "case": "En ocasiones es necesario eliminar directorios que contienen archivos, lo cual requiere opciones especiales.",
     "q": "¿Qué comando se utiliza para eliminar un directorio con todo su contenido?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra la estructura de carpetas que debes tener.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# rm -rf Tacticas\n[root@localhost Carpetascompartidas]# ls\nAltaGerencia Estrategias\n[root@localhost Carpetascompartidas]# mkdir Tacticas\n[root@localhost Carpetascompartidas]# ls\nAltaGerencia Estrategias Tacticas\n[root@localhost Carpetascompartidas]#</div></div>",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# rm <input placeholder="opciones" style="background:#333;color:#00ff00;border:1px solid #555;"> directorio
+</div>`,
     "opts": [
-      "rm -r directorio",
-      "rm -rf directorio",
-      "rmdir directorio",
-      "del directorio"
+      "rm -r",
+      "rm -rf",
+      "rmdir",
+      "del"
     ],
     "ans": 1,
-    "exp": "El comando 'rm -rf directorio' elimina el directorio y todo su contenido de forma recursiva y forzada. '-r' es recursivo y '-f' es forzado."
+    "exp": "La combinación '-rf' (recursivo y forzado) es necesaria para eliminar un directorio no vacío sin solicitar confirmación interactiva para cada archivo."
   },
   {
     "profe": true,
     "unit": "Linux",
     "diff": "hard",
     "case": "Linux permite utilizar patrones de búsqueda para listar archivos que cumplan ciertas condiciones.",
-    "q": "¿Qué comando lista los archivos que comienzan con un carácter alfabético en Linux?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Creación de archivos con touch y ls:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='touch y ls' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>Esta imagen muestra cómo listar archivos que comienzan con letras usando 'ls [[:alpha:]]*'.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>[root@localhost Carpetascompartidas]# ls [[:alpha:]]*\nAltaGerencia Estrategias Tacticas Trazabilidad.txt\n[root@localhost Carpetascompartidas]# ls [[:digit:]]*\n2025.txt 2026.txt\n[root@localhost Carpetascompartidas]#</div></div>",
+    "q": "¿Qué comando lista los archivos que comienzan con un carácter alfabético?",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# ls [[:alpha:]]*
+</div>`,
     "opts": [
       "ls [[:digit:]]*",
       "ls [[:alpha:]]*",
@@ -202,7 +317,7 @@ const preguntas_linux = [
       "ls [[:space:]]*"
     ],
     "ans": 1,
-    "exp": "El comando 'ls [[:alpha:]]*' lista los archivos que comienzan con un carácter alfabético (letras). '[[:digit:]]*' lista los que comienzan con números."
+    "exp": "El uso de corchetes con clases de caracteres como '[:alpha:]' permite filtrar el listado de archivos basándose en caracteres alfabéticos."
   },
   {
     "profe": true,
@@ -210,7 +325,10 @@ const preguntas_linux = [
     "diff": "hard",
     "case": "El comando 'cat' es uno de los comandos más utilizados para trabajar con archivos de texto.",
     "q": "¿Qué función cumple el comando 'cat' en Linux?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>CAT(1)    User Commands    CAT(1)\n\nNAME\n    cat - concatenate files and print on the standard output\n\nSYNOPSIS\n    cat [OPTION]... [FILE]...\n\nDESCRIPTION\n    Concatenate FILE(s) to standard output.\n\n    With no FILE, or when FILE is -, read standard input.\n\n    -A, --show-all\n    equivalent to -OET\n\n    -b, --number-nonblank\n    number nonempty output lines, overrides -n\n\n    -E, --show-ends\n    display $ at end of each line\n\n    -n, --number\n    number all output lines\n\n    -s, --squeeze-blank\n    suppress repeated empty output lines\n\n    -T, --show-tabs\n    display TAB characters as ^I\n\n[root@localhost ~]#</div>",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# cat archivo.txt
+</div>`,
     "opts": [
       "Copiar archivos de un lugar a otro",
       "Concatenar archivos y mostrar su contenido en pantalla",
@@ -218,7 +336,7 @@ const preguntas_linux = [
       "Mover archivos entre directorios"
     ],
     "ans": 1,
-    "exp": "El comando 'cat' (concatenate) lee uno o más archivos y muestra su contenido en la salida estándar (pantalla). También puede concatenar varios archivos."
+    "exp": "El comando 'cat' (concatenate) sirve principalmente para leer el contenido de archivos y enviarlo a la salida estándar."
   },
   {
     "profe": true,
@@ -226,7 +344,10 @@ const preguntas_linux = [
     "diff": "hard",
     "case": "El comando 'cp' tiene múltiples opciones que permiten copiar archivos preservando sus atributos.",
     "q": "¿Qué hace la opción '-a' del comando 'cp'?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;'><div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal - root@localhost</div>CP(1)    User Commands    CP(1)\n\nNAME\n    cp - copy files and directories\n\nSYNOPSIS\n    cp [OPTION]... [-T] SOURCE DEST\n    cp [OPTION]... SOURCE... DIRECTORY\n    cp [OPTION]... -t DIRECTORY SOURCE...\n\nDESCRIPTION\n    Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.\n\n    Mandatory arguments to long options are mandatory for short options too.\n\n    -a, --archive\n    same as -dR --preserve=all\n\n    -r, --recursive\n    copy directories recursively\n\n    -i, --interactive\n    prompt before overwrite\n\n[root@localhost ~]#</div>",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# cp -a origen destino
+</div>`,
     "opts": [
       "Copia solo el nombre del archivo",
       "Copia de forma recursiva preservando todos los atributos",
@@ -234,7 +355,7 @@ const preguntas_linux = [
       "Muestra ayuda sobre el comando cp"
     ],
     "ans": 1,
-    "exp": "La opción '-a' (archive) es equivalente a '-dR --preserve=all', lo que significa que copia recursivamente preservando todos los atributos del archivo."
+    "exp": "La opción '-a' (archive) es fundamental para preservar metadatos como permisos, propietarios y marcas de tiempo durante la copia."
   },
   {
     "profe": true,
@@ -242,7 +363,10 @@ const preguntas_linux = [
     "diff": "hard",
     "case": "El comando 'cp' tiene diferentes sintaxis dependiendo de si se copia a un archivo o a un directorio.",
     "q": "¿Cuál es la sintaxis correcta para copiar un archivo a un directorio en Linux?",
-    "extra": "<div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>[root@localhost ~]# cp archivo.txt /home/usuario/\n[root@localhost ~]#</div>",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+<div style='background:#2d2d2d;color:#ccc;padding:5px 10px;margin:-15px -15px 10px -15px;border-radius:8px 8px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:12px;'>Terminal</div>
+[root@localhost ~]# cp archivo.txt /ruta/directorio/
+</div>`,
     "opts": [
       "cp origen destino",
       "cp origen directorio",
@@ -250,7 +374,7 @@ const preguntas_linux = [
       "Todas las anteriores"
     ],
     "ans": 3,
-    "exp": "El comando 'cp' tiene varias sintaxis: 'cp SOURCE DEST' para copiar a un archivo, 'cp SOURCE DIRECTORY' para copiar a un directorio, y 'cp -r SOURCE DIRECTORY' para copiar directorios recursivamente."
+    "exp": "El comando 'cp' es flexible y acepta múltiples formas de especificar el destino, incluyendo la recursividad necesaria para directorios."
   },
   {
     "profe": true,
@@ -258,7 +382,11 @@ const preguntas_linux = [
     "diff": "medium",
     "case": "En la salida de 'ls -l', el primer carácter de cada línea proporciona información sobre el tipo de elemento.",
     "q": "En la salida de 'ls -l', ¿qué representa la primera letra de cada línea como 'd' o '-'?",
-    "extra": "<div style='text-align:center;'>IMAGEN DE REFERENCIA - Estructura de Carpetas Compartidas:<br><img src='/img/linux_carpetas_compartidas.jpg' alt='Estructura de Carpetas' style='max-width:60%;border-radius:5px;display:block;margin:0 auto;'><br><span style='color:#555;'>En la imagen de 'ls -l', observa que la primera letra de cada línea es 'd' para directorios.</span><br><br><div style='background:#1a1a1a;color:#00ff00;padding:10px 12px;border-radius:6px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;text-align:left;font-size:13px;'><div style='background:#2d2d2d;color:#ccc;padding:3px 8px;margin:-10px -12px 8px -12px;border-radius:6px 6px 0 0;border-bottom:1px solid #444;font-family:sans-serif;font-size:11px;'>Terminal - root@localhost</div>drwxr-xr-x. 2 root root 64 nov 16 15:39 AltaGerencia\n-rw-r--r--. 1 root root 0 nov 16 16:00 archivo.txt\n[root@localhost Carpetascompartidas]#</div></div>",
+    "extra": `<div style='background:#1a1a1a;color:#00ff00;padding:15px;border-radius:8px;font-family:monospace;white-space:pre-wrap;border:1px solid #333;'>
+[root@localhost ~]# ls -l<br>
+<span style="color:yellow">d</span>rwxr-xr-x. 2 root...<br>
+<span style="color:yellow">-</span>rw-r--r--. 1 root...
+</div>`,
     "opts": [
       "El tamaño del archivo",
       "El propietario del archivo",
@@ -266,10 +394,13 @@ const preguntas_linux = [
       "La fecha de modificación"
     ],
     "ans": 2,
-    "exp": "En 'ls -l', la primera letra indica el tipo: 'd' para directorio, '-' para archivo regular, 'l' para enlace simbólico, entre otros."
+    "exp": "El primer carácter indica el tipo de archivo: 'd' significa directorio, '-' indica un archivo regular y 'l' un enlace simbólico."
   },
 
-  // ========== PREGUNTAS DE PERMISOS Y USUARIOS ==========
+  // ==========================================================================
+  // ========== SECCIÓN: PREGUNTAS DE PERMISOS Y USUARIOS                    ==========
+  // ========== (Incluye gestión de usuarios, grupos y estructuras de archivos) ==========
+  // ==========================================================================
 
   {
     "profe": true,
@@ -592,7 +723,10 @@ const preguntas_linux = [
     "exp": "Se puede salir de la sesión root con 'exit', 'logout' o 'su - nombre_usuario'."
   },
 
-  // ========== ESCENARIOS DE PRUEBA ==========
+  // ==========================================================================
+  // ========== SECCIÓN: ESCENARIOS DE PRUEBA                                  ==========
+  // ========== (Casos prácticos de simulación administrativa)                 ==========
+  // ==========================================================================
 
   {
     "profe": true,
@@ -755,7 +889,10 @@ const preguntas_linux = [
     "exp": "El orden correcto es: 1) crear usuario, 2) crear grupo, 3) crear directorio, 4) asignar propietario, 5) asignar permisos."
   },
 
-  // ========== PREGUNTAS DE COMANDOS ADICIONALES ==========
+  // ==========================================================================
+  // ========== SECCIÓN: COMANDOS ADICIONALES Y UTILIDADES                     ==========
+  // ========== (Comandos de sistema y navegación básica)                      ==========
+  // ==========================================================================
 
   {
     "profe": true,
@@ -853,6 +990,36 @@ const preguntas_linux = [
     "ans": 1,
     "exp": "El comando 'cd ..' cambia al directorio padre (el directorio que contiene al directorio actual), permitiendo navegar hacia atrás en la estructura de carpetas."
   },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   {
     "profe": true,
     "unit": "Linux",

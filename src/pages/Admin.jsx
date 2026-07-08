@@ -49,7 +49,7 @@ function CampoError({ mensaje }) {
   if (!mensaje) return null;
   return (
     <span style={{ display: 'block', fontSize: '0.78rem', color: 'var(--danger, #ff4f6a)', marginTop: '0.25rem' }}>
-      ⚠️ {mensaje}
+       {mensaje}
     </span>
   );
 }
@@ -81,7 +81,7 @@ export default function Admin() {
   return Promise.all([
     getPreguntas(),
     getAsignaturas(),
-    getReportes() // ahora viene de Local Storage, ya no depende de json-server
+    getReportes() // viene de Local Storage, no depende de json-server
   ])
     .then(([p, a, r]) => { setPreguntas(p); setAsignaturas(a); setReportes(r); })
     .finally(() => setLoading(false));
@@ -290,8 +290,8 @@ export default function Admin() {
               <h3>{editId ? 'Editar pregunta' : 'Nueva pregunta'}</h3>
               <div className="form-row">
                 <div className="form-group" style={{ flex: 2 }}>
-                  <label className="input-label">Asignatura *</label>
-                  <select className="input" value={form.asignaturaId} onChange={e => { setForm(f => ({ ...f, asignaturaId: e.target.value })); setErrores(er => ({ ...er, asignaturaId: null })); }}>
+                  <label htmlFor="asignaturaId" className="input-label">Asignatura *</label>
+                  <select id="asignaturaId" className="input" value={form.asignaturaId} onChange={e => { setForm(f => ({ ...f, asignaturaId: e.target.value })); setErrores(er => ({ ...er, asignaturaId: null })); }}>
                     <option value="">Selecciona</option>
                     {asignaturas.map(a => (
                       <option key={a.key || a._id} value={a.key || a._id}>{a.nombre}</option>
@@ -300,39 +300,40 @@ export default function Admin() {
                   <CampoError mensaje={errores.asignaturaId} />
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label className="input-label">Dificultad</label>
-                  <select className="input" value={form.dificultad} onChange={e => setForm(f => ({ ...f, dificultad: e.target.value }))}>
+                  <label htmlFor="dificultad" className="input-label">Dificultad</label>
+                  <select id="dificultad" className="input" value={form.dificultad} onChange={e => setForm(f => ({ ...f, dificultad: e.target.value }))}>
                     {DIFFS.map(d => <option key={d} value={d}>{d}</option>)}
                   </select>
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label className="input-label">Unidad</label>
-                  <input className="input" value={form.unidad} onChange={e => setForm(f => ({ ...f, unidad: e.target.value }))} placeholder="Ej: Unidad 1" maxLength={MAX_UNIDAD} />
+                  <label htmlFor="unidad" className="input-label">Unidad</label>
+                  <input id="unidad" className="input" value={form.unidad} onChange={e => setForm(f => ({ ...f, unidad: e.target.value }))} placeholder="Ej: Unidad 1" maxLength={MAX_UNIDAD} />
                 </div>
               </div>
 
               {/* Caso: contexto/escenario opcional que se muestra antes de
                   la pregunta (ej: un caso de estudio para leer primero) */}
               <div className="form-group">
-                <label className="input-label">Caso (opcional)</label>
-                <textarea className="input" rows={2} value={form.caso} onChange={e => { setForm(f => ({ ...f, caso: e.target.value })); setErrores(er => ({ ...er, caso: null })); }} placeholder="Contexto o escenario que se muestra antes de la pregunta…" maxLength={MAX_CASO} />
+                <label htmlFor="caso" className="input-label">Caso (opcional)</label>
+                <textarea id="caso" className="input" rows={2} value={form.caso} onChange={e => { setForm(f => ({ ...f, caso: e.target.value })); setErrores(er => ({ ...er, caso: null })); }} placeholder="Contexto o escenario que se muestra antes de la pregunta…" maxLength={MAX_CASO} />
                 <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.caso.length}/{MAX_CASO}</span>
                 <CampoError mensaje={errores.caso} />
               </div>
 
               <div className="form-group">
-                <label className="input-label">Pregunta *</label>
-                <textarea className="input" rows={2} value={form.pregunta} onChange={e => { setForm(f => ({ ...f, pregunta: e.target.value })); setErrores(er => ({ ...er, pregunta: null })); }} placeholder="Escribe la pregunta…" maxLength={MAX_PREGUNTA} />
+                <label htmlFor="pregunta" className="input-label">Pregunta *</label>
+                <textarea id="pregunta" className="input" rows={2} value={form.pregunta} onChange={e => { setForm(f => ({ ...f, pregunta: e.target.value })); setErrores(er => ({ ...er, pregunta: null })); }} placeholder="Escribe la pregunta…" maxLength={MAX_PREGUNTA} />
                 <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.pregunta.length}/{MAX_PREGUNTA}</span>
                 <CampoError mensaje={errores.pregunta} />
               </div>
 
-              <label className="input-label">Opciones de respuesta * ({form.opciones.length})</label>
+              <label htmlFor="opciones" className="input-label">Opciones de respuesta * ({form.opciones.length})</label>
               {form.opciones.map((op, i) => (
                 <div className="form-group" key={i}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                     <input type="radio" name="correcta" checked={form.respuestaCorrecta === i} onChange={() => setForm(f => ({ ...f, respuestaCorrecta: i }))} />
                     <input
+                    id={`opcion-${i}`}
                       className="input"
                       value={op}
                       onChange={e => {
@@ -361,8 +362,8 @@ export default function Admin() {
               </div>
 
               <div className="form-group">
-                <label className="input-label">Explicación *</label>
-                <textarea className="input" rows={2} value={form.explicacion} onChange={e => { setForm(f => ({ ...f, explicacion: e.target.value })); setErrores(er => ({ ...er, explicacion: null })); }} placeholder="Explicación de la respuesta correcta…" maxLength={MAX_EXPLICACION} />
+                <label htmlFor="explicacion" className="input-label">Explicación *</label>
+                <textarea id="explicacion" className="input" rows={2} value={form.explicacion} onChange={e => { setForm(f => ({ ...f, explicacion: e.target.value })); setErrores(er => ({ ...er, explicacion: null })); }} placeholder="Explicación de la respuesta correcta…" maxLength={MAX_EXPLICACION} />
                 <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{form.explicacion.length}/{MAX_EXPLICACION}</span>
                 <CampoError mensaje={errores.explicacion} />
               </div>
@@ -371,7 +372,7 @@ export default function Admin() {
                   tabla (ej: subnetting) o una simulación de consola.
                   Se guarda como HTML y se muestra tal cual en el cuestionario. */}
               <div className="form-group">
-                <label className="input-label">Contenido extra (tabla o consola, opcional)</label>
+                <label htmlFor="extra" className="input-label">Contenido extra (tabla o consola, opcional)</label>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.4rem' }}>
                   <button
                     type="button"
@@ -413,14 +414,14 @@ export default function Admin() {
                   para distinguir preguntas de una prueba/archivo real del
                   profesor vs. preguntas inventadas para estudiar. */}
               <div className="form-group">
-                <label className="input-label">¿Es de una prueba o archivo del profesor? *</label>
+                <label htmlFor="esDelProfesor" className="input-label">¿Es de una prueba o archivo del profesor? *</label>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                    <input type="radio" name="esDelProfesor" checked={form.esDelProfesor === true} onChange={() => { setForm(f => ({ ...f, esDelProfesor: true })); setErrores(er => ({ ...er, esDelProfesor: null })); }} />
+                    <input id="esDelProfesor" type="radio" name="esDelProfesor" checked={form.esDelProfesor === true} onChange={() => { setForm(f => ({ ...f, esDelProfesor: true })); setErrores(er => ({ ...er, esDelProfesor: null })); }} />
                     Sí, viene de una prueba/archivo real
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                    <input type="radio" name="esDelProfesor" checked={form.esDelProfesor === false} onChange={() => { setForm(f => ({ ...f, esDelProfesor: false })); setErrores(er => ({ ...er, esDelProfesor: null })); }} />
+                    <input id="esDelProfesorNo" type="radio" name="esDelProfesor" checked={form.esDelProfesor === false} onChange={() => { setForm(f => ({ ...f, esDelProfesor: false })); setErrores(er => ({ ...er, esDelProfesor: null })); }} />
                     No, es inventada para estudiar
                   </label>
                 </div>
@@ -433,8 +434,7 @@ export default function Admin() {
               </div>
             </div>
 
-            {/* Ya no se lista aquí el banco completo de preguntas: para revisar,
-                editar o eliminar preguntas existentes, entra a la asignatura
+            {/* Entra a la asignatura
                 correspondiente desde la pestaña "Asignaturas". Así este
                 formulario queda solo para crear, sin preguntas de fondo. */}
             <p style={{ color: 'var(--muted)', fontSize: '0.85rem', textAlign: 'center', padding: '0.5rem' }}>

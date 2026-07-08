@@ -36,7 +36,7 @@ function CampoError({ mensaje }) {
   if (!mensaje) return null;
   return (
     <span style={{ display: 'block', fontSize: '0.78rem', color: '#ff4f6a', marginTop: '0.25rem' }}>
-      ⚠️ {mensaje}
+       {mensaje}
     </span>
   );
 }
