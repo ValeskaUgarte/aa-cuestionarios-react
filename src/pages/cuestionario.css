@@ -259,8 +259,66 @@ header p {
   font-weight: 600;
 }
 
+/* ── ORDEN (select chico, mismo lenguaje visual que el resto de la app) ── */
+.orden-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.orden-select {
+  width: auto;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.6rem;
+}
+
+/* ── HEADER MÓVIL (oculto por defecto; visible solo en celulares reales,
+   no al angostar la ventana del navegador en escritorio) ── */
+.header-mobile {
+  display: none;
+}
+
+@media (max-width: 600px) and (pointer: coarse) {
+  .header-desktop {
+    display: none;
+  }
+
+  .header-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .header-mobile-images {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+
+  .header-mobile-images img {
+    width: 42px;
+    object-fit: contain;
+  }
+
+  .header-mobile h1 {
+    font-family: 'Lora', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+}
+
 /* RESPONSIVE */
 @media (max-width: 600px) {
+  .orden-row {
+    justify-content: center;
+  }
+
   .subject-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.6rem;
