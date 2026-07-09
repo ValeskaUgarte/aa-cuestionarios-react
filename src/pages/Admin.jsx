@@ -82,6 +82,7 @@ export default function Admin() {
   const [msg, setMsg] = useState('');                 // Mensajes de feedback
   const [msgTipo, setMsgTipo] = useState('success');  // 'success' (verde) o 'error' (rojo)
   const [errores, setErrores] = useState({});         // Errores por campo del formulario de pregunta (para mostrar debajo de cada uno)
+  const [erroresA, setErroresA] = useState({});       // Errores por campo del formulario de asignatura (para mostrar debajo de cada uno)
   const [reportes, setReportes] = useState([]);       // Lista de reportes de errores
   const [desactivadas, setDesactivadas] = useState([]); // Keys de cuestionarios desactivados
   const [ordenPreguntas, setOrdenPreguntas] = useState('fecha'); // 'fecha' o 'nombre'
@@ -243,11 +244,18 @@ export default function Admin() {
   // CRUD DE ASIGNATURAS Guardar y eliminar
   async function guardarAsignatura() {
     const nombreLimpio = formA.nombre.trim();
-    const faltantes = [];
-    if (!nombreLimpio) faltantes.push('Nombre');
-    if (faltantes.length) return flash(`Faltan campos obligatorios: ${faltantes.join(', ')}.`, 'error');
-    if (nombreLimpio.length > MAX_NOMBRE_ASIG) return flash(`El nombre no puede superar los ${MAX_NOMBRE_ASIG} caracteres.`, 'error');
-    if (formA.descripcion.length > MAX_DESC_ASIG) return flash(`La descripción no puede superar los ${MAX_DESC_ASIG} caracteres.`, 'error');
+
+    // Reunimos los errores por campo, igual que en el formulario de
+    // preguntas, para mostrarlos debajo de cada input y no solo en un
+    // mensaje flash genérico arriba.
+    const nuevosErroresA = {};
+    if (!nombreLimpio) nuevosErroresA.nombre = 'Falta el nombre de la asignatura.';
+    else if (nombreLimpio.length > MAX_NOMBRE_ASIG) nuevosErroresA.nombre = `El nombre no puede superar los ${MAX_NOMBRE_ASIG} caracteres.`;
+    if (formA.descripcion.length > MAX_DESC_ASIG) nuevosErroresA.descripcion = `La descripción no puede superar los ${MAX_DESC_ASIG} caracteres.`;
+
+    setErroresA(nuevosErroresA);
+    if (Object.keys(nuevosErroresA).length) return flash('Revisa los campos marcados en rojo.', 'error');
+
     // El admin publica directo (estado 'aprobado'); un colaborador que
     // propone una asignatura desde su panel siempre queda 'pendiente'.
     const payload = { ...formA, nombre: nombreLimpio, key: nombreLimpio.toLowerCase().replace(/\s+/g, '_'), estado: 'aprobado' };
@@ -255,6 +263,7 @@ export default function Admin() {
     flash('Asignatura creada ✓');
     registrarActividad(`Creó la asignatura "${nombreLimpio}"`);
     setFormA(EMPTY_A);
+    setErroresA({});
     cargar();
   }
 
@@ -717,7 +726,8 @@ export default function Admin() {
                   <div className="form-row">
                     <div className="form-group" style={{ flex: 3 }}>
                       <label className="input-label" htmlFor="asig-nombre">Nombre *</label>
-                      <input id="asig-nombre" name="nombre" className="input" value={formA.nombre} onChange={e => setFormA(f => ({ ...f, nombre: e.target.value }))} placeholder="Ej: Base de Datos" maxLength={MAX_NOMBRE_ASIG} />
+                      <input id="asig-nombre" name="nombre" className="input" value={formA.nombre} onChange={e => { setFormA(f => ({ ...f, nombre: e.target.value })); setErroresA(er => ({ ...er, nombre: null })); }} placeholder="Ej: Base de Datos" maxLength={MAX_NOMBRE_ASIG} />
+                      <CampoError mensaje={erroresA.nombre} />
                     </div>
                     <div className="form-group" style={{ flex: 1 }}>
                       <label className="input-label" htmlFor="asig-color">Color</label>
@@ -730,7 +740,8 @@ export default function Admin() {
                   </div>
                   <div className="form-group">
                     <label className="input-label" htmlFor="asig-descripcion">Descripción</label>
-                    <input id="asig-descripcion" name="descripcion" className="input" value={formA.descripcion} onChange={e => setFormA(f => ({ ...f, descripcion: e.target.value }))} placeholder="Descripción breve…" maxLength={MAX_DESC_ASIG} />
+                    <input id="asig-descripcion" name="descripcion" className="input" value={formA.descripcion} onChange={e => { setFormA(f => ({ ...f, descripcion: e.target.value })); setErroresA(er => ({ ...er, descripcion: null })); }} placeholder="Descripción breve…" maxLength={MAX_DESC_ASIG} />
+                    <CampoError mensaje={erroresA.descripcion} />
                   </div>
                   <button className="btn btn-primary" onClick={guardarAsignatura}>Crear asignatura</button>
                 </div>
