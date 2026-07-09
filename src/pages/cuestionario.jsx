@@ -245,9 +245,9 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'backend', nombre: 'Programación Back End', el: (
-                    <div className={`subject-card${desactivadas.includes('backend') ? ' subject-disabled' : ''}`} key="static-backend" id="card-backend" onClick={() => irAlQuiz('backend')}>
+                    ) },
+                    { key: 'backend', nombre: 'Programación Back End', el: (
+                      <div className={`subject-card${desactivadas.includes('backend') ? ' subject-disabled' : ''}`} key="static-backend" id="card-backend" onClick={() => irAlQuiz('backend')}>
                       <img src="img/Programación BackEnd01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Programación Back End</div>
                       <div className="subject-meta">Pendiente: agregar preguntas</div>
@@ -262,9 +262,9 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'bd_estructurados', nombre: 'Base de Datos Estructurados', el: (
-                    <div className={`subject-card${desactivadas.includes('bd_estructurados') ? ' subject-disabled' : ''}`} key="static-bd_estructurados" id="card-bd_estructurados" onClick={() => irAlQuiz('bd_estructurados')}>
+                      ) },
+                      { key: 'bd_estructurados', nombre: 'Base de Datos Estructurados', el: (
+                      <div className={`subject-card${desactivadas.includes('bd_estructurados') ? ' subject-disabled' : ''}`} key="static-bd_estructurados" id="card-bd_estructurados" onClick={() => irAlQuiz('bd_estructurados')}>
                       <img src="img/bdestructuradas01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Base de Datos Estructurados</div>
                       <div className="subject-meta">preguntas prácticas de diferentes lenguajes/tecnologías, incluyendo campos interactivos para que el usuario complete</div>
@@ -279,9 +279,9 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'bd_no_estructurados', nombre: 'Base de Datos No Estructurados', el: (
-                    <div className={`subject-card${desactivadas.includes('bd_no_estructurados') ? ' subject-disabled' : ''}`} key="static-bd_no_estructurados" id="card-bd_no_estructurados" onClick={() => irAlQuiz('bd_no_estructurados')}>
+                      ) },
+                      { key: 'bd_no_estructurados', nombre: 'Base de Datos No Estructurados', el: (
+                      <div className={`subject-card${desactivadas.includes('bd_no_estructurados') ? ' subject-disabled' : ''}`} key="static-bd_no_estructurados" id="card-bd_no_estructurados" onClick={() => irAlQuiz('bd_no_estructurados')}>
                       <img src="img/bdnoestructuradas01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Base de Datos No Estructurados</div>
                       <div className="subject-meta">Pendiente: agregar preguntas</div>           
@@ -296,8 +296,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'fundamentos_bd', nombre: 'Fundamentos de Base de Datos', el: (
+                    ) },
+                    { key: 'fundamentos_bd', nombre: 'Fundamentos de Base de Datos', el: (
                     <div className={`subject-card${desactivadas.includes('fundamentos_bd') ? ' subject-disabled' : ''}`} key="static-fundamentos_bd" id="card-fundamentos_bd" onClick={() => irAlQuiz('fundamentos_bd')}>
                       <img src="img/Base de datos01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Fundamentos de Base de Datos</div>
@@ -313,8 +313,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'administracion', nombre: 'Administración', el: (
+                    ) },
+                    { key: 'administracion', nombre: 'Administración', el: (
                     <div className={`subject-card${desactivadas.includes('administracion') ? ' subject-disabled' : ''}`} key="static-administracion" id="card-administracion" onClick={() => irAlQuiz('administracion')}>
                       <img src="img/Administración01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Administración</div>
@@ -330,8 +330,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'ingenieria_software', nombre: 'Ingeniería de Software', el: (
+                    ) },
+                    { key: 'ingenieria_software', nombre: 'Ingeniería de Software', el: (
                     <div className={`subject-card${desactivadas.includes('ingenieria_software') ? ' subject-disabled' : ''}`} key="static-ingenieria_software" id="card-ingenieria_software" onClick={() => irAlQuiz('ingenieria_software')}>
                       <img src="img/Inhgenieriasoftware01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Ingeniería de Software</div>
@@ -347,8 +347,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'hardware_software', nombre: 'Fundamentos de Hardware y Software', el: (
+                    ) },
+                    { key: 'hardware_software', nombre: 'Fundamentos de Hardware y Software', el: (
                     <div className={`subject-card${desactivadas.includes('hardware_software') ? ' subject-disabled' : ''}`} key="static-hardware_software" id="card-hardware_software" onClick={() => irAlQuiz('hardware_software')}>
                       <img src="img/Hardware y Software01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Fundamentos de Hardware y Software</div>
@@ -364,8 +364,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'modelamiento_informaticas', nombre: 'Modelamiento de Soluciones Informáticas', el: (
+                    ) },
+                    { key: 'modelamiento_informaticas', nombre: 'Modelamiento de Soluciones Informáticas', el: (
                     <div className={`subject-card${desactivadas.includes('modelamiento_informaticas') ? ' subject-disabled' : ''}`} key="static-modelamiento_informaticas" id="card-modelamiento_informaticas" onClick={() => irAlQuiz('modelamiento_informaticas')}>
                       <img src="img/Modelamiento01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Modelamiento de Soluciones Informáticas</div>
@@ -381,8 +381,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'mobile_iot', nombre: 'Aplicaciones Móviles IoT', el: (
+                    ) },
+                    { key: 'mobile_iot', nombre: 'Aplicaciones Móviles IoT', el: (
                     <div className={`subject-card${desactivadas.includes('mobile_iot') ? ' subject-disabled' : ''}`} key="static-mobile_iot" id="card-mobile_iot" onClick={() => irAlQuiz('mobile_iot')}>
                       <img src="img/Apps Móviles para IoT02.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Aplicaciones Móviles IoT</div>
@@ -398,8 +398,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'ingles_basico', nombre: 'Inglés Inicial', el: (
+                    ) },
+                    { key: 'ingles_basico', nombre: 'Inglés Inicial', el: (
                     <div className={`subject-card${desactivadas.includes('ingles_basico') ? ' subject-disabled' : ''}`} key="static-ingles_basico" id="card-ingles_basico" onClick={() => irAlQuiz('ingles_basico')}>
                       <img src="img/Ingles Imicial01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Inglés Inicial</div>
@@ -415,8 +415,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'ingles_intermedio', nombre: 'Inglés Intermedio', el: (
+                    ) },
+                    { key: 'ingles_intermedio', nombre: 'Inglés Intermedio', el: (
                     <div className={`subject-card${desactivadas.includes('ingles_intermedio') ? ' subject-disabled' : ''}`} key="static-ingles_intermedio" id="card-ingles_intermedio" onClick={() => irAlQuiz('ingles_intermedio')}>
                       <img src="img/InglesIntermedio01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Inglés Intermedio</div>
@@ -432,8 +432,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'ingles_avanzado', nombre: 'Inglés Avanzado', el: (
+                    ) },
+                    { key: 'ingles_avanzado', nombre: 'Inglés Avanzado', el: (
                     <div className={`subject-card${desactivadas.includes('ingles_avanzado') ? ' subject-disabled' : ''}`} key="static-ingles_avanzado" id="card-ingles_avanzado" onClick={() => irAlQuiz('ingles_avanzado')}>
                       <img src="img/Inglesavanzado01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Inglés Avanzado</div>
@@ -449,8 +449,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'lenguaje_python', nombre: 'Lenguaje de Programación Python', el: (
+                    ) },
+                    { key: 'lenguaje_python', nombre: 'Lenguaje de Programación Python', el: (
                     <div className={`subject-card${desactivadas.includes('lenguaje_python') ? ' subject-disabled' : ''}`} key="static-lenguaje_python" id="card-lenguaje_python" onClick={() => irAlQuiz('lenguaje_python')}>
                       <img src="img/lenguaje_python.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Lenguaje de Programación Python</div>
@@ -466,8 +466,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'lenguaje_javascript', nombre: 'Lenguaje de Programación JavaScript', el: (
+                    ) },
+                    { key: 'lenguaje_javascript', nombre: 'Lenguaje de Programación JavaScript', el: (
                     <div className={`subject-card${desactivadas.includes('lenguaje_javascript') ? ' subject-disabled' : ''}`} key="static-lenguaje_javascript" id="card-lenguaje_javascript" onClick={() => irAlQuiz('lenguaje_javascript')}>
                       <img src="img/lenguaje_java01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Lenguaje de Programación JavaScript</div>
@@ -483,8 +483,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'prog_html', nombre: 'Programación HTML', el: (
+                    ) },
+                    { key: 'prog_html', nombre: 'Programación HTML', el: (
                     <div className={`subject-card${desactivadas.includes('prog_html') ? ' subject-disabled' : ''}`} key="static-prog_html" id="card-prog__html" onClick={() => irAlQuiz('prog_html')}>
                       <img src="img/lenguaje_html01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Programación HTML</div>
@@ -500,8 +500,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'lenguaje_css', nombre: 'Lenguaje de Programación CSS', el: (
+                    ) },
+                    { key: 'lenguaje_css', nombre: 'Lenguaje de Programación CSS', el: (
                     <div className={`subject-card${desactivadas.includes('lenguaje_css') ? ' subject-disabled' : ''}`} key="static-lenguaje_css" id="card-lenguaje_css" onClick={() => irAlQuiz('lenguaje_css')}>
                       <img src="img/lenguaje_css01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Lenguaje de Programación CSS</div>
@@ -519,8 +519,8 @@ export default function Cuestionario() {
                       </div>
 
 
-      ) },
-      { key: 'linux', nombre: 'Linux', el: (
+                    ) },
+                    { key: 'linux', nombre: 'Linux', el: (
                     <div className={`subject-card${desactivadas.includes('linux') ? ' subject-disabled' : ''}`} key="static-linux" id="card-linux" onClick={() => irAlQuiz('linux')}>
                       <img src="img/linux002.jpg" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Linux</div>
@@ -536,8 +536,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'japones', nombre: 'Japonés', el: (
+                    ) },
+                    { key: 'japones', nombre: 'Japonés', el: (
                     <div className={`subject-card${desactivadas.includes('japones') ? ' subject-disabled' : ''}`} key="static-japones" id="card-japones" onClick={() => irAlQuiz('japones')}>
                       <img src="img/japones01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Japonés</div>
@@ -553,8 +553,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'chino', nombre: 'Chino', el: (
+                    ) },
+                    { key: 'chino', nombre: 'Chino', el: (
                     <div className={`subject-card${desactivadas.includes('chino') ? ' subject-disabled' : ''}`} key="static-chino" id="card-chino" onClick={() => irAlQuiz('chino')}>
                       <img src="img/Chino01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Chino</div>
@@ -570,8 +570,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'coreano', nombre: 'Coreano', el: (
+                    ) },
+                    { key: 'coreano', nombre: 'Coreano', el: (
                     <div className={`subject-card${desactivadas.includes('coreano') ? ' subject-disabled' : ''}`} key="static-coreano" id="card-coreano" onClick={() => irAlQuiz('coreano')}>
                       <img src="img/Coreano03.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Coreano</div>
@@ -587,8 +587,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-    ];
+                ) },
+              ];
 
               const dinamicas = asignaturas
                 .filter(a => !KEYS_ESTATICAS.includes(a.key))

@@ -1,12 +1,11 @@
 // src/services/api.js
 
-// ══════════════════════════════════════════════════════════
+
 // URL de la API (json-server / server.cjs)
 // En desarrollo local usa http://localhost:3001.
 // En producción (Render) se toma de la variable de entorno
 // VITE_API_URL, que debe apuntar al servicio de Render donde
-// desplegaste server.cjs (ej: https://aa-cuestionarios-api.onrender.com)
-// ══════════════════════════════════════════════════════════
+
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 import preguntas_seguridad_examen from '../data/preguntas/seguridad_examen.js';
@@ -187,14 +186,14 @@ function setPreguntasLS(preguntas) {
   localStorage.setItem(LS_KEY, JSON.stringify(preguntas));
 }
 
-// ══════════════════════════════════════════════════════════
+
 // MODERACIÓN (aprobación de contenido)
 // Regla: si quien crea la pregunta/asignatura es 'admin', queda
 // "aprobado" de inmediato (se confía en el admin). Si es 'colaborador'
 // o 'moderador', queda "pendiente" hasta que un admin la apruebe desde
 // el panel de Admin (tab "Revisión"). Esto evita que un colaborador
 // tenga, en la práctica, los mismos privilegios que un administrador.
-// ══════════════════════════════════════════════════════════
+
 export function estadoSegunRol(rol) {
   return rol === 'admin' ? 'aprobado' : 'pendiente';
 }
@@ -317,7 +316,7 @@ export const eliminarAsignatura = (id) => {
   return Promise.resolve({ deleted: id });
 };
 
-// ⭐ UNICA DECLARACIÓN DE getAsignaturas - eliminé la duplicada
+// UNICA DECLARACIÓN DE getAsignaturas - eliminé la duplicada
 // IMPORTANTE: a diferencia de los reportes, crearAsignatura/editarAsignatura/
 // eliminarAsignatura NUNCA escriben en la API real (solo en Local Storage).
 // Por eso esta función NO debe intentar leer de la API: si lo hiciera y
@@ -375,12 +374,12 @@ export function getPreguntasPorAsignatura(key) {
 
 export const getPreguntasByKey = (key) => getPreguntasPorAsignatura(key);
 
-// ══════════════════════════════════════════════════════════
+
 // ACTIVAR / DESACTIVAR CUESTIONARIOS
 // Permite que un administrador oculte temporalmente una
 // asignatura sin eliminarla. Se guarda solo la lista de
 // keys desactivadas en Local Storage.
-// ══════════════════════════════════════════════════════════
+
 
 const LS_KEY_DESACTIVADAS = 'asignaturas_desactivadas';
 
@@ -443,13 +442,13 @@ export function toggleAsignaturaActiva(key) {
   return estabaDesactivada;
 }
 
-// ══════════════════════════════════════════════════════════
+
 // REPORTES (json-server / server.cjs)
 // Igual que getAsignaturas: primero intenta la API real; si no
 // responde, usa un respaldo en Local Storage para no perder el
 // reporte (ese respaldo NO se ve en el Admin de la API real,
 // solo evita que la app falle).
-// ══════════════════════════════════════════════════════════
+
 
 const LS_KEY_REPORTES = 'reportes_admin_fallback';
 
@@ -492,13 +491,13 @@ export function eliminarReporte(id) {
     });
 }
 
-// ══════════════════════════════════════════════════════════
+
 // REGISTRO DE ACTIVIDAD DEL ADMINISTRADOR
 // Guarda un historial simple de las acciones del admin (crear/editar/
 // eliminar preguntas y asignaturas, activar/desactivar) para mostrarlo
 // en su Perfil, a modo de demostración de la funcionalidad del panel.
 // Solo guarda las últimas 50 acciones para no llenar Local Storage.
-// ══════════════════════════════════════════════════════════
+
 
 const LS_KEY_ACTIVIDAD = 'admin_actividad';
 const MAX_ACTIVIDAD = 50;
