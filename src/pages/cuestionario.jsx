@@ -65,7 +65,7 @@ export default function Cuestionario() {
       <Navbar /> 
       <header>
         {/* Versión escritorio/tablet: imágenes a los costados del texto */}
-        <div className="header-desktop" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem' }}>
+        <div className="header-desktop">
           <img src="/img/app002.jpg" style={{ width: '130px', objectFit: 'contain' }} alt="estudiante" />
           <div>
             <div className="header-badge">App de Estudio · Valeska Ugarte</div>
