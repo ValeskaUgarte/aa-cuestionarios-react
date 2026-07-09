@@ -45,10 +45,13 @@ export default function Login() {
 
           {/* CAMPO EMAIL */}
           <div className="form-group">
-            <label className="input-label">Email</label>
+            <label className="input-label" htmlFor="login-email">Email</label>
             <input
+              id="login-email"
+              name="email"
               className="input"
               type="email"
+              autoComplete="email"
               placeholder="tucorreo@email.com"
               value={form.email}
               onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
@@ -60,10 +63,13 @@ export default function Login() {
 
           {/* CAMPO CONTRASEÑA */}
           <div className="form-group">
-            <label className="input-label">Contraseña</label>
+            <label className="input-label" htmlFor="login-password">Contraseña</label>
             <input
+              id="login-password"
+              name="password"
               className="input"
               type="password"
+              autoComplete="current-password"
               placeholder="••••••••"
               value={form.password}
               onChange={e => setForm(f => ({ ...f, password: e.target.value }))}

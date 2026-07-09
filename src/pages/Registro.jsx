@@ -107,10 +107,13 @@ export default function Registro() {
 
           {/* Campo nombre */}
           <div className="form-group">
-            <label className="input-label">Nombre</label>
+            <label className="input-label" htmlFor="registro-nombre">Nombre</label>
             <input 
+              id="registro-nombre"
+              name="nombre"
               className="input" 
               placeholder="Tu nombre" 
+              autoComplete="name"
               value={form.nombre}
               onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} 
               maxLength={50}
@@ -119,11 +122,14 @@ export default function Registro() {
 
           {/* Campo email */}
           <div className="form-group">
-            <label className="input-label">Email</label>
+            <label className="input-label" htmlFor="registro-email">Email</label>
             <input 
+              id="registro-email"
+              name="email"
               className="input" 
               type="email" 
               placeholder="tucorreo@gmail.com" 
+              autoComplete="email"
               value={form.email}
               onChange={e => setForm(f => ({ ...f, email: e.target.value }))} 
               maxLength={100}
@@ -132,11 +138,14 @@ export default function Registro() {
 
           {/* Campo contraseña */}
           <div className="form-group">
-            <label className="input-label">Contraseña</label>
+            <label className="input-label" htmlFor="registro-password">Contraseña</label>
             <input 
+              id="registro-password"
+              name="password"
               className="input" 
               type="password" 
               placeholder="Mínimo 6 caracteres" 
+              autoComplete="new-password"
               value={form.password}
               onChange={e => setForm(f => ({ ...f, password: e.target.value }))} 
               maxLength={30}
@@ -148,11 +157,14 @@ export default function Registro() {
 
           {/* Campo confirmar contraseña */}
           <div className="form-group">
-            <label className="input-label">Confirmar contraseña</label>
+            <label className="input-label" htmlFor="registro-confirmar">Confirmar contraseña</label>
             <input 
+              id="registro-confirmar"
+              name="confirmar"
               className="input" 
               type="password" 
               placeholder="Repite tu contraseña" 
+              autoComplete="new-password"
               value={form.confirmar}
               onChange={e => setForm(f => ({ ...f, confirmar: e.target.value }))} 
               maxLength={30}
@@ -161,8 +173,10 @@ export default function Registro() {
 
           {/* Selector de rol */}
           <div className="form-group">
-            <label className="input-label">Rol</label>
+            <label className="input-label" htmlFor="registro-rol">Rol</label>
             <select 
+              id="registro-rol"
+              name="rol"
               className="input" 
               value={form.rol} 
               onChange={e => setForm(f => ({ ...f, rol: e.target.value }))}

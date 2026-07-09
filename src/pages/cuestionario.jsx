@@ -110,7 +110,10 @@ export default function Cuestionario() {
               cuestionario (estáticas + creadas por el admin), no solo a
               las asignaturas nuevas */}
           <div className="orden-row">
-            <select className="input orden-select" value={orden} onChange={e => setOrden(e.target.value)}>
+            <label htmlFor="orden-cuestionarios" style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}>
+              Ordenar asignaturas
+            </label>
+            <select id="orden-cuestionarios" name="orden" className="input orden-select" value={orden} onChange={e => setOrden(e.target.value)}>
               <option value="fecha">Más recientes primero</option>
               <option value="nombre">Orden alfabético</option>
             </select>

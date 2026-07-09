@@ -12,6 +12,10 @@ function mezclar(arr) {
   return [...arr].sort(() => Math.random() - 0.5);
 }
 
+// Traducción de la dificultad al español para mostrarla en pantalla
+// (el valor interno 'easy'/'medium'/'hard' se mantiene igual).
+const DIFICULTAD_LABEL = { easy: 'Fácil', medium: 'Media', hard: 'Difícil' };
+
 // HOOKS Parámetros de ruta, navegación y estado de ubicación
 export default function Quiz() {
   const { asignaturaId } = useParams();                    // ID de la asignatura desde la URL
@@ -280,7 +284,7 @@ if (esIdioma && !nivelElegido) {
         {/* TARJETA DE PREGUNTA */}
         <div className="quiz-card">
           <div className="quiz-meta">
-            <span className={`badge badge-${pregunta.dificultad}`}>{pregunta.dificultad}</span>
+            <span className={`badge badge-${pregunta.dificultad}`}>{DIFICULTAD_LABEL[pregunta.dificultad] || pregunta.dificultad}</span>
             {pregunta.profe && <span className="badge badge-profe">📋 Profe</span>}
             <span className="quiz-unidad">{pregunta.unidad}</span>
           </div>

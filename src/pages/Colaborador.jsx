@@ -246,8 +246,10 @@ export default function Colaborador() {
             
             <div className="form-row">
               <div className="form-group" style={{ flex: 2 }}>
-                <label className="input-label">📚 Asignatura</label>
+                <label className="input-label" htmlFor="colab-asignaturaId">📚 Asignatura</label>
                 <select 
+                  id="colab-asignaturaId"
+                  name="asignaturaId"
                   className="input" 
                   value={formP.asignaturaId} 
                   onChange={e => { setFormP(f => ({ ...f, asignaturaId: e.target.value })); setErroresP(er => ({ ...er, asignaturaId: null })); }}
@@ -267,8 +269,10 @@ export default function Colaborador() {
               </div>
               
               <div className="form-group" style={{ flex: 1 }}>
-                <label className="input-label">📊 Dificultad</label>
+                <label className="input-label" htmlFor="colab-dificultad">📊 Dificultad</label>
                 <select 
+                  id="colab-dificultad"
+                  name="dificultad"
                   className="input" 
                   value={formP.dificultad} 
                   onChange={e => setFormP(f => ({ ...f, dificultad: e.target.value }))}
@@ -280,8 +284,10 @@ export default function Colaborador() {
               </div>
               
               <div className="form-group" style={{ flex: 1 }}>
-                <label className="input-label">📂 Unidad</label>
+                <label className="input-label" htmlFor="colab-unidad">📂 Unidad</label>
                 <input 
+                  id="colab-unidad"
+                  name="unidad"
                   className="input" 
                   value={formP.unidad} 
                   onChange={e => setFormP(f => ({ ...f, unidad: e.target.value }))} 
@@ -292,8 +298,10 @@ export default function Colaborador() {
             </div>
             
             <div className="form-group">
-              <label className="input-label">📝 Caso (opcional)</label>
+              <label className="input-label" htmlFor="colab-caso">📝 Caso (opcional)</label>
               <textarea
+                id="colab-caso"
+                name="caso"
                 className="input"
                 rows={2}
                 value={formP.caso}
@@ -306,8 +314,10 @@ export default function Colaborador() {
             </div>
 
             <div className="form-group">
-              <label className="input-label">❓ Pregunta *</label>
+              <label className="input-label" htmlFor="colab-pregunta">❓ Pregunta *</label>
               <textarea 
+                id="colab-pregunta"
+                name="pregunta"
                 className="input" 
                 rows={2} 
                 value={formP.pregunta} 
@@ -320,7 +330,7 @@ export default function Colaborador() {
             </div>
             
             <div className="form-group">
-              <label className="input-label">Opciones de respuesta * ({formP.opciones.length})</label>
+              <label className="input-label" id="colab-opciones-label">Opciones de respuesta * ({formP.opciones.length})</label>
               <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>
                 👆 Selecciona el radio button de la opción correcta
               </p>
@@ -328,12 +338,17 @@ export default function Colaborador() {
                 <div key={i} style={{ marginBottom: '0.5rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                     <input 
+                      id={`colab-correcta${i}`}
                       type="radio" 
                       name="correcta" 
+                      aria-label={`Marcar opción ${String.fromCharCode(65 + i)} como correcta`}
                       checked={formP.respuestaCorrecta === i} 
                       onChange={() => setFormP(f => ({ ...f, respuestaCorrecta: i }))} 
                     />
                     <input 
+                      id={`colab-opcion${i}`}
+                      name={`opcion${i}`}
+                      aria-label={`Opción ${String.fromCharCode(65 + i)}`}
                       className="input" 
                       value={op} 
                       onChange={e => {
@@ -365,8 +380,10 @@ export default function Colaborador() {
             </div>
 
             <div className="form-group">
-              <label className="input-label">💡 Explicación</label>
+              <label className="input-label" htmlFor="colab-explicacion">💡 Explicación</label>
               <textarea 
+                id="colab-explicacion"
+                name="explicacion"
                 className="input" 
                 rows={2} 
                 value={formP.explicacion} 

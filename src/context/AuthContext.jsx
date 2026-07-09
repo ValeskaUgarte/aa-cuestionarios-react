@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
   const guardado = localStorage.getItem('usuario_actual');
     if (guardado) setUsuario(JSON.parse(guardado));
-    setLoading(false); // ← AGREGAR ESTO
+    setLoading(false); 
   }, []);
 
    // LOGIN - Inicia sesión (admin fijo o usuario registrado)

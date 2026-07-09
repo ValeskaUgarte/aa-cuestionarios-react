@@ -17,6 +17,10 @@ import {
 
 // CONFIGURACIÓN INICIAL Valores por defecto para formularios
 const DIFFS = ['easy', 'medium', 'hard'];
+// Traducción de la dificultad al español para mostrarla en pantalla.
+// El valor interno ('easy'/'medium'/'hard') se mantiene igual porque
+// es el que se guarda en la API y el que usan las clases CSS de los badges.
+const DIFICULTAD_LABEL = { easy: 'Fácil', medium: 'Media', hard: 'Difícil' };
 // LÍMITES DE CARACTERES Evita entradas desproporcionadas en los formularios
 const MAX_PREGUNTA = 300;
 const MAX_OPCION = 120;
@@ -76,6 +80,7 @@ export default function Admin() {
   const [filtroAsig, setFiltroAsig] = useState('');   // Filtro por asignatura
   const [formA, setFormA] = useState(EMPTY_A);        // Formulario de asignatura
   const [msg, setMsg] = useState('');                 // Mensajes de feedback
+  const [msgTipo, setMsgTipo] = useState('success');  // 'success' (verde) o 'error' (rojo)
   const [errores, setErrores] = useState({});         // Errores por campo del formulario de pregunta (para mostrar debajo de cada uno)
   const [reportes, setReportes] = useState([]);       // Lista de reportes de errores
   const [desactivadas, setDesactivadas] = useState([]); // Keys de cuestionarios desactivados
@@ -91,8 +96,9 @@ export default function Admin() {
   const [usuarios, setUsuarios] = useState([]);
 
   // FUNCIONES AUXILIARES
-  // Muestra un mensaje temporal (2.5 segundos)
-  function flash(txt) { setMsg(txt); setTimeout(() => setMsg(''), 3200); }
+  // Muestra un mensaje temporal (2.5 segundos). tipo: 'success' | 'error'
+  // (mismo esquema de colores que usan Colaborador/Moderador).
+  function flash(txt, tipo = 'success') { setMsg(txt); setMsgTipo(tipo); setTimeout(() => setMsg(''), 3200); }
 
   // CARGA DE DATOS Obtiene preguntas, asignaturas, reportes y lo pendiente de revisión
   function cargar() {
@@ -156,11 +162,11 @@ export default function Admin() {
     if (form.caso.length > MAX_CASO) nuevosErrores.caso = `El caso no puede superar los ${MAX_CASO} caracteres.`;
 
     setErrores(nuevosErrores);
-    if (Object.keys(nuevosErrores).length) return flash('Revisa los campos marcados en rojo.');
+    if (Object.keys(nuevosErrores).length) return flash('Revisa los campos marcados en rojo.', 'error');
 
     try {
       const asig = asignaturas.find(a => a.key === form.asignaturaId || a._id === form.asignaturaId);
-      if (!asig) return flash('Asignatura no encontrada.');
+      if (!asig) return flash('Asignatura no encontrada.', 'error');
       const payload = {
         ...form,
         pregunta: preguntaLimpia,
@@ -185,19 +191,19 @@ export default function Admin() {
       setErrores({});
       cargar();
     } catch (error) {
-      flash('Error al guardar la pregunta');
+      flash('Error al guardar la pregunta', 'error');
     }
   }
 
   // Agrega una opción de respuesta más (hasta MAX_OPCIONES)
   function agregarOpcion() {
-    if (form.opciones.length >= MAX_OPCIONES) return flash(`Máximo ${MAX_OPCIONES} opciones.`);
+    if (form.opciones.length >= MAX_OPCIONES) return flash(`Máximo ${MAX_OPCIONES} opciones.`, 'error');
     setForm(f => ({ ...f, opciones: [...f.opciones, ''] }));
   }
 
   // Quita la última opción de respuesta (hasta MIN_OPCIONES)
   function quitarOpcion() {
-    if (form.opciones.length <= MIN_OPCIONES) return flash(`Mínimo ${MIN_OPCIONES} opciones.`);
+    if (form.opciones.length <= MIN_OPCIONES) return flash(`Mínimo ${MIN_OPCIONES} opciones.`, 'error');
     setForm(f => {
       const opciones = f.opciones.slice(0, -1);
       // Si la respuesta correcta apuntaba a la opción que quitamos, la reseteamos a la primera
@@ -239,9 +245,9 @@ export default function Admin() {
     const nombreLimpio = formA.nombre.trim();
     const faltantes = [];
     if (!nombreLimpio) faltantes.push('Nombre');
-    if (faltantes.length) return flash(`Faltan campos obligatorios: ${faltantes.join(', ')}.`);
-    if (nombreLimpio.length > MAX_NOMBRE_ASIG) return flash(`El nombre no puede superar los ${MAX_NOMBRE_ASIG} caracteres.`);
-    if (formA.descripcion.length > MAX_DESC_ASIG) return flash(`La descripción no puede superar los ${MAX_DESC_ASIG} caracteres.`);
+    if (faltantes.length) return flash(`Faltan campos obligatorios: ${faltantes.join(', ')}.`, 'error');
+    if (nombreLimpio.length > MAX_NOMBRE_ASIG) return flash(`El nombre no puede superar los ${MAX_NOMBRE_ASIG} caracteres.`, 'error');
+    if (formA.descripcion.length > MAX_DESC_ASIG) return flash(`La descripción no puede superar los ${MAX_DESC_ASIG} caracteres.`, 'error');
     // El admin publica directo (estado 'aprobado'); un colaborador que
     // propone una asignatura desde su panel siempre queda 'pendiente'.
     const payload = { ...formA, nombre: nombreLimpio, key: nombreLimpio.toLowerCase().replace(/\s+/g, '_'), estado: 'aprobado' };
@@ -352,7 +358,7 @@ export default function Admin() {
           </div>
         </div>
 
-        {msg && <div className="admin-flash">{msg}</div>}
+        {msg && <div className={`admin-flash ${msgTipo}`}>{msg}</div>}
 
         <div className="admin-tabs">
           {/* "Revisión" es lo primero que ve un moderador: preguntas y
@@ -423,7 +429,7 @@ export default function Admin() {
                 {preguntasPend.map(p => (
                   <div key={p._id} className="preg-item">
                     <div className="preg-info">
-                      <span className={`badge badge-${p.dificultad || 'medium'}`}>{p.dificultad}</span>
+                      <span className={`badge badge-${p.dificultad || 'medium'}`}>{DIFICULTAD_LABEL[p.dificultad] || 'Media'}</span>
                       <span className="preg-asig">{p.asignatura}</span>
                       <span style={{ fontSize: '0.75rem', color: 'var(--muted)', marginLeft: 'auto' }}>
                         {p.creadoPorNombre || 'desconocido'} ({p.creadoPorRol || '—'})
@@ -502,8 +508,8 @@ export default function Admin() {
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
                   <label htmlFor="dificultad" className="input-label">Dificultad</label>
-                  <select id="dificultad" className="input" value={form.dificultad} onChange={e => setForm(f => ({ ...f, dificultad: e.target.value }))}>
-                    {DIFFS.map(d => <option key={d} value={d}>{d}</option>)}
+                  <select id="dificultad" name="dificultad" className="input" value={form.dificultad} onChange={e => setForm(f => ({ ...f, dificultad: e.target.value }))}>
+                    {DIFFS.map(d => <option key={d} value={d}>{DIFICULTAD_LABEL[d]}</option>)}
                   </select>
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
@@ -528,15 +534,23 @@ export default function Admin() {
                 <CampoError mensaje={errores.pregunta} />
               </div>
 
-              <label className="input-label">Opciones de respuesta * ({form.opciones.length})</label>
+              <label className="input-label" id="opciones-label">Opciones de respuesta * ({form.opciones.length})</label>
               {form.opciones.map((op, i) => (
                 
                 <div className="form-group" key={i}>
-                  {/* <label htmlFor={`opcion${i}`} className="input-label">Opciones de respuesta * ({form.opciones.length})</label> */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                    <input type="radio" name="correcta" checked={form.respuestaCorrecta === i} onChange={() => setForm(f => ({ ...f, respuestaCorrecta: i }))} />
                     <input
-                    id={`opcion${i}`}
+                      id={`correcta${i}`}
+                      type="radio"
+                      name="correcta"
+                      aria-label={`Marcar opción ${String.fromCharCode(65 + i)} como correcta`}
+                      checked={form.respuestaCorrecta === i}
+                      onChange={() => setForm(f => ({ ...f, respuestaCorrecta: i }))}
+                    />
+                    <input
+                      id={`opcion${i}`}
+                      name={`opcion${i}`}
+                      aria-label={`Opción ${String.fromCharCode(65 + i)}`}
                       className="input"
                       value={op}
                       onChange={e => {
@@ -662,8 +676,8 @@ export default function Admin() {
                 <div className="admin-list-header">
                   <h3>{asigDetalle.icono ? `${asigDetalle.icono} ` : ''}{asigDetalle.nombre} ({pregsFiltradas.length})</h3>
                   <div className="select-compact-wrap">
-                    <span className="select-compact-label">Ordenar:</span>
-                    <select className="select-compact" value={ordenPreguntas} onChange={e => setOrdenPreguntas(e.target.value)}>
+                    <label htmlFor="ordenPreguntas" className="select-compact-label">Ordenar:</label>
+                    <select id="ordenPreguntas" name="ordenPreguntas" className="select-compact" value={ordenPreguntas} onChange={e => setOrdenPreguntas(e.target.value)}>
                       <option value="fecha">Recientes</option>
                       <option value="nombre">Alfabético</option>
                     </select>
@@ -677,7 +691,7 @@ export default function Admin() {
                     {pregsFiltradas.map(p => (
                       <div key={p._id || p.id} className="preg-item">
                         <div className="preg-info">
-                          <span className={`badge badge-${p.dificultad}`}>{p.dificultad}</span>
+                          <span className={`badge badge-${p.dificultad}`}>{DIFICULTAD_LABEL[p.dificultad] || p.dificultad}</span>
                           {typeof p.esDelProfesor === 'boolean' && (
                             <span className="badge" style={{ background: p.esDelProfesor ? '#e8f0fe' : '#f4f0fa', color: p.esDelProfesor ? '#3a5aa0' : '#7a6a9a' }}>
                               {p.esDelProfesor ? '📄 Del profesor' : '✏️ Inventada'}
@@ -702,21 +716,21 @@ export default function Admin() {
                   <h3>Nueva asignatura</h3>
                   <div className="form-row">
                     <div className="form-group" style={{ flex: 3 }}>
-                      <label className="input-label">Nombre *</label>
-                      <input className="input" value={formA.nombre} onChange={e => setFormA(f => ({ ...f, nombre: e.target.value }))} placeholder="Ej: Base de Datos" maxLength={MAX_NOMBRE_ASIG} />
+                      <label className="input-label" htmlFor="asig-nombre">Nombre *</label>
+                      <input id="asig-nombre" name="nombre" className="input" value={formA.nombre} onChange={e => setFormA(f => ({ ...f, nombre: e.target.value }))} placeholder="Ej: Base de Datos" maxLength={MAX_NOMBRE_ASIG} />
                     </div>
                     <div className="form-group" style={{ flex: 1 }}>
-                      <label className="input-label">Color</label>
-                      <input type="color" className="input" value={formA.color} onChange={e => setFormA(f => ({ ...f, color: e.target.value }))} style={{ height: '42px', padding: '2px' }} />
+                      <label className="input-label" htmlFor="asig-color">Color</label>
+                      <input id="asig-color" name="color" type="color" className="input" value={formA.color} onChange={e => setFormA(f => ({ ...f, color: e.target.value }))} style={{ height: '42px', padding: '2px' }} />
                     </div>
                     <div className="form-group" style={{ flex: 1 }}>
-                      <label className="input-label">Ícono (emoji, opcional)</label>
-                      <input className="input" value={formA.icono} onChange={e => setFormA(f => ({ ...f, icono: e.target.value.slice(0, 4) }))} placeholder="📚" />
+                      <label className="input-label" htmlFor="asig-icono">Ícono (emoji, opcional)</label>
+                      <input id="asig-icono" name="icono" className="input" value={formA.icono} onChange={e => setFormA(f => ({ ...f, icono: e.target.value.slice(0, 4) }))} placeholder="📚" />
                     </div>
                   </div>
                   <div className="form-group">
-                    <label className="input-label">Descripción</label>
-                    <input className="input" value={formA.descripcion} onChange={e => setFormA(f => ({ ...f, descripcion: e.target.value }))} placeholder="Descripción breve…" maxLength={MAX_DESC_ASIG} />
+                    <label className="input-label" htmlFor="asig-descripcion">Descripción</label>
+                    <input id="asig-descripcion" name="descripcion" className="input" value={formA.descripcion} onChange={e => setFormA(f => ({ ...f, descripcion: e.target.value }))} placeholder="Descripción breve…" maxLength={MAX_DESC_ASIG} />
                   </div>
                   <button className="btn btn-primary" onClick={guardarAsignatura}>Crear asignatura</button>
                 </div>
@@ -724,8 +738,8 @@ export default function Admin() {
                 <div className="admin-list-header">
                   <h3>Asignaturas ({asignaturasOrdenadas.length})</h3>
                   <div className="select-compact-wrap">
-                    <span className="select-compact-label">Ordenar:</span>
-                    <select className="select-compact" value={ordenAsignaturas} onChange={e => setOrdenAsignaturas(e.target.value)}>
+                    <label htmlFor="ordenAsignaturas" className="select-compact-label">Ordenar:</label>
+                    <select id="ordenAsignaturas" name="ordenAsignaturas" className="select-compact" value={ordenAsignaturas} onChange={e => setOrdenAsignaturas(e.target.value)}>
                       <option value="fecha">Recientes</option>
                       <option value="nombre">Alfabético</option>
                     </select>
@@ -748,7 +762,15 @@ export default function Admin() {
                         <p className="asig-nombre">{a.icono ? `${a.icono} ` : ''}{a.nombre}</p>
                         <p className="asig-desc">{a.descripcion}</p>
                       </div>
-                      <button className="btn btn-danger btn-sm" onClick={(e) => { e.stopPropagation(); borrarA(a._id || a.key); }}>Eliminar</button>
+                      <div className="preg-actions" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => { setForm(f => ({ ...f, asignaturaId: a.key || a._id })); setErrores({}); setTab('preguntas'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        >
+                          ➕ Crear pregunta
+                        </button>
+                        <button className="btn btn-danger btn-sm" onClick={() => borrarA(a._id || a.key)}>Eliminar</button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -779,7 +801,7 @@ export default function Admin() {
                       <button className="btn btn-ghost btn-sm" onClick={() => {
                         const preg = preguntas.find(p => p.pregunta === r.pregunta);
                         if (preg) { editarP(preg); setTab('preguntas'); }
-                        else flash('Pregunta no encontrada en el banco.');
+                        else flash('Pregunta no encontrada en el banco.', 'error');
                       }}>
                         ✏️ Ir a la pregunta
                       </button>
