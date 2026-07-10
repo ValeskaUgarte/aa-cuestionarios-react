@@ -13,7 +13,7 @@ import './cuestionario.css';
 // desde el panel de administración, así que se renderiza aparte
 // (ver bloque "ASIGNATURAS CREADAS POR EL ADMINISTRADOR").
 const KEYS_ESTATICAS = [
-  'administracion', 'algebra', 'backend', 'bd_estructurados', 'bd_no_estructurados',
+  'administracion', 'algebra', 'backend', 'bd_estructurados', 'bd_no_estructurados', 'introduccion_programacion_robotica',
   'chino', 'coreano', 'frontend', 'funciones_matrices', 'fundamentos_bd',
   'hardware_software', 'ingenieria_software', 'ingles_avanzado', 'ingles_basico',
   'ingles_intermedio', 'japones', 'lenguaje_css', 'lenguaje_javascript',
@@ -125,10 +125,10 @@ export default function Cuestionario() {
                 combinan en una sola, para que el orden elegido abajo
                 (recientes / alfabético) aplique a TODO el cuestionario,
                 no solo a las asignaturas nuevas. */}
-            {(() => {
-    const estaticas = [
-      { key: 'seguridad_informacion', nombre: 'Seguridad de la Información', el: (
-                    <div className={`subject-card${desactivadas.includes('seguridad_informacion') ? ' subject-disabled' : ''}`} key="static-seguridad_informacion" id="card-seguridad_informacion" onClick={() => irAlQuiz('seguridad_informacion')}>
+              {(() => {
+                const estaticas = [
+                { key: 'seguridad_informacion', nombre: 'Seguridad de la Información', el: (
+                      <div className={`subject-card${desactivadas.includes('seguridad_informacion') ? ' subject-disabled' : ''}`} key="static-seguridad_informacion" id="card-seguridad_informacion" onClick={() => irAlQuiz('seguridad_informacion')}>
                       <img src="img/Seguridad de la Información01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Seguridad de la Información</div>
                       <div className="subject-meta">Prueba 1 · Solo las 32 primeras preguntas son de la prueba</div>
@@ -143,8 +143,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'sistemas_operativos', nombre: 'Sistemas Operativos', el: (
+                    ) },
+                    { key: 'sistemas_operativos', nombre: 'Sistemas Operativos', el: (
                     <div className={`subject-card${desactivadas.includes('sistemas_operativos') ? ' subject-disabled' : ''}`} key="static-sistemas_operativos" id="card-sistemas_operativos" onClick={() => irAlQuiz('sistemas_operativos')}>
                       <img src="img/Sistemas Operativos02.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Sistemas Operativos</div>
@@ -160,8 +160,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'seguridad-examen', nombre: 'Fundamentos de Seguridad de la Información', el: (
+                    ) },
+                    { key: 'seguridad-examen', nombre: 'Fundamentos de Seguridad de la Información', el: (
                     <div className={`subject-card${desactivadas.includes('seguridad-examen') ? ' subject-disabled' : ''}`} key="static-seguridad-examen" id="card-seguridad-examen" onClick={() => irAlQuiz('seguridad-examen')}>
                       <img src="img/Seguridad de la Información02.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Fundamentos de Seguridad de la Información</div>
@@ -177,8 +177,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'algebra', nombre: 'Resolución de Problemas de Álgebra', el: (
+                    ) },
+                    { key: 'algebra', nombre: 'Resolución de Problemas de Álgebra', el: (
                     <div className={`subject-card${desactivadas.includes('algebra') ? ' subject-disabled' : ''}`} key="static-algebra" id="card-algebra" onClick={() => irAlQuiz('algebra')}>
                       <img src="img/Algebra01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Resolución de Problemas de Álgebra</div>
@@ -194,8 +194,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'funciones_matrices', nombre: 'Funciones y Matrices', el: (
+                    ) },
+                    { key: 'funciones_matrices', nombre: 'Funciones y Matrices', el: (
                     <div className={`subject-card${desactivadas.includes('funciones_matrices') ? ' subject-disabled' : ''}`} key="static-funciones_matrices" id="card-funciones_matrices" onClick={() => irAlQuiz('funciones_matrices')}>
                       <img src="img/FuncionesMatrices01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Funciones y Matrices</div>
@@ -211,8 +211,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'metodologia_agil', nombre: 'Metodología de Desarrollo Ágil', el: (
+                    ) },
+                    { key: 'metodologia_agil', nombre: 'Metodología de Desarrollo Ágil', el: (
                     <div className={`subject-card${desactivadas.includes('metodologia_agil') ? ' subject-disabled' : ''}`} key="static-metodologia_agil" id="card-metodologia_agil" onClick={() => irAlQuiz('metodologia_agil')}>
                       <img src="img/Desarrollo Agil01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Metodología de Desarrollo Ágil</div>
@@ -228,8 +228,8 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
-      ) },
-      { key: 'frontend', nombre: 'Programación Front End', el: (
+                    ) },
+                    { key: 'frontend', nombre: 'Programación Front End', el: (
                     <div className={`subject-card${desactivadas.includes('frontend') ? ' subject-disabled' : ''}`} key="static-frontend" id="card-frontend" onClick={() => irAlQuiz('frontend')}>
                       <img src="img/Programación FrontEnd01.JPG" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
                       <div className="subject-name">Programación Front End</div>
@@ -296,6 +296,25 @@ export default function Cuestionario() {
                         </button>
                       )}
                       </div>
+
+                      ) },
+                      { key: 'introduccion_programacion_robotica', nombre: 'Introducción a la Programación y Robótica Aplicada', el: (
+                      <div className={`subject-card${desactivadas.includes('introduccion_programacion_robotica') ? ' subject-disabled' : ''}`} key="static-introduccion_programacion_robotica" id="card-introduccion_programacion_robotica" onClick={() => irAlQuiz('introduccion_programacion_robotica')}>
+                      <img src="img/inRobotica01.jpg" width="20%" height="20%" style={{ display: 'block', margin: '0 auto' }} />
+                      <div className="subject-name">Introducción a la Programación y Robótica Aplicada</div>
+                      <div className="subject-meta">Material de la asignatura</div>
+                      <div><span className="coming-badge">Material - Elaborando cuestionario</span></div>
+                      {/* Solo aparece si hay sesión iniciada */}
+                      {usuario && (
+                        <button
+                          className={`fav-btn ${usuario.favoritas?.includes('introduccion_programacion_robotica') ? 'fav-activa' : ''}`}
+                          onClick={(e) => { e.stopPropagation(); toggleFavorita('introduccion_programacion_robotica'); }}
+                        >
+                          {usuario.favoritas?.includes('introduccion_programacion_robotica') ? 'Guardada' : 'Guardar'}
+                        </button>
+                      )}
+                      </div>
+
                     ) },
                     { key: 'fundamentos_bd', nombre: 'Fundamentos de Base de Datos', el: (
                     <div className={`subject-card${desactivadas.includes('fundamentos_bd') ? ' subject-disabled' : ''}`} key="static-fundamentos_bd" id="card-fundamentos_bd" onClick={() => irAlQuiz('fundamentos_bd')}>

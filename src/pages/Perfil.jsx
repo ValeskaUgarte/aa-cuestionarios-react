@@ -130,7 +130,7 @@ export default function Perfil() {
           )}
         </div>
 
-        {/* ACTIVIDAD DEL ADMINISTRADOR — solo visible para el rol admin,
+        {/* ACTIVIDAD DEL ADMINISTRADOR solo visible para el rol admin,
             muestra sus últimas acciones en el panel como demostración
             de la funcionalidad para la evaluación. */}
         {usuario.rol === 'admin' && (

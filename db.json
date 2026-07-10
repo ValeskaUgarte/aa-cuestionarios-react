@@ -62,48 +62,55 @@
     },
     {
       "id": 11,
+      "key": "introduccion_programacion_robotica",
+      "nombre": "Introducción a la Programación y Robótica Aplicada",
+      "totalPreguntas": 109
+    },
+
+    {
+      "id": 12,
       "key": "hardware_software",
       "nombre": "Fundamentos de Hardware y Software",
       "totalPreguntas": 164
     },
     {
-      "id": 12,
+      "id": 13,
       "key": "prog_html",
       "nombre": "Programación HTML",
       "totalPreguntas": 143
     },
     {
-      "id": 13,
+      "id": 14,
       "key": "ingles_basico",
       "nombre": "Inglés Inicial",
       "totalPreguntas": 0
     },
     {
-      "id": 14,
+      "id": 15,
       "key": "ingles_intermedio",
       "nombre": "Inglés Intermedio",
       "totalPreguntas": 0
     },
     {
-      "id": 15,
+      "id": 16,
       "key": "ingles_avanzado",
       "nombre": "Inglés Avanzado",
       "totalPreguntas": 0
     },
     {
-      "id": 16,
+      "id": 17,
       "key": "japones",
       "nombre": "Japonés",
       "totalPreguntas": 300
     },
     {
-      "id": 17,
+      "id": 18,
       "key": "chino",
       "nombre": "Chino",
       "totalPreguntas": 0
     },
     {
-      "id": 18,
+      "id": 19,
       "key": "coreano",
       "nombre": "Coreano",
       "totalPreguntas": 210

@@ -13,6 +13,7 @@ import preguntas_seguridad_informacion from '../data/preguntas/seguridad_informa
 import preguntas_sistemas_operativos from '../data/preguntas/sistemas_operativos.js';
 import preguntas_frontend from '../data/preguntas/frontend.js'
 import preguntas_bd_estructurados from '../data/preguntas/bd_estructurados.js';
+import preguntas_introduccion_programacion_robotica from '../data/preguntas/introduccion_programacion_robotica.js';
 import preguntas_linux from '../data/preguntas/linux.js';
 import preguntas_hardware_software from '../data/preguntas/hardware_software.js';
 import preguntas_ingles_basico from '../data/preguntas/ingles_basico.js';
@@ -98,6 +99,14 @@ const ASIGNATURAS = [
 
   { key: 'bd_no_estructurados', nombre: 'Base de Datos No Estructurados', icon: '🍃', meta: 'Pendiente: agregar preguntas', badge: 'Material - Aun sin preguntas', preguntas: [] },
    
+   { 
+    key: 'introduccion_programacion_robotica', 
+    nombre: 'Introducción a la Programación y Robótica Aplicada', 
+    meta: 'Pendiente: en desarrollo', 
+    badge: 'Material - actualizandose', 
+    preguntas: preguntas_introduccion_programacion_robotica,
+  },
+
   {
     key: 'hardware_software',
     nombre: 'Fundamentos de Hardware y Software',
@@ -396,6 +405,7 @@ export const LISTA_ASIGNATURAS_ADMIN = [
   { key: 'frontend', nombre: 'Programación Front End' },
   { key: 'backend', nombre: 'Programación Back End' },
   { key: 'bd_estructurados', nombre: 'Base de Datos Estructurados' },
+  { key: 'introduccion_programacion_robotica', nombre: 'Introducción a la Programación y Robótica Aplicada' },
   { key: 'bd_no_estructurados', nombre: 'Base de Datos No Estructurados' },
   { key: 'fundamentos_bd', nombre: 'Fundamentos de Base de Datos' },
   { key: 'administracion', nombre: 'Administración' },
