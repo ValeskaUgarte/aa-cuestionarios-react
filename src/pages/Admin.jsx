@@ -89,11 +89,11 @@ export default function Admin() {
   const [ordenAsignaturas, setOrdenAsignaturas] = useState('fecha'); // 'fecha' o 'nombre'
   const [asigDetalle, setAsigDetalle] = useState(null); // Asignatura cuyo detalle (preguntas) se está viendo, o null
 
-  // ── MODERACIÓN: preguntas y asignaturas pendientes de aprobación ──
+  // MODERACIÓN: preguntas y asignaturas pendientes de aprobación
   const [preguntasPend, setPreguntasPend] = useState([]);
   const [asignaturasPend, setAsignaturasPend] = useState([]);
 
-  // ── MODERADORES: lista de usuarios registrados (solo admin la usa) ──
+  // MODERADORES: lista de usuarios registrados (solo admin la usa)
   const [usuarios, setUsuarios] = useState([]);
 
   // FUNCIONES AUXILIARES
@@ -276,11 +276,10 @@ export default function Admin() {
     cargar();
   }
 
-  // ══════════════════════════════════════════════════════════
   // ACCIONES DEL TAB "REVISIÓN" - aprobar/rechazar lo que enviaron
   // colaboradores y moderadores. Disponibles tanto para admin como
   // para moderador (por eso NO se filtran por esAdmin).
-  // ══════════════════════════════════════════════════════════
+
   async function aprobarPreg(id) {
     await aprobarPregunta(id);
     flash('Pregunta aprobada ✓');
@@ -311,9 +310,9 @@ export default function Admin() {
     cargar();
   }
 
-  // ══════════════════════════════════════════════════════════
+ 
   // ACCIONES DEL TAB "MODERADORES" (solo admin)
-  // ══════════════════════════════════════════════════════════
+ 
   function handleNombrarModerador(id) {
     nombrarModerador(id);
     setUsuarios(listarUsuarios());
@@ -676,7 +675,7 @@ export default function Admin() {
         {esAdmin && tab === 'asignaturas' && (
           <div>
             {asigDetalle ? (
-              // ── DETALLE: preguntas de UNA asignatura, con editar/eliminar ──
+              // DETALLE: preguntas de UNA asignatura, con editar/eliminar
               <div>
                 <button className="btn btn-ghost btn-sm" style={{ marginBottom: '1rem' }} onClick={() => { setAsigDetalle(null); setFiltroAsig(''); }}>
                   ← Volver a Asignaturas
@@ -719,7 +718,7 @@ export default function Admin() {
                 )}
               </div>
             ) : (
-              // ── LISTA: todas las asignaturas (clic entra al detalle) ──
+              //LISTA: todas las asignaturas (clic entra al detalle)
               <div>
                 <div className="admin-form card">
                   <h3>Nueva asignatura</h3>

@@ -183,7 +183,7 @@ function normalizar(p) {
   };
 }
 
-// ── LOCALSTORAGE PREGUNTAS ──
+//LOCALSTORAGE PREGUNTAS
 const LS_KEY = 'preguntas_admin';
 
 function getPreguntasLS() {
@@ -268,7 +268,7 @@ export const getPreguntas = () => {
   return Promise.resolve([...delArchivo, ...delAdmin]);
 };
 
-// ── LOCALSTORAGE ASIGNATURAS ──
+//LOCALSTORAGE ASIGNATURAS
 const LS_KEY_ASIG = 'asignaturas_admin';
 
 function getAsignaturasLS() {

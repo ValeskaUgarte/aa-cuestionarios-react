@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
     if (guardado) setUsuario(JSON.parse(guardado));
     setLoading(false); 
   }, []);
-
+ 
    // LOGIN - Inicia sesión (admin fijo o usuario registrado)
   function login(email, password) {
   const emailLimpio = (email || '').trim().toLowerCase();
@@ -119,13 +119,11 @@ export function AuthProvider({ children }) {
     actualizarUsuario({ historial: [...historial, resultado] });
   }
 
-  // ══════════════════════════════════════════════════════════
   // MODERADORES - El administrador puede nombrar a un usuario
   // registrado (estudiante o colaborador) como "moderador", para que
   // lo ayude a aprobar/rechazar preguntas y asignaturas pendientes.
   // Un moderador NO tiene los permisos completos de admin (no puede
   // nombrar a otros moderadores, ni activar/desactivar cuestionarios).
-  // ══════════════════════════════════════════════════════════
 
   // Devuelve la lista de usuarios registrados (sin la contraseña, para
   // no exponerla en el panel de Admin) — no incluye al admin fijo,
